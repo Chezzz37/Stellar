@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stellar Game Hub/launcher</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Audiowide&family=Bungee&family=Fredoka+One&family=Nosifer&family=Black+Ops+One&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg: #f0f0f0;
+      --text: #222;
+      --menu-bg: #2c3e50;
+      --menu-text: #ecf0f1;
+      --highlight: #5c6ac4;
+      --buy-btn-bg: #3498db;
+      --buy-btn-cursor: pointer;
+      --buy-btn-disabled-bg: #666;
+      --buy-btn-disabled-cursor: default;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+
+    /* Themes (background colors for body) */
+    body.theme-red {
+      background-color: #b94a48;
+      color: #fff;
+    }
+
+    body.theme-orange {
+      background-color: #e67e22;
+      color: #fff;
+    }
+
+    body.theme-yellow {
+      background-color: #f1c40f;
+      color: #222;
+    }
+
+    body.theme-green {
+      background-color: #2ecc71;
+      color: #fff;
+    }
+
+    body.theme-cyan {
+      background-color: #1abc9c;
+      color: #fff;
+    }
+
+    body.theme-blue {
+      background-color: #3498db;
+      color: #fff;
+    }
+
+    body.theme-purple {
+      background-color: #9b59b6;
+      color: #fff;
+    }
+
+    body.theme-pink {
+      background-color: #e91e63;
+      color: #fff;
+    }
+
+    body.theme-black {
+      background-color: #121212;
+      color: #eee;
+    }
+
+    /* Fonts */
+    body.font-bungee {
+      font-family: 'Bungee', cursive, Arial, sans-serif;
+    }
+
+    body.font-fredoka {
+      font-family: 'Fredoka One', cursive, Arial, sans-serif;
+    }
+
+    body.font-blackops {
+      font-family: 'Black Ops One', cursive, Arial, sans-serif;
+    }
+
+    body.font-nosifer {
+      font-family: 'Nosifer', cursive, Arial, sans-serif;
+    }
+
+    body.font-audiowide {
+      font-family: 'Audiowide', cursive, Arial, sans-serif;
+    }
+
+    /* Top menu */
+    .top-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: var(--menu-bg);
+      color: var(--menu-text);
+      display: flex;
+      align-items: center;
+      padding: 0 8px;
+      height: 48px;
+      font-weight: 600;
+      font-size: 14px;
+      z-index: 1000;
+      user-select: none;
+    }
+
+    .top-menu > .balance {
+      margin-left: auto;
+      margin-right: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #f39c12;
+    }
+
+    .menu-item {
+      position: relative;
+      padding: 12px 16px;
+      cursor: pointer;
+    }
+
+    .menu-item:hover,
+    .menu-item:focus {
+      background-color: #34495e;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: var(--menu-bg);
+      min-width: 190px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      z-index: 1100;
+      top: 48px;
+      left: 0;
+      border-radius: 0 0 6px 6px;
+      overflow: auto;
+      max-height: 250px;
+    }
+
+    .dropdown-content > div,
+    .dropdown-content > button {
+      color: var(--menu-text);
+      padding: 10px 16px;
+      text-align: left;
+      border: none;
+      background: none;
+      width: 100%;
+      cursor: pointer;
+      font-size: 14px;
+      white-space: nowrap;
+      border-bottom: 1px solid #3a4a62;
+      display: inline-flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dropdown-content > div:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-content > div:hover,
+    .dropdown-content > button:hover,
+    .dropdown-content > div.buy-disabled {
+      background-color: #3a4a62;
+    }
+
+    .menu-item:hover > .dropdown-content,
+    .menu-item:focus-within > .dropdown-content {
+      display: block;
+    }
+
+    /* Search bar inside top menu */
+    .search-container {
+      display: flex;
+      align-items: center;
+      margin-left: 16px;
+      margin-right: 12px;
+      flex-grow: 1;
+      max-width: 400px;
+    }
+
+    #searchInput {
+      width: 100%;
+      padding: 6px 10px;
+      font-size: 13px;
+      border: 2px solid var(--highlight);
+      border-radius: 4px;
+      outline: none;
+      color: var(--text);
+      background-color: #fff;
+      transition: border-color 0.3s ease;
+    }
+
+    #searchInput:focus {
+      border-color: var(--menu-bg);
+    }
+
+    /* Games grid */
+    #gamesGrid {
+      margin: 0 auto 60px;
+      max-width: 900px;
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      padding: 0 16px 32px;
+      user-select: none;
+    }
+
+    .game-card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      position: relative;
+    }
+
+    .game-card img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 10px;
+      user-select: none;
+    }
+
+    .game-title {
+      text-align: center;
+      margin: 8px 0 4px;
+      font-weight: 700;
+      font-size: 18px;
+      user-select: text;
+      color: #000000;
+    }
+
+    .game-category {
+      font-size: 12px;
+      color: #000000;
+      text-align: center;
+      margin-bottom: 8px;
+      user-select: text;
+    }
+
+    .game-description {
+      font-size: 13px;
+      flex-grow: 1;
+      margin-bottom: 8px;
+      user-select: text;
+      white-space: pre-line;
+      color: #000000;
+    }
+
+    .game-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .buy-btn, .sell-btn-game {
+      background-color: var(--buy-btn-bg);
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      font-weight: 600;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: var(--buy-btn-cursor);
+      user-select: none;
+      min-width: 80px;
+      transition: background-color 0.3s ease;
+    }
+
+    .buy-btn:disabled,
+    .buy-btn.buy-disabled,
+    .sell-btn-game:disabled {
+      background-color: var(--buy-btn-disabled-bg);
+      cursor: var(--buy-btn-disabled-cursor);
+    }
+
+    .buy-btn:hover:not(:disabled),
+    .sell-btn-game:hover:not(:disabled) {
+      background-color: #2980b9;
+    }
+
+    .cost {
+      font-weight: 700;
+      font-size: 14px;
+      user-select: none;
+      color: #27ae60;
+      margin-right: 10px;
+      white-space: nowrap;
+    }
+
+    /* Sell button common style */
+    .sell-btn {
+      background-color: #e74c3c;
+      color: #fff;
+      border: none;
+      padding: 4px 8px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      user-select: none;
+      margin-left: 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background-color 0.3s ease;
+    }
+
+    .sell-btn:hover:not(:disabled) {
+      background-color: #c0392b;
+    }
+
+    /* Favorites star */
+    .star-fav {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 22px;
+      cursor: pointer;
+      color: #bbb;
+      user-select: none;
+      transition: color 0.3s ease;
+      user-drag: none;
+      user-select: none;
+    }
+
+    .star-fav.favorited {
+      color: #f39c12;
+      text-shadow: 0 0 3px #f39c12;
+    }
+
+    /* Modal game iframe */
+    #gameModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 48px;
+      z-index: 2000;
+      user-select: none;
+    }
+
+    #gameModal iframe {
+      width: 90vw;
+      height: 80vh;
+      border: none;
+      border-radius: 10px;
+      background: #000;
+    }
+
+    #gameModal button.close-game {
+      position: fixed;
+      top: 8px;
+      right: 12px;
+      background-color: #f44336;
+      border: none;
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      z-index: 3000;
+      user-select: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: background-color 0.3s ease;
+    }
+
+    #gameModal button.close-game:hover {
+      background-color: #d32f2f;
+    }
+
+    /* Scroll for dropdown with large list */
+    .dropdown-content {
+      scrollbar-width: thin;
+      scrollbar-color: #34495e transparent;
+    }
+
+    .dropdown-content::-webkit-scrollbar {
+      width: 6px;
+    }
+    .dropdown-content::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .dropdown-content::-webkit-scrollbar-thumb {
+      background-color: #34495e;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-menu" role="navigation" aria-label="Main menu">
+    <div class="menu-item" tabindex="0" aria-haspopup="true" aria-expanded="false" id="settingsMenu">
+      Settings ▼
+      <div class="dropdown-content" role="menu" aria-label="Settings submenu">
+        <div role="menuitem" aria-haspopup="true" tabindex="0" id="themeShopBtn">Theme Shop</div>
+        <div id="themeOptions" style="display:none; padding-left:16px;">
+          <button data-theme="red" data-cost="200" class="buy-theme-btn" type="button">Red (200)</button>
+          <button data-theme="orange" data-cost="200" class="buy-theme-btn" type="button">Orange (200)</button>
+          <button data-theme="yellow" data-cost="200" class="buy-theme-btn" type="button">Yellow (200)</button>
+          <button data-theme="green" data-cost="200" class="buy-theme-btn" type="button">Green (200)</button>
+          <button data-theme="cyan" data-cost="200" class="buy-theme-btn" type="button">Cyan (200)</button>
+          <button data-theme="blue" data-cost="200" class="buy-theme-btn" type="button">Blue (200)</button>
+          <button data-theme="purple" data-cost="200" class="buy-theme-btn" type="button">Purple (200)</button>
+          <button data-theme="pink" data-cost="200" class="buy-theme-btn" type="button">Pink (200)</button>
+          <button data-theme="black" data-cost="200" class="buy-theme-btn" type="button">Black Background (200)</button>
+        </div>
+        <div role="menuitem" aria-haspopup="true" tabindex="0" id="fontShopBtn" style="margin-top:8px;">Font Shop</div>
+        <div id="fontOptions" style="display:none; padding-left:16px;">
+          <button data-font="bungee" data-cost="150" class="buy-font-btn" type="button">Bungee (150)</button>
+          <button data-font="fredoka" data-cost="250" class="buy-font-btn" type="button">Fredoka One (250)</button>
+          <button data-font="blackops" data-cost="300" class="buy-font-btn" type="button">Black Ops One (300)</button>
+          <button data-font="nosifer" data-cost="350" class="buy-font-btn" type="button">Nosifer (350)</button>
+          <button data-font="audiowide" data-cost="400" class="buy-font-btn" type="button">Audiowide (400)</button>
+        </div>
+        
+        <div role="menuitem" tabindex="0" id="creditsBtn" style="margin-top:8px;">Credits</div>
+        <div id="creditsContent" style="display:none; padding-left:16px; white-space: pre-wrap; font-size: 13px;">
+          <!-- Credits will go here when you add them -->
+          <i>Will put credits later.</i>
+        </div>
+        <div role="menuitem" tabindex="0" id="infoBtn" style="margin-top:8px;">Info</div>
+        <div id="infoContent" style="display:none; padding-left:16px; font-size: 13px; white-space: pre-wrap;">
+          Wsp guys! I'm chez! I started this project one april night, trying to bring the fun of games to everyone wherever they are. Have fun with my site!
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-item" tabindex="0" id="investMenuBtn" aria-haspopup="true" aria-expanded="false">
+      Invest ▼
+      <div class="dropdown-content" role="menu" aria-label="Invest submenu" id="investMenu" style="max-height: 260px;">
+        <!-- Companies injected by JS -->
+      </div>
+    </div>
+
+    <div class="balance" aria-live="polite" aria-atomic="true" id="coinBalance" title="Your current coin balance">
+      Coins: 3000
+    </div>
+
+    <section class="search-container" aria-label="Game search">
+      <input
+        type="search"
+        id="searchInput"
+        placeholder="Search Thingies..."
+        aria-label="Search games"
+        autocomplete="off"
+      />
+    </section>
+  </nav>
+
+ <main>
+  <h1 style="text-align:center; color: #505050; user-select:none; margin-top: 64px;">
+    Stellar - Game Hub/Launcher
+  </h1>
+
+  <h2 style="text-align:center; color: #505050; user-select:none; margin-top: 16px;">
+    Your Entertainment lies here!
+  </h2>
+
+  <section id="gamesGrid" aria-live="polite" aria-atomic="false" aria-label="List of games">
+    <!-- Game cards injected by JS -->
+  </section>
+</main>
+
+
+  <!-- Game iframe modal -->
+  <section role="dialog" aria-modal="true" aria-label="Game window" id="gameModal">
+    <button class="close-game" aria-label="Close game window">✕ Close</button>
+    <iframe src="" title="Game window" id="gameFrame" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+  </section>
+
+  <script>
+    (() => {
+      // Initial state
+      let coinBalance = 3000;
+      const purchasedThemes = new Set();
+      const purchasedFonts = new Set();
+      const purchasedGames = new Set();
+      const favorites = new Set();
+
+      // Store last selected theme and font
+      let currentTheme = "";
+      let currentFont = "";
+
+      // Companies for invest
+      const companies = [
+        { name: "AstroTech", desc: "Leading space tech innovator." },
+        { name: "StarDynamics", desc: "Futuristic propulsion systems." },
+        { name: "GalaxySoft", desc: "Top space simulation games." },
+        { name: "CosmoEnergy", desc: "Renewable cosmic energy." },
+        { name: "NovaWorks", desc: "Advanced AI for space missions." },
+        { name: "OrbitalNetworks", desc: "Space communication tech." },
+        { name: "QuantumSat", desc: "Quantum satellite networks." },
+        { name: "SolarFlare", desc: "Solar absorption technology." },
+        { name: "MeteorMines", desc: "Asteroid mining experts." },
+        { name: "LunarLogistics", desc: "Moon transport services." },
+      ];
+
+      // Dummy games data
+      const gamesData = [
+        {
+          id: "game1",
+          title: "Galaxy Racer",
+          category: "Racing",
+          description: "Race through the stars at warp speed! Dodge asteroids and opponents. Thrilling space adrenaline.",
+          cost: 400,
+          image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+          url: "https://example.com/game1.html",
+        },
+        {
+          id: "game2",
+          title: "Space Miner",
+          category: "Strategy",
+          description: "Mine precious minerals from asteroids and build your interstellar empire. Resource management gameplay.",
+          cost: 350,
+          image: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=600&q=80",
+          url: "https://example.com/game2.html",
+        },
+        {
+          id: "game3",
+          title: "Alien Invasion",
+          category: "Shooter",
+          description: "Defend Earth against alien hordes in this fast-paced shooter. Upgrade weapons and gadgets.",
+          cost: 500,
+          image: "https://images.unsplash.com/photo-1555435029-84dfe875bebb?auto=format&fit=crop&w=600&q=80",
+          url: "https://example.com/game3.html",
+        },
+        {
+          id: "game4",
+          title: "Orbit Puzzle",
+          category: "Puzzle",
+          description: "Solve mind-bending puzzles to save stranded astronauts. Space-themed logic challenge.",
+          cost: 300,
+          image: "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=600&q=80",
+          url: "https://example.com/game4.html",
+        },
+        {
+          id: "game5",
+          title: "Star Colony",
+          category: "Simulation",
+          description: "Build and manage your own star colony in an alien world. Strategic and economic simulation.",
+          cost: 450,
+          image: "https://images.unsplash.com/photo-1558981403-cb76e53be555?auto=format&fit=crop&w=600&q=80",
+          url: "https://example.com/game5.html",
+        },
+      ];
+
+      // Helpers
+      const updateBalance = () => {
+        const balEl = document.getElementById("coinBalance");
+        balEl.textContent = `Coins: ${coinBalance}`;
+        balEl.style.color = coinBalance <= 0 ? "#c0392b" : "#f39c12";
+      };
+
+      // Load from localStorage (persisting)
+      const loadState = () => {
+        try {
+          const savedBal = localStorage.getItem("stellar_coinBalance");
+          if (savedBal !== null) {
+            coinBalance = parseInt(savedBal);
+          }
+          const savedThemes = JSON.parse(localStorage.getItem("stellar_purchasedThemes") || "[]");
+          savedThemes.forEach(t => purchasedThemes.add(t));
+          const savedFonts = JSON.parse(localStorage.getItem("stellar_purchasedFonts") || "[]");
+          savedFonts.forEach(f => purchasedFonts.add(f));
+          const savedGames = JSON.parse(localStorage.getItem("stellar_purchasedGames") || "[]");
+          savedGames.forEach(g => purchasedGames.add(g));
+          const savedFavorites = JSON.parse(localStorage.getItem("stellar_favorites") || "[]");
+          savedFavorites.forEach(fav => favorites.add(fav));
+          currentTheme = localStorage.getItem("stellar_currentTheme") || "";
+          currentFont = localStorage.getItem("stellar_currentFont") || "";
+        } catch {
+          // ignore JSON parse errors
+        }
+      };
+
+      const saveState = () => {
+        localStorage.setItem("stellar_coinBalance", coinBalance);
+        localStorage.setItem("stellar_purchasedThemes", JSON.stringify([...purchasedThemes]));
+        localStorage.setItem("stellar_purchasedFonts", JSON.stringify([...purchasedFonts]));
+        localStorage.setItem("stellar_purchasedGames", JSON.stringify([...purchasedGames]));
+        localStorage.setItem("stellar_favorites", JSON.stringify([...favorites]));
+        localStorage.setItem("stellar_currentTheme", currentTheme);
+        localStorage.setItem("stellar_currentFont", currentFont);
+      };
+
+      // Apply current theme/font classes
+      const applyTheme = () => {
+        document.body.className = ""; // clear all
+        if (currentTheme) {
+          document.body.classList.add(`theme-${currentTheme}`);
+        }
+        if (currentFont) {
+          document.body.classList.add(`font-${currentFont}`);
+        }
+      };
+
+      // ----- INVEST -----
+      const investMenu = document.getElementById("investMenu");
+
+      const renderInvestMenu = () => {
+        investMenu.innerHTML = "";
+        companies.forEach((c, idx) => {
+          const div = document.createElement("div");
+          div.tabIndex = 0;
+          div.role = "menuitem";
+          div.className = "invest-company";
+          div.dataset.idx = idx;
+          div.style.userSelect = "none";
+          div.textContent = `${c.name} — ${c.desc}`;
+          investMenu.appendChild(div);
+        });
+      };
+
+      const investAmountPrompt = (companyName) => {
+        let amount = window.prompt(`Enter amount of coins to invest in ${companyName} (you have ${coinBalance} coins):`, "0");
+        if (amount === null) return null;
+        amount = parseInt(amount.trim());
+        if (isNaN(amount) || amount <= 0) {
+          alert("Please enter a valid positive number.");
+          return null;
+        }
+        if (amount > coinBalance) {
+          alert("You do not have enough coins.");
+          return null;
+        }
+        return amount;
+      };
+
+      // ----- THEMES & FONTS -----
+      const themeShopBtn = document.getElementById("themeShopBtn");
+      const fontShopBtn = document.getElementById("fontShopBtn");
+      const creditsBtn = document.getElementById("creditsBtn");
+      const infoBtn = document.getElementById("infoBtn");
+
+      const themeOptions = document.getElementById("themeOptions");
+      const fontOptions = document.getElementById("fontOptions");
+      const creditsContent = document.getElementById("creditsContent");
+      const infoContent = document.getElementById("infoContent");
+
+      const hideAllSettingsSubmenus = () => {
+        themeOptions.style.display = "none";
+        fontOptions.style.display = "none";
+        creditsContent.style.display = "none";
+        infoContent.style.display = "none";
+      };
+
+      themeShopBtn.addEventListener("click", () => {
+        const shown = themeOptions.style.display === "block";
+        hideAllSettingsSubmenus();
+        themeOptions.style.display = shown ? "none" : "block";
+      });
+
+      fontShopBtn.addEventListener("click", () => {
+        const shown = fontOptions.style.display === "block";
+        hideAllSettingsSubmenus();
+        fontOptions.style.display = shown ? "none" : "block";
+      });
+
+      creditsBtn.addEventListener("click", () => {
+        const shown = creditsContent.style.display === "block";
+        hideAllSettingsSubmenus();
+        creditsContent.style.display = shown ? "none" : "block";
+      });
+
+      infoBtn.addEventListener("click", () => {
+        const shown = infoContent.style.display === "block";
+        hideAllSettingsSubmenus();
+        infoContent.style.display = shown ? "none" : "block";
+      });
+
+      // Selling functions
+      function sellTheme(themeId) {
+        const sellValue = 100; // half cost 200/2
+        if (!purchasedThemes.has(themeId)) return;
+        if (!confirm(`Sell theme "${themeId}" for ${sellValue} coins?`)) return;
+        purchasedThemes.delete(themeId);
+        if (currentTheme === themeId) currentTheme = "";
+        coinBalance += sellValue;
+        applyTheme();
+        updateBalance();
+        updateBuyButtons();
+        saveState();
+        alert(`Sold theme "${themeId}" for ${sellValue} coins.`);
+      }
+
+      function sellFont(fontId) {
+        const btn = document.querySelector(`.buy-font-btn[data-font="${fontId}"]`);
+        const cost = btn ? parseInt(btn.dataset.cost) : 0;
+        const sellValue = Math.floor(cost / 2);
+        if (!purchasedFonts.has(fontId)) return;
+        if (!confirm(`Sell font "${fontId}" for ${sellValue} coins?`)) return;
+        purchasedFonts.delete(fontId);
+        if (currentFont === fontId) currentFont = "";
+        coinBalance += sellValue;
+        applyTheme();
+        updateBalance();
+        updateBuyButtons();
+        saveState();
+        alert(`Sold font "${fontId}" for ${sellValue} coins.`);
+      }
+
+      function sellGame(gameId) {
+        const game = gamesData.find(g => g.id === gameId);
+        if (!game) return;
+        const sellValue = Math.floor(game.cost / 2);
+        if (!purchasedGames.has(gameId)) return;
+        if (!confirm(`Sell game "${game.title}" for ${sellValue} coins?`)) return;
+        purchasedGames.delete(gameId);
+        coinBalance += sellValue;
+        updateBalance();
+        updateBuyButtons();
+        saveState();
+        alert(`Sold game "${game.title}" for ${sellValue} coins.`);
+      }
+
+      // Buying Themes
+      const buyThemeButtons = document.querySelectorAll(".buy-theme-btn");
+      buyThemeButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const theme = btn.dataset.theme;
+          const cost = parseInt(btn.dataset.cost);
+          if (purchasedThemes.has(theme)) {
+            // Select this theme
+            currentTheme = theme;
+            applyTheme();
+            saveState();
+            alert(`Theme "${theme}" applied.`);
+          } else {
+            if (coinBalance < cost) {
+              alert("Not enough coins to buy this theme.");
+              return;
+            }
+            if (
+              confirm(`Buy theme "${theme}" for ${cost} coins?`)
+            ) {
+              coinBalance -= cost;
+              purchasedThemes.add(theme);
+              currentTheme = theme;
+              applyTheme();
+              updateBalance();
+              saveState();
+              updateBuyButtons();
+              alert(`Theme "${theme}" bought and applied!`);
+            }
+          }
+        });
+      });
+
+      // Buying Fonts
+      const buyFontButtons = document.querySelectorAll(".buy-font-btn");
+      buyFontButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const font = btn.dataset.font;
+          const cost = parseInt(btn.dataset.cost);
+          if (purchasedFonts.has(font)) {
+            // Select this font
+            currentFont = font;
+            applyTheme();
+            saveState();
+            alert(`Font "${font}" applied.`);
+          } else {
+            if (coinBalance < cost) {
+              alert("Not enough coins to buy this font.");
+              return;
+            }
+            if (
+              confirm(`Buy font "${font}" for ${cost} coins?`)
+            ) {
+              coinBalance -= cost;
+              purchasedFonts.add(font);
+              currentFont = font;
+              applyTheme();
+              updateBalance();
+              saveState();
+              updateBuyButtons();
+              alert(`Font "${font}" bought and applied!`);
+            }
+          }
+        });
+      });
+
+      // Update buy buttons style for themes/fonts/games
+      function updateBuyButtons() {
+        buyThemeButtons.forEach(btn => {
+          const t = btn.dataset.theme;
+          if (purchasedThemes.has(t)) {
+            btn.textContent = (currentTheme === t ? '★ ' : '') + capitalize(t) + " (Owned)";
+            btn.disabled = false;
+            btn.classList.remove("buy-disabled");
+
+            // Add sell button if not exists
+            if (!btn.nextElementSibling || !btn.nextElementSibling.classList.contains('sell-btn')) {
+              const sellBtn = document.createElement('button');
+              sellBtn.textContent = 'Sell';
+              sellBtn.className = 'sell-btn';
+              sellBtn.type = 'button';
+              sellBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sellTheme(t);
+              });
+              btn.parentNode.insertBefore(sellBtn, btn.nextSibling);
+            }
+          } else {
+            btn.textContent = capitalize(t) + ` (${btn.dataset.cost})`;
+            btn.disabled = false;
+            btn.classList.remove("buy-disabled");
+            // Remove sell button if exists
+            if (btn.nextElementSibling && btn.nextElementSibling.classList.contains('sell-btn')) {
+              btn.nextElementSibling.remove();
+            }
+          }
+        });
+
+        buyFontButtons.forEach(btn => {
+          const f = btn.dataset.font;
+          if (purchasedFonts.has(f)) {
+            btn.textContent = (currentFont === f ? '★ ' : '') + fontLabel(f) + " (Owned)";
+            btn.disabled = false;
+            btn.classList.remove("buy-disabled");
+
+            // Add sell button if not exists
+            if (!btn.nextElementSibling || !btn.nextElementSibling.classList.contains('sell-btn')) {
+              const sellBtn = document.createElement('button');
+              sellBtn.textContent = 'Sell';
+              sellBtn.className = 'sell-btn';
+              sellBtn.type = 'button';
+              sellBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sellFont(f);
+              });
+              btn.parentNode.insertBefore(sellBtn, btn.nextSibling);
+            }
+          } else {
+            btn.textContent = fontLabel(f) + ` (${btn.dataset.cost})`;
+            btn.disabled = false;
+            btn.classList.remove("buy-disabled");
+            // Remove sell button if exists
+            if (btn.nextElementSibling && btn.nextElementSibling.classList.contains('sell-btn')) {
+              btn.nextElementSibling.remove();
+            }
+          }
+        });
+
+        // Games buy/play/sell buttons
+        gamesData.forEach(game => {
+          const btn = document.querySelector(`.game-card[data-id="${game.id}"] button.buy-btn`);
+          if (!btn) return;
+          if (purchasedGames.has(game.id)) {
+            btn.textContent = "Sell";
+            btn.disabled = false;
+            btn.classList.remove("buy-disabled");
+            btn.onclick = () => {
+              sellGame(game.id);
+            };
+          } else {
+            btn.textContent = `Buy (${game.cost})`;
+            btn.disabled = coinBalance < game.cost;
+            btn.classList.toggle("buy-disabled", coinBalance < game.cost);
+            btn.onclick = () => {
+              if (coinBalance < game.cost) {
+                alert("Not enough coins to buy this game.");
+                return;
+              }
+              if (confirm(`Buy "${game.title}" for ${game.cost} coins?`)) {
+                coinBalance -= game.cost;
+                purchasedGames.add(game.id);
+                updateBalance();
+                updateBuyButtons();
+                saveState();
+                alert(`You bought "${game.title}"! You can now play it or sell it.`);
+              }
+            };
+          }
+        });
+      }
+
+      // Capitalize helper
+      function capitalize(str) {
+        if (!str) return "";
+        return str.charAt(0).toUpperCase() + str.slice(1);
+      }
+
+      // Font label helper (map internal font id to human-readable)
+      function fontLabel(id) {
+        const map = {
+          bungee: "Bungee",
+          fredoka: "Fredoka One",
+          blackops: "Black Ops One",
+          nosifer: "Nosifer",
+          audiowide: "Audiowide",
+        };
+        return map[id] || id;
+      }
+
+      // ----- GAMES -----
+      const gamesGrid = document.getElementById("gamesGrid");
+
+      // Create game cards
+      function createGameCard(game) {
+        const card = document.createElement("article");
+        card.className = "game-card";
+        card.dataset.id = game.id;
+        card.setAttribute("tabindex", "0");
+        card.setAttribute("aria-label", `${game.title}, category: ${game.category}. Cost ${game.cost} coins.`);
+
+        // Favorites star
+        const star = document.createElement("span");
+        star.className = "star-fav";
+        star.role = "button";
+        star.setAttribute("aria-label", "Toggle favorite");
+        star.tabIndex = 0;
+        star.innerHTML = favorites.has(game.id) ? "★" : "☆";
+        if (favorites.has(game.id)) star.classList.add("favorited");
+        star.addEventListener("click", () => toggleFavorite(game.id, star));
+        star.addEventListener("keydown", e => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggleFavorite(game.id, star);
+          }
+        });
+        card.appendChild(star);
+
+        // Image
+        const img = document.createElement("img");
+        img.src = game.image;
+        img.alt = `${game.title} thumbnail`;
+        img.draggable = false;
+        card.appendChild(img);
+
+        // Title
+        const title = document.createElement("h2");
+        title.className = "game-title";
+        title.textContent = game.title;
+        card.appendChild(title);
+
+        // Category
+        const cat = document.createElement("div");
+        cat.className = "game-category";
+        cat.textContent = `Category: ${game.category}`;
+        card.appendChild(cat);
+
+        // Description
+        const desc = document.createElement("p");
+        desc.className = "game-description";
+        desc.textContent = game.description;
+        card.appendChild(desc);
+
+        // Bottom: cost + buy/play/sell button
+        const bottom = document.createElement("div");
+        bottom.className = "game-bottom";
+
+        const costSpan = document.createElement("span");
+        costSpan.className = "cost";
+        costSpan.textContent = `${game.cost} coins`;
+        bottom.appendChild(costSpan);
+
+        const buyBtn = document.createElement("button");
+        buyBtn.type = "button";
+        buyBtn.className = "buy-btn";
+        buyBtn.tabIndex = 0;
+        bottom.appendChild(buyBtn);
+
+        buyBtn.addEventListener("click", () => {
+          if (purchasedGames.has(game.id)) {
+            // Sell button now triggers selling
+            sellGame(game.id);
+          } else {
+            if (coinBalance < game.cost) {
+              alert("Not enough coins to buy this game.");
+              return;
+            }
+            if (confirm(`Buy "${game.title}" for ${game.cost} coins?`)) {
+              coinBalance -= game.cost;
+              purchasedGames.add(game.id);
+              updateBalance();
+              updateBuyButtons();
+              saveState();
+              alert(`You bought "${game.title}"! You can now play it or sell it.`);
+            }
+          }
+        });
+
+        card.appendChild(bottom);
+        return card;
+      }
+
+      // Toggle favorite star
+      function toggleFavorite(gameId, starEl) {
+        if (favorites.has(gameId)) {
+          favorites.delete(gameId);
+          starEl.classList.remove("favorited");
+          starEl.textContent = "☆";
+        } else {
+          favorites.add(gameId);
+          starEl.classList.add("favorited");
+          starEl.textContent = "★";
+        }
+        saveState();
+      }
+
+      // Render all games
+      function renderGames() {
+        gamesGrid.innerHTML = "";
+        const search = document.getElementById("searchInput").value.toLowerCase().trim();
+
+        // Filter and sort: favorites on top
+        const sortedGames = [...gamesData]
+          .filter(g => {
+            const haystack = (g.title + " " + g.category + " " + g.description).toLowerCase();
+            return haystack.includes(search);
+          })
+          .sort((a,b) => {
+            const aFav = favorites.has(a.id);
+            const bFav = favorites.has(b.id);
+            if (aFav && !bFav) return -1;
+            if (!aFav && bFav) return 1;
+            return 0;
+          });
+
+        sortedGames.forEach(game => {
+          const card = createGameCard(game);
+          gamesGrid.appendChild(card);
+        });
+
+        updateBuyButtons();
+      }
+
+      // Game modal open/close
+      const gameModal = document.getElementById("gameModal");
+      const gameFrame = document.getElementById("gameFrame");
+      const closeGameBtn = gameModal.querySelector("button.close-game");
+
+      function openGame(game) {
+        gameFrame.src = game.url || "about:blank";
+        gameModal.style.display = "flex";
+        closeGameBtn.focus();
+      }
+
+      function closeGame() {
+        gameModal.style.display = "none";
+        gameFrame.src = "";
+      }
+
+      closeGameBtn.addEventListener("click", closeGame);
+
+      // Invest menu click
+      investMenu.addEventListener("click", e => {
+        if (e.target && e.target.matches(".invest-company")) {
+          const idx = parseInt(e.target.dataset.idx);
+          if (isNaN(idx) || idx < 0 || idx >= companies.length) return;
+          const company = companies[idx];
+          let amount = investAmountPrompt(company.name);
+          if (amount === null) return;
+
+          // Simulate result
+          const gainOrLose = Math.random() < 0.5 ? "gain" : "loss";
+          let multiplier = 1;
+          if (gainOrLose === "gain") {
+            multiplier = (Math.random() * 49) + 1;  // 1x to 50x
+          } else {
+            multiplier = Math.random() * 0.002; // 0 to 0.002 (meaning loss up to 99.8%)
+          }
+
+          let outcomeCoins;
+          let resultText;
+          if (gainOrLose === "gain") {
+            outcomeCoins = Math.floor(amount * multiplier);
+            coinBalance += outcomeCoins; // gain amount equals amount * multiplier
+            resultText = `Congrats! Your investment in ${company.name} yielded ${outcomeCoins} coins (${multiplier.toFixed(
+              2
+            )}x).`;
+          } else {
+            outcomeCoins = Math.floor(amount * multiplier);
+            const lost = amount - outcomeCoins;
+            coinBalance -= lost;
+            if (coinBalance < 0) coinBalance = 0;
+            resultText = `Oh no! Your investment in ${company.name} lost ${lost} coins (${(100 - multiplier * 100).toFixed(
+              2
+            )}% loss).`;
+          }
+
+          updateBalance();
+          saveState();
+          alert(resultText);
+          updateBuyButtons();
+        }
+      });
+      
+      // Search filter input
+      document.getElementById("searchInput").addEventListener("input", renderGames);
+
+      // Initial setup
+      loadState();
+      applyTheme();
+      updateBalance();
+      renderInvestMenu();
+      renderGames();
+      updateBuyButtons();
+
+      // Close modal with ESC key
+      document.addEventListener("keydown", e => {
+        if (e.key === "Escape" && gameModal.style.display === "flex") {
+          closeGame();
+        }
+      });
+
+      // Accessibility: close dropdowns on click outside
+      document.body.addEventListener("click", (e) => {
+        if (!e.target.closest(".menu-item")) {
+          hideAllSettingsSubmenus();
+        }
+      });
+
+      // Accessibility: open invest dropdown on focus
+      const investMenuBtn = document.getElementById("investMenuBtn");
+      investMenuBtn.addEventListener("focus", () => {
+        investMenu.style.display = "block";
+        investMenuBtn.setAttribute("aria-expanded", "true");
+      });
+      investMenuBtn.addEventListener("blur", () => {
+        setTimeout(() => {
+          if (!investMenu.contains(document.activeElement)) {
+            investMenu.style.display = "none";
+            investMenuBtn.setAttribute("aria-expanded", "false");
+          }
+        }, 100);
+      });
+
+      // Capitalize first letter of theme label on buy buttons on load
+      buyThemeButtons.forEach(btn => {
+        if (!purchasedThemes.has(btn.dataset.theme)) {
+          btn.textContent = capitalize(btn.dataset.theme) + ` (${btn.dataset.cost})`;
+        }
+      });
+
+      // Font label fix for buttons on load
+      buyFontButtons.forEach(btn => {
+        if (!purchasedFonts.has(btn.dataset.font)) {
+          btn.textContent = fontLabel(btn.dataset.font) + ` (${btn.dataset.cost})`;
+        }
+      });
+
+    })();
+  </script>
+</body>
+</html>
