@@ -489,7 +489,7 @@
   <script>
    (() => {
   // Proxy URL for CORS
-  const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+  const PROXY_URL = "https://cors-anywhere.herokuapp.com/";
 
   // Initial state
   let coinBalance = 3000;
@@ -520,14 +520,14 @@
   const gamesData = [
     {
       id: "game1",
-      title: "Galaxy Racer",
-      category: "Racing",
+      title: "Soccer Random",
+      category: "Sports",
       description:
-        "Race through the stars at warp speed! Dodge asteroids and opponents. Thrilling space adrenaline.",
+        "Play this game with friends or just yourself. Crazy soccer action with randomly generated circumstances.",
       cost: 400,
       image:
-        "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
-      url: "https://raw.githubusercontent.com/your-repo/galaxy-racer/main/index.html",
+        "https://th.bing.com/th/id/OIP.09kY4K3Tx9CbrIsVLzm__AHaHa?w=180&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3&adlt=strict",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/soccerrandom.htm",
       requiresCors: true,
     },
     {
@@ -540,7 +540,7 @@
       image:
         "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=600&q=80",
       url: "https://example.com/game2.html",
-      requiresCors: false,
+      requiresCors: true,
     },
     {
       id: "game3",
@@ -552,7 +552,7 @@
       image:
         "https://images.unsplash.com/photo-1555435029-84dfe875bebb?auto=format&fit=crop&w=600&q=80",
       url: "https://example.com/game3.html",
-      requiresCors: false,
+      requiresCors: true,
     },
     {
       id: "game4",
@@ -564,7 +564,7 @@
       image:
         "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=600&q=80",
       url: "https://example.com/game4.html",
-      requiresCors: false,
+      requiresCors: true,
     },
     {
       id: "game5",
@@ -576,7 +576,7 @@
       image:
         "https://images.unsplash.com/photo-1558981403-cb76e53be555?auto=format&fit=crop&w=600&q=80",
       url: "https://example.com/game5.html",
-      requiresCors: false,
+      requiresCors: true,
     },
   ];
 
@@ -1089,25 +1089,44 @@
   }
 
   // Open game respecting CORS proxy if needed in new about:blank tab with iframe
-  function openGameWithCors(game) {
-    let gameUrl = game.url;
-    if (game.requiresCors) {
-      gameUrl = proxyUrl + game.url;
-    }
-    const newTab = window.open("about:blank", "_blank");
-    if (!newTab) {
-      alert("Pop-up blocked. Please allow pop-ups for this site.");
-      return;
-    }
-    newTab.document.title = game.title;
-    const style = `
-      body,html {margin:0; padding:0; height:100%; overflow:hidden; background:#000;}
-      iframe {
-        border:none; width:100vw; height:100vh; display:block;
+  function launchGame(gameUrl, title) {
+  const proxyGameUrl = PROXY_URL + gameUrl;
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("GET", proxyGameUrl, true);
+
+  xhr.onload = function () {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      const win = window.open("", "_blank");
+
+      if (win) {
+        win.document.open();
+        win.document.write(xhr.responseText);
+        win.document.close();
+
+        win.document.title = title || "Game";
+        win.document.body.style.margin = "0";
+        win.document.body.style.overflow = "auto";
+      } else {
+        alert("Please allow pop-ups for this site to launch the game.");
       }
-    `;
-    newTab.document.body.innerHTML = `<style>${style}</style><iframe src="${gameUrl}" sandbox="allow-scripts allow-same-origin allow-popups" allowfullscreen></iframe>`;
-  }
+    } else {
+      console.error("Failed to load game:", xhr.statusText);
+      alert("Could not load the game. Make sure cors-anywhere is unlocked.");
+    }
+  };
+
+  xhr.onerror = function () {
+    console.error("Network error occurred.");
+    alert("Network error while loading game.");
+  };
+
+  xhr.send();
+}
+ 
+ function openGameWithCors(game) {
+  launchGame(game.url, game.title);
+}
 
   // Invest menu click
   investMenu.addEventListener("click", (e) => {
