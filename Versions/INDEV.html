@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Stellar Game Hub/launcher</title>
+  <title>Stellar Game Hub/Launcher</title>
   <link
     href="https://fonts.googleapis.com/css2?family=Audiowide&family=Bungee&family=Fredoka+One&family=Nosifer&family=Black+Ops+One&display=swap"
     rel="stylesheet"
@@ -265,8 +265,10 @@
       align-items: center;
     }
 
+    /* Gradient multicolor buy & sell buttons */
     .buy-btn, .sell-btn-game {
-      background-color: var(--buy-btn-bg);
+      background: linear-gradient(45deg, #ff6b6b, #f8e71c, #6bffb2, #3498db);
+      background-size: 400% 400%;
       color: #fff;
       border: none;
       padding: 6px 14px;
@@ -276,7 +278,13 @@
       cursor: var(--buy-btn-cursor);
       user-select: none;
       min-width: 80px;
-      transition: background-color 0.3s ease;
+      transition: background-position 0.5s ease, background-color 0.3s ease;
+      user-select: none;
+    }
+
+    .buy-btn:hover:not(:disabled),
+    .sell-btn-game:hover:not(:disabled) {
+      background-position: 100% 50%;
     }
 
     .buy-btn:disabled,
@@ -284,11 +292,7 @@
     .sell-btn-game:disabled {
       background-color: var(--buy-btn-disabled-bg);
       cursor: var(--buy-btn-disabled-cursor);
-    }
-
-    .buy-btn:hover:not(:disabled),
-    .sell-btn-game:hover:not(:disabled) {
-      background-color: #2980b9;
+      background-image: none;
     }
 
     .cost {
@@ -357,14 +361,6 @@
       user-select: none;
     }
 
-    #gameModal iframe {
-      width: 90vw;
-      height: 80vh;
-      border: none;
-      border-radius: 10px;
-      background: #000;
-    }
-
     #gameModal button.close-game {
       position: fixed;
       top: 8px;
@@ -404,7 +400,7 @@
       border-radius: 3px;
     }
   </style>
-</head>
+  </head>
 <body>
   <nav class="top-menu" role="navigation" aria-label="Main menu">
     <div class="menu-item" tabindex="0" aria-haspopup="true" aria-expanded="false" id="settingsMenu">
@@ -532,26 +528,26 @@
     },
     {
       id: "game2",
-      title: "Space Miner",
-      category: "Strategy",
+      title: "Gn-math Game Loader",
+      category: "Game Loaders",
       description:
-        "Mine precious minerals from asteroids and build your interstellar empire. Resource management gameplay.",
-      cost: 350,
+        "A site with several different games to load all for free. Very intuative and isnt made up of all games. It even has a code editor!",
+      cost: 10000,
       image:
-        "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=600&q=80",
-      url: "https://example.com/game2.html",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhZuxLIqreVnTSJ6-5ZoF4rspCYq8Yz_D_Sk6rvz-V-w&s=10",
+      url: "https://raw.githubusercontent.com/gn-math/gn-math-DONTDMCA/refs/heads/main/singlefile.html",
       requiresCors: true,
     },
     {
       id: "game3",
-      title: "Alien Invasion",
-      category: "Shooter",
+      title: "Crossy Road",
+      category: "Strategy",
       description:
-        "Defend Earth against alien hordes in this fast-paced shooter. Upgrade weapons and gadgets.",
-      cost: 500,
+        "Play as a chicken (or anything you buy with the in game currency) and run across roads and bodies of water on water to avoid dying. Compete for a best high score.",
+      cost: 2320,
       image:
-        "https://images.unsplash.com/photo-1555435029-84dfe875bebb?auto=format&fit=crop&w=600&q=80",
-      url: "https://example.com/game3.html",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSozrbJp8K-A3Ki_STY80jF3iYbdkvkc_9IEKOEaIYNqg&s",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/crossyroad.htm",
       requiresCors: true,
     },
     {
@@ -650,7 +646,6 @@
       investMenu.appendChild(div);
     });
   };
-
   const investAmountPrompt = (companyName) => {
     let amount = window.prompt(
       `Enter amount of coins to invest in ${companyName} (you have ${coinBalance} coins):`,
@@ -848,7 +843,7 @@
         }
       }
     });
-
+    
     buyFontButtons.forEach((btn) => {
       const f = btn.dataset.font;
       if (purchasedFonts.has(f)) {
@@ -1123,7 +1118,7 @@
 
   xhr.send();
 }
- 
+
  function openGameWithCors(game) {
   launchGame(game.url, game.title);
 }
