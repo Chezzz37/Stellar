@@ -462,13 +462,20 @@
   </nav>
 
  <main>
-  <h1 style="text-align:center; color: #505050; user-select:none; margin-top: 64px;">
+  <h1 style="text-align:center; color: #000000; user-select:none; margin-top: 64px;">
     Stellar - Game Hub/Launcher
   </h1>
 
-  <h2 style="text-align:center; color: #505050; user-select:none; margin-top: 16px;">
+  <h2 style="text-align:center; color: #000000; user-select:none; margin-top: 16px;">
     Your Entertainment lies here!
   </h2>
+  <h4 style="color:black; text-align:center; max-width:900px; margin: 0 auto 24px; user-select:none;">
+  Warning! Games require CORS to load. Go to https://cors-anywhere.herokuapp.com/corsdemo to obtain access, or click the button below.
+</h4>
+
+<button id="corsAccessBtn" style="background-color: black; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; display: block; margin: 0 auto 24px; user-select:none;">
+  Request CORS Access
+</button>
 
   <section id="gamesGrid" aria-live="polite" aria-atomic="false" aria-label="List of games">
     <!-- Game cards injected by JS -->
@@ -538,8 +545,7 @@
       url: "https://raw.githubusercontent.com/gn-math/gn-math-DONTDMCA/refs/heads/main/singlefile.html",
       requiresCors: true,
     },
-    {
-      id: "game3",
+    { id: "game3",
       title: "Crossy Road",
       category: "Strategy",
       description:
@@ -552,14 +558,14 @@
     },
     {
       id: "game4",
-      title: "Orbit Puzzle",
-      category: "Puzzle",
+      title: "Slow Roads",
+      category: "Racing/Driving",
       description:
-        "Solve mind-bending puzzles to save stranded astronauts. Space-themed logic challenge.",
-      cost: 300,
+        "A game where you drive your choice of either a car, motorbike or RV and drive across randomly generated landscapes. You can also change the time of day.",
+      cost: 4050,
       image:
-        "https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=600&q=80",
-      url: "https://example.com/game4.html",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTubJHcKPH3uM4UY_XZ3ZBhzEdG6FdRFYqAL6zcai3GVA&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/slowroads.html",
       requiresCors: true,
     },
     {
@@ -1010,19 +1016,7 @@
     desc.textContent = game.description;
     card.appendChild(desc);
 
-    // CORS warning if required
-    if (game.requiresCors) {
-      const warning = document.createElement("p");
-      warning.style.color = "red";
-      warning.style.fontWeight = "bold";
-      warning.style.fontSize = "13px";
-      warning.style.marginTop = "0";
-      warning.textContent =
-        "Warning! This game requires CORS to load. Go to https://cors-anywhere.herokuapp.com/corsdemo to obtain access.";
-      card.appendChild(warning);
-    }
-
-    // Bottom container (empty for now, will be filled in updateBuyButtons)
+  // Bottom container (empty for now, will be filled in updateBuyButtons)
     const bottom = document.createElement("div");
     bottom.className = "game-bottom";
     card.appendChild(bottom);
@@ -1232,6 +1226,11 @@
       btn.textContent = fontLabel(btn.dataset.font) + ` (${btn.dataset.cost})`;
     }
   });
+  document.getElementById("corsAccessBtn").addEventListener("click", () => {
+  const corsUrl = "https://cors-anywhere.herokuapp.com/corsdemo";
+  window.open(corsUrl, "_blank", "noopener");
+});
+
 })();
   </script>
 </body>
