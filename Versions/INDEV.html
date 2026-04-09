@@ -8,7 +8,7 @@
     href="https://fonts.googleapis.com/css2?family=Audiowide&family=Bungee&family=Fredoka+One&family=Nosifer&family=Black+Ops+One&display=swap"
     rel="stylesheet"
   />
-  <style>
+<style>
     :root {
       --bg: #f0f0f0;
       --text: #222;
@@ -75,7 +75,9 @@
     }
     
     body.theme-rainbow {
-    background: linear-gradient(45deg, red, orange, yellow, green, cyan, blue, purple);
+    background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, purple);
+    animation: gradient 29s ease infinite;
+    background-size: 400% 400%;
     }
     /* Fonts */
     body.font-bungee {
@@ -402,8 +404,18 @@
       background-color: #34495e;
       border-radius: 3px;
     }
+    @keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
   </style>
-   </head>
+  </head>
 <body>
   <nav class="top-menu" role="navigation" aria-label="Main menu">
     <div class="menu-item" tabindex="0" aria-haspopup="true" aria-expanded="false" id="settingsMenu">
