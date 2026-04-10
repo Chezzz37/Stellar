@@ -423,24 +423,28 @@
       <div class="dropdown-content" role="menu" aria-label="Settings submenu">
         <div role="menuitem" aria-haspopup="true" tabindex="0" id="themeShopBtn">Theme Shop</div>
         <div id="themeOptions" style="display:none; padding-left:16px;">
-          <button data-theme="red" data-cost="200" class="buy-theme-btn" type="button">Red (200)</button>
-          <button data-theme="orange" data-cost="200" class="buy-theme-btn" type="button">Orange (200)</button>
-          <button data-theme="yellow" data-cost="200" class="buy-theme-btn" type="button">Yellow (200)</button>
-          <button data-theme="green" data-cost="200" class="buy-theme-btn" type="button">Green (200)</button>
-          <button data-theme="cyan" data-cost="200" class="buy-theme-btn" type="button">Cyan (200)</button>
-          <button data-theme="blue" data-cost="200" class="buy-theme-btn" type="button">Blue (200)</button>
-          <button data-theme="purple" data-cost="200" class="buy-theme-btn" type="button">Purple (200)</button>
-          <button data-theme="pink" data-cost="200" class="buy-theme-btn" type="button">Pink (200)</button>
-          <button data-theme="black" data-cost="200" class="buy-theme-btn" type="button">Black Background (200)</button>
-          <button data-theme="rainbow" data-cost="1000" class="buy-theme-btn" type="button">Rainbow (1000)</button>
+          <ul style="list-style-type: disc; padding-left: 20px; margin: 4px 0;">
+            <li><button data-theme="red" data-cost="200" class="buy-theme-btn" type="button">Red (200)</button></li>
+            <li><button data-theme="orange" data-cost="200" class="buy-theme-btn" type="button">Orange (200)</button></li>
+            <li><button data-theme="yellow" data-cost="200" class="buy-theme-btn" type="button">Yellow (200)</button></li>
+            <li><button data-theme="green" data-cost="200" class="buy-theme-btn" type="button">Green (200)</button></li>
+            <li><button data-theme="cyan" data-cost="200" class="buy-theme-btn" type="button">Cyan (200)</button></li>
+            <li><button data-theme="blue" data-cost="200" class="buy-theme-btn" type="button">Blue (200)</button></li>
+            <li><button data-theme="purple" data-cost="200" class="buy-theme-btn" type="button">Purple (200)</button></li>
+            <li><button data-theme="pink" data-cost="200" class="buy-theme-btn" type="button">Pink (200)</button></li>
+            <li><button data-theme="black" data-cost="200" class="buy-theme-btn" type="button">Black Background (200)</button></li>
+            <li><button data-theme="rainbow" data-cost="1000" class="buy-theme-btn" type="button">Rainbow (1000)</button></li>
+          </ul>
         </div>
         <div role="menuitem" aria-haspopup="true" tabindex="0" id="fontShopBtn" style="margin-top:8px;">Font Shop</div>
         <div id="fontOptions" style="display:none; padding-left:16px;">
-          <button data-font="bungee" data-cost="150" class="buy-font-btn" type="button">Bungee (150)</button>
-          <button data-font="fredoka" data-cost="250" class="buy-font-btn" type="button">Fredoka One (250)</button>
-          <button data-font="blackops" data-cost="300" class="buy-font-btn" type="button">Black Ops One (300)</button>
-          <button data-font="nosifer" data-cost="350" class="buy-font-btn" type="button">Nosifer (350)</button>
-          <button data-font="audiowide" data-cost="400" class="buy-font-btn" type="button">Audiowide (400)</button>
+          <ul style="list-style-type: disc; padding-left: 20px; margin: 4px 0;">
+            <li><button data-font="bungee" data-cost="150" class="buy-font-btn" type="button">Bungee (150)</button></li>
+            <li><button data-font="fredoka" data-cost="250" class="buy-font-btn" type="button">Fredoka One (250)</button></li>
+            <li><button data-font="blackops" data-cost="300" class="buy-font-btn" type="button">Black Ops One (300)</button></li>
+            <li><button data-font="nosifer" data-cost="350" class="buy-font-btn" type="button">Nosifer (350)</button></li>
+            <li><button data-font="audiowide" data-cost="400" class="buy-font-btn" type="button">Audiowide (400)</button></li>
+          </ul>
         </div>
         
         <div role="menuitem" tabindex="0" id="creditsBtn" style="margin-top:8px;">Credits</div>
@@ -635,7 +639,7 @@
       JSON.stringify([...purchasedFonts])
     );
     localStorage.setItem(
-      "stellar_purchasedGames",
+    "stellar_purchasedGames",
       JSON.stringify([...purchasedGames])
     );
     localStorage.setItem("stellar_favorites", JSON.stringify([...favorites]));
@@ -1246,7 +1250,6 @@
   const corsUrl = "https://cors-anywhere.herokuapp.com/corsdemo";
   window.open(corsUrl, "_blank", "noopener");
 });
-
 })();
   </script>
 </body>
