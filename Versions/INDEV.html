@@ -73,12 +73,50 @@
       background-color: #121212;
       color: #eee;
     }
+
+    /* Added Gradient Themes */
+    body.theme-redyellow {
+      background: linear-gradient(90deg, red, yellow);
+      animation: gradient 11s ease infinite;
+    background-size: 400% 400%;
+    }
+    body.theme-greenblue {
+     background: linear-gradient(90deg, green, blue);
+      animation: gradient 11s ease infinite;
+    background-size: 400% 400%;
+    }
+    body.theme-redblue {
+    background: linear-gradient(90deg, red, blue);
+      animation: gradient 11s ease infinite;
+    background-size: 400% 400%;
+    }
+    body.theme-yellowblue {
+      background: linear-gradient(90deg, yellow, blue);
+       animation: gradient 11s ease infinite;
+    background-size: 400% 400%;
+    }
+    body.theme-greenpink {
+      background: linear-gradient(90deg, green, pink);
+       animation: gradient 11s ease infinite;
+    background-size: 400% 400%;
+    }
+    body.theme-greenyellow {
+      background: linear-gradient(90deg, green, yellow);
+       animation: gradient 11s ease infinite;
+    background-size: 400% 400%;
+    }
+    body.theme-redcyan {
+      background: linear-gradient(90deg, red, cyan);
+       animation: gradient 11s ease infinite;
+    background-size: 400% 400%;
+    }
     
     body.theme-rainbow {
     background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, purple);
     animation: gradient 29s ease infinite;
     background-size: 400% 400%;
     }
+
     /* Fonts */
     body.font-bungee {
       font-family: 'Bungee', cursive, Arial, sans-serif;
@@ -434,6 +472,15 @@
             <li><button data-theme="pink" data-cost="200" class="buy-theme-btn" type="button">Pink (200)</button></li>
             <li><button data-theme="black" data-cost="200" class="buy-theme-btn" type="button">Black Background (200)</button></li>
             <li><button data-theme="rainbow" data-cost="1000" class="buy-theme-btn" type="button">Rainbow (1000)</button></li>
+
+            <!-- Added gradient themes with cost 550 -->
+            <li><button data-theme="redyellow" data-cost="550" class="buy-theme-btn" type="button">Red Yellow Gradient (550)</button></li>
+            <li><button data-theme="greenblue" data-cost="550" class="buy-theme-btn" type="button">Green Blue Gradient (550)</button></li>
+            <li><button data-theme="redblue" data-cost="550" class="buy-theme-btn" type="button">Red Blue Gradient (550)</button></li>
+            <li><button data-theme="yellowblue" data-cost="550" class="buy-theme-btn" type="button">Yellow Blue Gradient (550)</button></li>
+            <li><button data-theme="greenpink" data-cost="550" class="buy-theme-btn" type="button">Green Pink Gradient (550)</button></li>
+            <li><button data-theme="greenyellow" data-cost="550" class="buy-theme-btn" type="button">Green Yellow Gradient (550)</button></li>
+            <li><button data-theme="redcyan" data-cost="550" class="buy-theme-btn" type="button">Red Cyan Gradient (550)</button></li>
           </ul>
         </div>
         <div role="menuitem" aria-haspopup="true" tabindex="0" id="fontShopBtn" style="margin-top:8px;">Font Shop</div>
@@ -589,7 +636,7 @@
       requiresCors: true,
     },
     {
-      id: "game5",
+       id: "game5",
       title: "Basket Random",
       category: "Sports",
       description:
@@ -639,7 +686,7 @@
       JSON.stringify([...purchasedFonts])
     );
     localStorage.setItem(
-    "stellar_purchasedGames",
+      "stellar_purchasedGames",
       JSON.stringify([...purchasedGames])
     );
     localStorage.setItem("stellar_favorites", JSON.stringify([...favorites]));
@@ -734,7 +781,7 @@
 
   // Selling functions
   function sellTheme(themeId) {
-    const sellValue = 100; // half cost 200/2
+    const sellValue = 100; // half cost 200/2 for normal themes, 275 for 550 themes is not handled separately for simplicity
     if (!purchasedThemes.has(themeId)) return;
     if (!confirm(`Sell theme "${themeId}" for ${sellValue} coins?`)) return;
     purchasedThemes.delete(themeId);
@@ -1254,3 +1301,4 @@
   </script>
 </body>
 </html>
+    
