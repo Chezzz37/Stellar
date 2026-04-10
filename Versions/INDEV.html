@@ -8,6 +8,8 @@
     href="https://fonts.googleapis.com/css2?family=Audiowide&family=Bungee&family=Fredoka+One&family=Nosifer&family=Black+Ops+One&display=swap"
     rel="stylesheet"
   />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Montserrat&family=Lobster&family=Open+Sans&family=Pacifico&family=Raleway&family=Dancing+Script&family=Playfair+Display&family=Nunito&family=Indie+Flower&display=swap" rel="stylesheet" />
+  
 <style>
     :root {
       --bg: #f0f0f0;
@@ -77,43 +79,48 @@
     /* Added Gradient Themes */
     body.theme-redyellow {
       background: linear-gradient(90deg, red, yellow);
-      animation: gradient 11s ease infinite;
+      animation: gradient 13s ease infinite;
     background-size: 400% 400%;
     }
     body.theme-greenblue {
      background: linear-gradient(90deg, green, blue);
-      animation: gradient 11s ease infinite;
+      animation: gradient 13s ease infinite;
     background-size: 400% 400%;
     }
     body.theme-redblue {
     background: linear-gradient(90deg, red, blue);
-      animation: gradient 11s ease infinite;
+      animation: gradient 13s ease infinite;
+    background-size: 400% 400%;
+    }
+    body.theme-redgreen {
+    background: linear-gradient(90deg, red, green);
+      animation: gradient 13s ease infinite;
     background-size: 400% 400%;
     }
     body.theme-yellowblue {
       background: linear-gradient(90deg, yellow, blue);
-       animation: gradient 11s ease infinite;
+       animation: gradient 13s ease infinite;
     background-size: 400% 400%;
     }
     body.theme-greenpink {
       background: linear-gradient(90deg, green, pink);
-       animation: gradient 11s ease infinite;
+       animation: gradient 13s ease infinite;
     background-size: 400% 400%;
     }
     body.theme-greenyellow {
       background: linear-gradient(90deg, green, yellow);
-       animation: gradient 11s ease infinite;
+       animation: gradient 13s ease infinite;
     background-size: 400% 400%;
     }
     body.theme-redcyan {
       background: linear-gradient(90deg, red, cyan);
-       animation: gradient 11s ease infinite;
+       animation: gradient 13s ease infinite;
     background-size: 400% 400%;
     }
     
     body.theme-rainbow {
     background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, purple);
-    animation: gradient 29s ease infinite;
+    animation: gradient 45s ease infinite;
     background-size: 400% 400%;
     }
 
@@ -137,6 +144,45 @@
     body.font-audiowide {
       font-family: 'Audiowide', cursive, Arial, sans-serif;
     }
+body.font-roboto {
+  font-family: 'Roboto', sans-serif;
+}
+
+body.font-montserrat {
+  font-family: 'Montserrat', sans-serif;
+}
+
+body.font-lobster {
+  font-family: 'Lobster', cursive;
+}
+
+body.font-opensans {
+  font-family: 'Open Sans', sans-serif;
+}
+
+body.font-pacifico {
+  font-family: 'Pacifico', cursive;
+}
+
+body.font-raleway {
+  font-family: 'Raleway', sans-serif;
+}
+
+body.font-dancingscript {
+  font-family: 'Dancing Script', cursive;
+}
+
+body.font-playfairdisplay {
+  font-family: 'Playfair Display', serif;
+}
+
+body.font-nunito {
+  font-family: 'Nunito', sans-serif;
+}
+
+body.font-indieflower {
+  font-family: 'Indie Flower', cursive;
+}
 
     /* Top menu */
     .top-menu {
@@ -471,21 +517,32 @@
             <li><button data-theme="purple" data-cost="200" class="buy-theme-btn" type="button">Purple (200)</button></li>
             <li><button data-theme="pink" data-cost="200" class="buy-theme-btn" type="button">Pink (200)</button></li>
             <li><button data-theme="black" data-cost="200" class="buy-theme-btn" type="button">Black Background (200)</button></li>
-            <li><button data-theme="rainbow" data-cost="1000" class="buy-theme-btn" type="button">Rainbow (1000)</button></li>
-
             <!-- Added gradient themes with cost 550 -->
             <li><button data-theme="redyellow" data-cost="550" class="buy-theme-btn" type="button">Red Yellow Gradient (550)</button></li>
             <li><button data-theme="greenblue" data-cost="550" class="buy-theme-btn" type="button">Green Blue Gradient (550)</button></li>
             <li><button data-theme="redblue" data-cost="550" class="buy-theme-btn" type="button">Red Blue Gradient (550)</button></li>
+            <li><button data-theme="redgreen" data-cost="550" class="buy-theme-btn" type="button">Red Green Gradient (550)</button></li>
             <li><button data-theme="yellowblue" data-cost="550" class="buy-theme-btn" type="button">Yellow Blue Gradient (550)</button></li>
             <li><button data-theme="greenpink" data-cost="550" class="buy-theme-btn" type="button">Green Pink Gradient (550)</button></li>
             <li><button data-theme="greenyellow" data-cost="550" class="buy-theme-btn" type="button">Green Yellow Gradient (550)</button></li>
             <li><button data-theme="redcyan" data-cost="550" class="buy-theme-btn" type="button">Red Cyan Gradient (550)</button></li>
+            <li><button data-theme="rainbow" data-cost="1000" class="buy-theme-btn" type="button">Rainbow (1000)</button></li>
           </ul>
         </div>
         <div role="menuitem" aria-haspopup="true" tabindex="0" id="fontShopBtn" style="margin-top:8px;">Font Shop</div>
         <div id="fontOptions" style="display:none; padding-left:16px;">
           <ul style="list-style-type: disc; padding-left: 20px; margin: 4px 0;">
+            <li><button data-font="roboto" data-cost="200" class="buy-font-btn" type="button">Roboto (200)</button></li>
+<li><button data-font="montserrat" data-cost="250" class="buy-font-btn" type="button">Montserrat (250)</button></li>
+<li><button data-font="lobster" data-cost="300" class="buy-font-btn" type="button">Lobster (300)</button></li>
+<li><button data-font="opensans" data-cost="200" class="buy-font-btn" type="button">Open Sans (200)</button></li>
+<li><button data-font="pacifico" data-cost="220" class="buy-font-btn" type="button">Pacifico (220)</button></li>
+<li><button data-font="raleway" data-cost="240" class="buy-font-btn" type="button">Raleway (240)</button></li>
+<li><button data-font="dancingscript" data-cost="320" class="buy-font-btn" type="button">Dancing Script (320)</button></li>
+<li><button data-font="playfairdisplay" data-cost="350" class="buy-font-btn" type="button">Playfair Display (350)</button></li>
+<li><button data-font="nunito" data-cost="210" class="buy-font-btn" type="button">Nunito (210)</button></li>
+<li><button data-font="indieflower" data-cost="180" class="buy-font-btn" type="button">Indie Flower (180)</button></li>
+
             <li><button data-font="bungee" data-cost="150" class="buy-font-btn" type="button">Bungee (150)</button></li>
             <li><button data-font="fredoka" data-cost="250" class="buy-font-btn" type="button">Fredoka One (250)</button></li>
             <li><button data-font="blackops" data-cost="300" class="buy-font-btn" type="button">Black Ops One (300)</button></li>
@@ -555,7 +612,7 @@
     <button class="close-game" aria-label="Close game window">✕ Close</button>
     <iframe src="" title="Game window" id="gameFrame" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
   </section>
-
+  
   <script>
    (() => {
   // Proxy URL for CORS
@@ -636,7 +693,7 @@
       requiresCors: true,
     },
     {
-       id: "game5",
+      id: "game5",
       title: "Basket Random",
       category: "Sports",
       description:
@@ -781,7 +838,7 @@
 
   // Selling functions
   function sellTheme(themeId) {
-    const sellValue = 100; // half cost 200/2 for normal themes, 275 for 550 themes is not handled separately for simplicity
+    const sellValue = 100; // half cost 200/2
     if (!purchasedThemes.has(themeId)) return;
     if (!confirm(`Sell theme "${themeId}" for ${sellValue} coins?`)) return;
     purchasedThemes.delete(themeId);
@@ -1156,7 +1213,7 @@
       const win = window.open("", "_blank");
 
       if (win) {
-        win.document.open();
+         win.document.open();
         win.document.write(xhr.responseText);
         win.document.close();
 
@@ -1301,4 +1358,3 @@
   </script>
 </body>
 </html>
-    
