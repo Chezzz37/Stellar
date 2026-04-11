@@ -571,7 +571,7 @@ body.font-indieflower {
     </div>
 
     <div class="balance" aria-live="polite" aria-atomic="true" id="coinBalance" title="Your current coin balance">
-      Coins: 3000
+      Coins: 4850
     </div>
 
     <section class="search-container" aria-label="Game search">
@@ -635,204 +635,6 @@ body.font-indieflower {
   const companies = [
     { name: "AstroTech", desc: "Leading space tech innovator." },
     { name: "StarDynamics", desc: "Futuristic propulsion systems." },
-    { name: "GalaxySoft", desc: "T fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.85);
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding-top: 48px;
-      z-index: 2000;
-      user-select: none;
-    }
-
-    #gameModal button.close-game {
-      position: fixed;
-      top: 8px;
-      right: 12px;
-      background-color: #f44336;
-      border: none;
-      color: #fff;
-      font-weight: 700;
-      font-size: 16px;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      z-index: 3000;
-      user-select: none;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      transition: background-color 0.3s ease;
-    }
-
-    #gameModal button.close-game:hover {
-      background-color: #d32f2f;
-    }
-
-    /* Scroll for dropdown with large list */
-    .dropdown-content {
-      scrollbar-width: thin;
-      scrollbar-color: #34495e transparent;
-    }
-
-    .dropdown-content::-webkit-scrollbar {
-      width: 6px;
-    }
-    .dropdown-content::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .dropdown-content::-webkit-scrollbar-thumb {
-      background-color: #34495e;
-      border-radius: 3px;
-    }
-    @keyframes gradient {
-    0% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-    100% {
-        background-position: 0% 50%;
-    }
-  </style>
-  </head>
-<body>
-  <nav class="top-menu" role="navigation" aria-label="Main menu">
-    <div class="menu-item" tabindex="0" aria-haspopup="true" aria-expanded="false" id="settingsMenu">
-      Settings ▼
-      <div class="dropdown-content" role="menu" aria-label="Settings submenu">
-        <div role="menuitem" aria-haspopup="true" tabindex="0" id="themeShopBtn">Theme Shop</div>
-        <div id="themeOptions" style="display:none; padding-left:16px;">
-          <ul style="list-style-type: disc; padding-left: 20px; margin: 4px 0;">
-            <li><button data-theme="red" data-cost="200" class="buy-theme-btn" type="button">Red (200)</button></li>
-            <li><button data-theme="orange" data-cost="200" class="buy-theme-btn" type="button">Orange (200)</button></li>
-            <li><button data-theme="yellow" data-cost="200" class="buy-theme-btn" type="button">Yellow (200)</button></li>
-            <li><button data-theme="green" data-cost="200" class="buy-theme-btn" type="button">Green (200)</button></li>
-            <li><button data-theme="cyan" data-cost="200" class="buy-theme-btn" type="button">Cyan (200)</button></li>
-            <li><button data-theme="blue" data-cost="200" class="buy-theme-btn" type="button">Blue (200)</button></li>
-            <li><button data-theme="purple" data-cost="200" class="buy-theme-btn" type="button">Purple (200)</button></li>
-            <li><button data-theme="pink" data-cost="200" class="buy-theme-btn" type="button">Pink (200)</button></li>
-            <li><button data-theme="black" data-cost="200" class="buy-theme-btn" type="button">Black Background (200)</button></li>
-            <!-- Added gradient themes with cost 550 -->
-            <li><button data-theme="redyellow" data-cost="550" class="buy-theme-btn" type="button">Red Yellow Gradient (550)</button></li>
-            <li><button data-theme="greenblue" data-cost="550" class="buy-theme-btn" type="button">Green Blue Gradient (550)</button></li>
-            <li><button data-theme="redblue" data-cost="550" class="buy-theme-btn" type="button">Red Blue Gradient (550)</button></li>
-            <li><button data-theme="redgreen" data-cost="550" class="buy-theme-btn" type="button">Red Green Gradient (550)</button></li>
-            <li><button data-theme="yellowblue" data-cost="550" class="buy-theme-btn" type="button">Yellow Blue Gradient (550)</button></li>
-            <li><button data-theme="greenpink" data-cost="550" class="buy-theme-btn" type="button">Green Pink Gradient (550)</button></li>
-            <li><button data-theme="greenyellow" data-cost="550" class="buy-theme-btn" type="button">Green Yellow Gradient (550)</button></li>
-            <li><button data-theme="redcyan" data-cost="550" class="buy-theme-btn" type="button">Red Cyan Gradient (550)</button></li>
-            <li><button data-theme="rainbow" data-cost="1000" class="buy-theme-btn" type="button">Rainbow (1000)</button></li>
-          </ul>
-        </div>
-        <div role="menuitem" aria-haspopup="true" tabindex="0" id="fontShopBtn" style="margin-top:8px;">Font Shop</div>
-        <div id="fontOptions" style="display:none; padding-left:16px;">
-          <ul style="list-style-type: disc; padding-left: 20px; margin: 4px 0;">
-            <li><button data-font="roboto" data-cost="200" class="buy-font-btn" type="button">Roboto (200)</button></li>
-<li><button data-font="montserrat" data-cost="250" class="buy-font-btn" type="button">Montserrat (250)</button></li>
-<li><button data-font="lobster" data-cost="300" class="buy-font-btn" type="button">Lobster (300)</button></li>
-<li><button data-font="opensans" data-cost="200" class="buy-font-btn" type="button">Open Sans (200)</button></li>
-<li><button data-font="pacifico" data-cost="220" class="buy-font-btn" type="button">Pacifico (220)</button></li>
-<li><button data-font="raleway" data-cost="240" class="buy-font-btn" type="button">Raleway (240)</button></li>
-<li><button data-font="dancingscript" data-cost="320" class="buy-font-btn" type="button">Dancing Script (320)</button></li>
-<li><button data-font="playfairdisplay" data-cost="350" class="buy-font-btn" type="button">Playfair Display (350)</button></li>
-<li><button data-font="nunito" data-cost="210" class="buy-font-btn" type="button">Nunito (210)</button></li>
-<li><button data-font="indieflower" data-cost="180" class="buy-font-btn" type="button">Indie Flower (180)</button></li>
-
-            <li><button data-font="bungee" data-cost="150" class="buy-font-btn" type="button">Bungee (150)</button></li>
-            <li><button data-font="fredoka" data-cost="250" class="buy-font-btn" type="button">Fredoka One (250)</button></li>
-            <li><button data-font="blackops" data-cost="300" class="buy-font-btn" type="button">Black Ops One (300)</button></li>
-            <li><button data-font="nosifer" data-cost="350" class="buy-font-btn" type="button">Nosifer (350)</button></li>
-            <li><button data-font="audiowide" data-cost="400" class="buy-font-btn" type="button">Audiowide (400)</button></li>
-          </ul>
-        </div>
-        
-        <div role="menuitem" tabindex="0" id="creditsBtn" style="margin-top:8px;">Credits</div>
-        <div id="creditsContent" style="display:none; padding-left:16px; white-space: pre-wrap; font-size: 13px;">
-          <!-- Credits will go here when you add them -->
-          <i>Chez for codes, Lungus for support, and game devs and CORS developer s for game launching.</i>
-        </div>
-        <div role="menuitem" tabindex="0" id="infoBtn" style="margin-top:8px;">Info</div>
-        <div id="infoContent" style="display:none; padding-left:16px; font-size: 13px; white-space: pre-wrap;">
-          Wsp guys! I'm chez! I started this project one april night, trying to bring the fun of games to everyone wherever they are. Have fun with my site!
-        </div>
-      </div>
-    </div>
-
-    <div class="menu-item" tabindex="0" id="investMenuBtn" aria-haspopup="true" aria-expanded="false">
-      Invest ▼
-      <div class="dropdown-content" role="menu" aria-label="Invest submenu" id="investMenu" style="max-height: 260px;">
-        <!-- Companies injected by JS -->
-      </div>
-    </div>
-
-    <div class="balance" aria-live="polite" aria-atomic="true" id="coinBalance" title="Your current coin balance">
-      Coins: 3000
-    </div>
-
-    <section class="search-container" aria-label="Game search">
-      <input
-        type="search"
-        id="searchInput"
-        placeholder="Search Thingies..."
-        aria-label="Search games"
-        autocomplete="off"
-      />
-    </section>
-  </nav>
-
- <main>
-  <h1 style="text-align:center; color: #000000; user-select:none; margin-top: 64px;">
-    Stellar - Game Hub/Launcher
-  </h1>
-
-  <h2 style="text-align:center; color: #000000; user-select:none; margin-top: 16px;">
-    Your Entertainment lies here!
-  </h2>
-  <h4 style="color:black; text-align:center; max-width:900px; margin: 0 auto 24px; user-select:none;">
-  Warning! Games require CORS to load. Go to https://cors-anywhere.herokuapp.com/corsdemo to obtain access, or click the button below.
-</h4>
-
-<button id="corsAccessBtn" style="background-color: black; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; display: block; margin: 0 auto 24px; user-select:none;">
-  Request CORS Access
-</button>
-
-  <section id="gamesGrid" aria-live="polite" aria-atomic="false" aria-label="List of games">
-    <!-- Game cards injected by JS -->
-  </section>
-</main>
-
-
-  <!-- Game iframe modal -->
-  <section role="dialog" aria-modal="true" aria-label="Game window" id="gameModal">
-    <button class="close-game" aria-label="Close game window">✕ Close</button>
-    <iframe src="" title="Game window" id="gameFrame" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
-  </section>
-  
-  <script>
-   (() => {
-  // Proxy URL for CORS
-  const PROXY_URL = "https://cors-anywhere.herokuapp.com/";
-
-  // Initial state
-  let coinBalance = 4850;
-  const purchasedThemes = new Set();
-  const purchasedFonts = new Set();
-  const purchasedGames = new Set();
-  const favorites = new Set();
-
-  // Store last selected theme and font
-  let currentTheme = "";
-  let currentFont = "";
-
-  // Companies for invest
-  const companies = [
-    { name: "AstroTech", desc: "Leading space tech innovator." },
-    { name: "StarDynamics", desc: "Futuristic propulsion systems." },
     { name: "GalaxySoft", desc: "Top space simulation games." },
     { name: "CosmoEnergy", desc: "Renewable cosmic energy." },
     { name: "NovaWorks", desc: "Advanced AI for space missions." },
@@ -842,9 +644,9 @@ body.font-indieflower {
     { name: "MeteorMines", desc: "Asteroid mining experts." },
     { name: "LunarLogistics", desc: "Moon transport services." },
   ];
-      const gamesData = [
-      // Games data with requiresCors flag and real github raw urls for CORS game
-     {
+
+  // Games data with requiresCors flag and real github raw urls for CORS games
+   const gamesData = [ {
       id: "game1",
       title: "Soccer Random",
       category: "Sports, Multiplayer",
@@ -930,10 +732,10 @@ body.font-indieflower {
     {
       id: "game8",
       title: "3D Flight Sim",
-      category: "Racing/Driving",
+      category: "Adventure",
       description:
-        "A game where you can try to figure out how to get a plane of your choice to fly off a runway. Kinda hard ngl.",
-      cost: 1465,
+        "A game where you can try to figure out how to get a plane of your choice to fly off a runway and fly to random places on the map. Kinda hard ngl.",
+      cost: 1965,
       image:
         "https://imgs.crazygames.com/3d-flight-simulator.png?metadata=none&quality=60&width=216&height=120&fit=crop&dpr=3",
       url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/3Dflightsimulator.html",
@@ -966,7 +768,7 @@ body.font-indieflower {
    {
       id: "game11",
       title: "Eaglercraft 1.12",
-      category: "Multiplayer",
+      category: "Adventure",
       description:
         "Basically minecraft 1.12.",
       cost: 6575,
@@ -1054,7 +856,7 @@ body.font-indieflower {
       description:
         "Cool NBA Style game where you play as guys from the NBA.",
       cost: 4695,
-      image:"data:image/jpeg;base64,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",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQapBq-AdxOIK6B_3gn61lYT-XRqgyweNQZy6QewcCY9Q&s=10",
       url:"https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/basketbros.html",
      },
      {
@@ -1140,7 +942,67 @@ body.font-indieflower {
       url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/madalinstuntcars2.html",
       requiresCors: true,
     },
-  ];
+    {
+      id: "game26",
+      title: "Pac-Man",
+      category: "Strategy",
+      description:
+        "Play as a yellow ball with a mouth and a avoid ghosts that are chasing you.",
+      cost: 2635,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQohcgh7PB0taV9NlrB22UUwCW3eF45rTaQGnqmolyFpA&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/pacman.html",
+      requiresCors: true,
+    },
+    {
+      id: "game27",
+      title: "Supreme Math Lite",
+      category: "Game Loaders",
+      description:
+        "Has a ton of games to load. Thats basically it.",
+      cost: 17605,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-qpbL19c_DHduzxgXar8zXz5OEb1ISrQuVNMR9lgrvA&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/single-file.html",
+      requiresCors: true,
+    },
+    {
+      id: "game28",
+      title: "Curveball",
+      category: "Strategy",
+      description:
+        "A game where the ball gets hit by an opponent and you try to hit the ball back. Kinda like 3D Pong.",
+      cost: 2755,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWfEAWV4Ad3uw2_0PBYoWtkl1pz7GS-VIfbNJ7NdMZ4Q&s=10",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/C/clcurveball.html",
+      requiresCors: true,
+    },
+    {
+      id: "game29",
+      title: "Genizy Soundboard",
+      category: "Apps",
+      description:
+        "Has a bunch of sounds, possibly with over 300.",
+      cost: 1200,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTayEsgHJj9UXQ05H_jw7l8NYWFPxSLBpc1E7LorquQtA&s=10",
+      url: "https://raw.githubusercontent.com/genizy/soundboard/refs/heads/main/index.html",
+      requiresCors: true,
+    },
+    {
+      id: "game30",
+      title: "SoundBoardW",
+      category: "Apps",
+      description:
+        "This soundboard is the first web-based thing on our list. This actually has a URL. If you look at the code, the thing for this is an actual url website! How funny!",
+      cost: 1000,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRk6hY9ApFnGYg4vqqcm--T2l8V7sEydOKlAsyvyT4bzA&s",
+      url: "https://soundboardw.net/",
+      requiresCors: true,
+    },
+ ];
   // Helpers
   const updateBalance = () => {
     const balEl = document.getElementById("coinBalance");
