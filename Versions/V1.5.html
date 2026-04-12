@@ -667,7 +667,7 @@ body.font-indieflower {
     Welcome to Stellar! This game site is so good trust me gng 🥀. Anyways, on a serious note, have fun.
   </h3>
     <h3 style="text-align:center; color: #000000; user-select:none; margin-top: 16px;">Also, big updates and game additions coming soon!</h3>
-  <h4 style="color:black; text-align:center; max-width:900px; margin: 0 auto 24px; user-select:none;">
+ <h4 style="color:black; text-align:center; max-width:900px; margin: 0 auto 24px; user-select:none;">
   Warning! Games require CORS to load. Go to https://cors-anywhere.herokuapp.com/corsdemo to obtain access, or click the button below.
 </h4>
 
@@ -1159,7 +1159,7 @@ body.font-indieflower {
     }
   };
 
-  // ----- INVEST -----
+   // ----- INVEST -----
   const investMenu = document.getElementById("investMenu");
   const renderInvestMenu = () => {
     investMenu.innerHTML = "";
@@ -1775,14 +1775,21 @@ setInterval(cycleMessagesRandom, 4000);  // Change message every 4 seconds
       btn.textContent = fontLabel(btn.dataset.font) + ` (${btn.dataset.cost})`;
     }
   });
+  
   document.getElementById("corsAccessBtn").addEventListener("click", () => {
   const corsUrl = "https://cors-anywhere.herokuapp.com/corsdemo";
   window.open(corsUrl, "_blank", "noopener");
 });
 
- const CURRENT_VERSION = "1.5.0"; // Change this on every update
+ const UPDATE_DO_NOT_SHOW_KEY = 'stellar_doNotShowUpdate';
+ const VERSION = "1.5.0";
 
-  function showUpdatePopup() {
+function showUpdatePopup() {
+  const doNotShow = localStorage.getItem(UPDATE_DO_NOT_SHOW_KEY);
+  if (doNotShow === 'true') {
+    return; // User opted out, do not show popup
+  }
+
   const topMenu = document.querySelector(".top-menu");
   const bgColor = getComputedStyle(topMenu).backgroundColor;
 
@@ -1836,13 +1843,25 @@ setInterval(cycleMessagesRandom, 4000);  // Change message every 4 seconds
   closeBtn.style.padding = "0";
   closeBtn.style.userSelect = "none";
 
-  closeBtn.addEventListener("click", () => {
-    document.body.removeChild(overlay);
-  });
+  // Checkbox container
+  const checkboxContainer = document.createElement("label");
+  checkboxContainer.style.display = "flex";
+  checkboxContainer.style.alignItems = "center";
+  checkboxContainer.style.marginTop = "16px";
+  checkboxContainer.style.cursor = "pointer";
+  checkboxContainer.style.fontWeight = "normal";
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.style.marginRight = "8px";
+  checkbox.id = "dontShowUpdate";
+
+  checkboxContainer.appendChild(checkbox);
+  checkboxContainer.appendChild(document.createTextNode("Do not show again"));
 
   // Title
   const title = document.createElement("div");
-  title.textContent = "Welcome to the latest version of Stellar! (Release Date: 4/11/26)";
+  title.textContent = `Welcome to Stellar, version ${VERSION}! (Release Date: 4/11/26)`;
   title.style.marginBottom = "16px";
   title.style.fontSize = "22px";
   title.style.fontWeight = "700";
@@ -1850,7 +1869,7 @@ setInterval(cycleMessagesRandom, 4000);  // Change message every 4 seconds
 
   // Subtitle
   const subtitle = document.createElement("div");
-  subtitle.textContent = "This update includes:";
+  subtitle.textContent = "This update consisted of all UI improvements. It includes:";
   subtitle.style.marginBottom = "12px";
   subtitle.style.fontWeight = "600";
   subtitle.style.fontSize = "18px";
@@ -1877,10 +1896,22 @@ setInterval(cycleMessagesRandom, 4000);  // Change message every 4 seconds
   });
 
   popup.appendChild(ul);
+  popup.appendChild(checkboxContainer);
   popup.appendChild(closeBtn);
   overlay.appendChild(popup);
   document.body.appendChild(overlay);
+
+  closeBtn.addEventListener("click", () => {
+    if (checkbox.checked) {
+      localStorage.setItem(UPDATE_DO_NOT_SHOW_KEY, 'true');
+    }
+    document.body.removeChild(overlay);
+  });
 }
+
+// Call this once on initial load
+showUpdatePopup();
+
 
 })();
   </script>
