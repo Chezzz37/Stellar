@@ -667,7 +667,7 @@ body.font-indieflower {
     Welcome to Stellar! This game site is so good trust me gng 🥀. Anyways, on a serious note, have fun.
   </h3>
     <h3 style="text-align:center; color: #000000; user-select:none; margin-top: 16px;">Also, big updates and game additions coming soon!</h3>
- <h4 style="color:black; text-align:center; max-width:900px; margin: 0 auto 24px; user-select:none;">
+   <h4 style="color:black; text-align:center; max-width:900px; margin: 0 auto 24px; user-select:none;">
   Warning! Games require CORS to load. Go to https://cors-anywhere.herokuapp.com/corsdemo to obtain access, or click the button below.
 </h4>
 
@@ -1100,12 +1100,12 @@ body.font-indieflower {
   }
 
   // Use only one interval to create snowflakes every 400ms
-  setInterval(createSnowflake, 400);
+  setInterval(createSnowflake, 1150);
 })();
 
 
   // Helpers
-  const updateBalance = () => {
+    const updateBalance = () => {
     const balEl = document.getElementById("coinBalance");
     balEl.textContent = `Coins: ${coinBalance}`;
     balEl.style.color = coinBalance <= 0 ? "#c0392b" : "#f39c12";
@@ -1160,7 +1160,7 @@ body.font-indieflower {
   };
 
    // ----- INVEST -----
-  const investMenu = document.getElementById("investMenu");
+    const investMenu = document.getElementById("investMenu");
   const renderInvestMenu = () => {
     investMenu.innerHTML = "";
     companies.forEach((c, idx) => {
@@ -1719,7 +1719,7 @@ setInterval(cycleMessagesRandom, 4000);  // Change message every 4 seconds
   renderInvestMenu();
   renderGames();
   updateBuyButtons();
-
+  
   // Close modal with ESC key (unused modal still present)
   const gameModal = document.getElementById("gameModal");
   const gameFrame = document.getElementById("gameFrame");
