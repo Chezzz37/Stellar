@@ -1,0 +1,3116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stellar Game Hub/Launcher</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Audiowide&family=Bungee&family=Fredoka+One&family=Nosifer&family=Black+Ops+One&display=swap"
+    rel="stylesheet"
+  />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Montserrat&family=Lobster&family=Open+Sans&family=Pacifico&family=Raleway&family=Dancing+Script&family=Playfair+Display&family=Nunito&family=Indie+Flower&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+<style>
+    :root {
+      --bg: #f0f0f0;
+      --text: #222;
+      --menu-bg: #2c3e50;
+      --menu-text: #ecf0f1;
+      --highlight: #5c6ac4;
+      --buy-btn-bg: #3498db;
+      --buy-btn-cursor: pointer;
+      --buy-btn-disabled-bg: #666;
+      --buy-btn-disabled-cursor: default;
+    }
+    
+    .snowflake {
+  position: fixed;
+  top: -10px;
+  color: white;
+  user-select: none;
+  pointer-events: none;
+  font-size: 1em;
+  z-index: 5000;
+  animation-name: fall, sway;
+  animation-timing-function: linear, ease-in-out;
+  animation-iteration-count: infinite, infinite;
+}
+
+@keyframes fall {
+  0% {
+    top: -10px;
+    opacity: 1;
+  }
+  100% {
+    top: 100vh;
+    opacity: 0;
+  }
+}
+
+
+@keyframes sway {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(25px);
+  }
+}
+
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+    
+    #chatModal {
+  position: fixed;
+  top: 48px; right: 0; bottom: 0; left: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  z-index: 3000;
+  user-select: none;
+}
+
+#chatContainer {
+  background: #222;
+  color: #eee;
+  width: 100%;
+  max-width: 400px;
+  height: 80vh;
+  margin-top: 20px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+#chatCloseBtn {
+  align-self: flex-end;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: #eee;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+#chatOutput {
+  flex-grow: 1;
+  background: #111;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 8px;
+  overflow-y: auto;
+  font-family: monospace, monospace;
+  white-space: pre-wrap;
+  outline: none;
+}
+
+#chatInput {
+  border-radius: 6px;
+  border: none;
+  padding: 8px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+#chatInput:focus {
+  outline: 2px solid var(--highlight);
+}
+
+.chat-message {
+  margin: 3px 0;
+}
+.chat-bot {
+  color: #6bc1ff;
+}
+.chat-error {
+  color: #ff4c4c;
+}
+
+#pongGame {
+  display: none;
+}
+/* Weather city select */
+#citySelect {
+  margin-top:8px;
+  border-radius:6px;
+  border:none;
+  padding:8px;
+  font-size:14px;
+  width:100%;
+  display: block;
+}
+/* Weather fetch button */
+#fetchWeatherBtn {
+  margin-top:6px;
+  width: 100%;
+  padding: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: block;
+}
+/* Weather error */
+#weatherError {
+  color:#ff4c4c;
+  margin-top:4px;
+  font-size:13px;
+  display:none;
+}
+
+/* Themes (background colors for body) */
+body.theme-red {
+  background-color: #b94a48;
+  color: #fff;
+}
+
+body.theme-orange {
+  background-color: #e67e22;
+  color: #fff;
+}
+
+body.theme-yellow {
+  background-color: #f1c40f;
+  color: #222;
+}
+
+body.theme-green {
+  background-color: #2ecc71;
+  color: #fff;
+}
+
+body.theme-cyan {
+  background-color: #1abc9c;
+  color: #fff;
+}
+
+body.theme-blue {
+  background-color: #3498db;
+  color: #fff;
+}
+
+body.theme-purple {
+  background-color: #9b59b6;
+  color: #fff;
+}
+
+body.theme-pink {
+  background-color: #e91e63;
+  color: #fff;
+}
+
+body.theme-black {
+  background-color: #121212;
+  color: #eee;
+}
+
+/* Added Gradient Themes */
+body.theme-redyellow {
+  background: linear-gradient(90deg, red, yellow);
+  animation: gradient 13s ease infinite;
+background-size: 400% 400%;
+}
+body.theme-greenblue {
+ background: linear-gradient(90deg, green, blue);
+  animation: gradient 13s ease infinite;
+background-size: 400% 400%;
+}
+body.theme-redblue {
+background: linear-gradient(90deg, red, blue);
+  animation: gradient 13s ease infinite;
+background-size: 400% 400%;
+}
+body.theme-redgreen {
+background: linear-gradient(90deg, red, green);
+  animation: gradient 13s ease infinite;
+background-size: 400% 400%;
+}
+body.theme-yellowblue {
+  background: linear-gradient(90deg, yellow, blue);
+   animation: gradient 13s ease infinite;
+background-size: 400% 400%;
+}
+body.theme-greenpink {
+  background: linear-gradient(90deg, green, pink);
+   animation: gradient 13s ease infinite;
+background-size: 400% 400%;
+}
+body.theme-greenyellow {
+  background: linear-gradient(90deg, green, yellow);
+   animation: gradient 13s ease infinite;
+background-size: 400% 400%;
+}
+body.theme-redcyan {
+  background: linear-gradient(90deg, red, cyan);
+   animation: gradient 13s ease infinite;
+background-size: 400% 400%;
+}
+ 
+body.theme-rainbow {
+background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, purple);
+animation: gradient 45s ease infinite;
+background-size: 400% 400%;
+}
+
+/* Fonts */
+body.font-bungee {
+  font-family: 'Bungee', cursive, Arial, sans-serif;
+}
+
+body.font-fredoka {
+  font-family: 'Fredoka One', cursive, Arial, sans-serif;
+}
+
+body.font-blackops {
+  font-family: 'Black Ops One', cursive, Arial, sans-serif;
+}
+
+body.font-nosifer {
+  font-family: 'Nosifer', cursive, Arial, sans-serif;
+}
+
+body.font-audiowide {
+  font-family: 'Audiowide', cursive, Arial, sans-serif;
+}
+body.font-roboto {
+  font-family: 'Roboto', sans-serif;
+}
+
+body.font-montserrat {
+  font-family: 'Montserrat', sans-serif;
+}
+
+body.font-lobster {
+  font-family: 'Lobster', cursive;
+}
+
+body.font-opensans {
+  font-family: 'Open Sans', sans-serif;
+}
+
+body.font-pacifico {
+  font-family: 'Pacifico', cursive;
+}
+
+body.font-raleway {
+  font-family: 'Raleway', sans-serif;
+}
+
+body.font-dancingscript {
+  font-family: 'Dancing Script', cursive;
+}
+
+body.font-playfairdisplay {
+  font-family: 'Playfair Display', serif;
+}
+
+body.font-nunito {
+  font-family: 'Nunito', sans-serif;
+}
+
+body.font-indieflower {
+  font-family: 'Indie Flower', cursive;
+}
+
+/* Top menu */
+.top-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: var(--menu-bg);
+  color: var(--menu-text);
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  height: 48px;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 1000;
+  user-select: none;
+}
+
+.top-menu > .balance {
+  margin-left: auto;
+  margin-right: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #f39c12;
+}
+
+.menu-item {
+  position: relative;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+.menu-item:hover,
+.menu-item:focus {
+  background-color: #34495e;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: var(--menu-bg);
+  min-width: 190px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  z-index: 1100;
+  top: 48px;
+  left: 0;
+  border-radius: 0 0 6px 6px;
+  overflow: auto;
+  max-height: 250px;
+}
+
+.dropdown-content > div,
+.dropdown-content > button {
+  color: var(--menu-text);
+  padding: 10px 16px;
+  text-align: left;
+  border: none;
+  background: none;
+  width: 100%;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+  border-bottom: 1px solid #3a4a62;
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dropdown-content > div:last-child {
+  border-bottom: none;
+}
+
+.dropdown-content {
+display: block; /* Temporarily change display to block for animation */
+opacity: 0;
+transform: translateY(-10px);
+pointer-events: none;
+transition: opacity 0.5s ease, transform 0.3s ease;
+max-height: 250px;
+overflow: auto;
+}
+
+.menu-item:hover > .dropdown-content,
+.menu-item:focus-within > .dropdown-content {
+opacity: 1;
+transform: translateY(0);
+pointer-events: auto;
+/* keep max-height and overflow as before */
+}
+
+
+.dropdown-content > div:hover,
+.dropdown-content > button:hover,
+.dropdown-content > div.buy-disabled {
+  background-color: #3a4a62;
+}
+
+.menu-item:hover > .dropdown-content,
+.menu-item:focus-within > .dropdown-content {
+  display: block;
+}
+
+/* Search bar inside top menu */
+.search-container {
+  display: flex;
+  align-items: center;
+  margin-left: 16px;
+  margin-right: 12px;
+  flex-grow: 1;
+  max-width: 400px;
+}
+ 
+@keyframes fadeCycle {
+0% { opacity: 0; }
+10% { opacity: 1; }
+90% { opacity: 1; }
+100% { opacity: 0; }
+}
+
+#cyclingMessages {
+  animation: fadeCycle 4s infinite;
+  transition: opacity 0.5s ease;
+}
+
+#searchInput {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 13px;
+  border: 2px solid var(--highlight);
+  border-radius: 4px;
+  outline: none;
+  color: var(--text);
+  background-color: #fff;
+  transition: border-color 0.3s ease;
+}
+
+#searchInput:focus {
+  border-color: var(--menu-bg);
+}
+
+/* Games grid */
+#gamesGrid {
+  margin: 0 auto 60px;
+  max-width: 900px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  padding: 0 16px 32px;
+  user-select: none;
+}
+
+.game-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  position: relative;
+}
+
+.game-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+  user-select: none;
+}
+
+.game-title {
+  text-align: center;
+  margin: 8px 0 4px;
+  font-weight: 700;
+  font-size: 18px;
+  user-select: text;
+  color: #000000;
+}
+
+.game-category {
+  font-size: 12px;
+  color: #000000;
+  text-align: center;
+  margin-bottom: 8px;
+  user-select: text;
+}
+
+.game-description {
+  font-size: 13px;
+  flex-grow: 1;
+  margin-bottom: 8px;
+  user-select: text;
+  white-space: pre-line;
+  color: #000000;
+}
+
+.game-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Gradient multicolor buy & sell buttons */
+.buy-btn, .sell-btn-game {
+  background: linear-gradient(45deg, #ff6b6b, #f8e71c, #6bffb2, #3498db);
+  background-size: 400% 400%;
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: var(--buy-btn-cursor);
+  user-select: none;
+  min-width: 80px;
+  transition: background-position 0.5s ease, background-color 0.3s ease;
+  user-select: none;
+}
+
+.buy-btn:hover:not(:disabled),
+.sell-btn-game:hover:not(:disabled) {
+  background-position: 100% 50%;
+}
+
+.buy-btn:disabled,
+.buy-btn.buy-disabled,
+.sell-btn-game:disabled {
+  background-color: var(--buy-btn-disabled-bg);
+  cursor: var(--buy-btn-disabled-cursor);
+  background-image: none;
+}
+
+.cost {
+  font-weight: 700;
+  font-size: 14px;
+  user-select: none;
+  color: #27ae60;
+  margin-right: 10px;
+  white-space: nowrap;
+}
+
+/* Sell button common style */
+.sell-btn {
+  background-color: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 4px 8px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  user-select: none;
+  margin-left: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background-color 0.3s ease;
+}
+
+.sell-btn:hover:not(:disabled) {
+  background-color: #c0392b;
+}
+
+/* Favorites star */
+.star-fav {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 22px;
+  cursor: pointer;
+  color: #bbb;
+  user-select: none;
+  transition: color 0.3s ease;
+  user-drag: none;
+  user-select: none;
+}
+
+.star-fav.favorited {
+  color: #f39c12;
+  text-shadow: 0 0 3px #f39c12;
+}
+
+/* Modal game iframe */
+#gameModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 48px;
+  z-index: 2000;
+  user-select: none;
+}
+
+#gameModal button.close-game {
+  position: fixed;
+  top: 8px;
+  right: 12px;
+  background-color: #f44336;
+  border: none;
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 3000;
+  user-select: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  transition: background-color 0.3s ease;
+}
+
+#gameModal button.close-game:hover {
+  background-color: #d32f2f;
+}
+
+/* Scroll for dropdown with large list */
+.dropdown-content {
+  scrollbar-width: thin;
+  scrollbar-color: #34495e transparent;
+}
+
+.dropdown-content::-webkit-scrollbar {
+  width: 6px;
+}
+.dropdown-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.dropdown-content::-webkit-scrollbar-thumb {
+  background-color: #34495e;
+  border-radius: 3px;
+}
+@keyframes gradient {
+  0% {
+      background-position: 0% 50%;
+  }
+  50% {
+      background-position: 100% 50%;
+  }
+  100% {
+      background-position: 0% 50%;
+  }
+}
+
+/* Rainbow text for terminal */
+.rainbow-text {
+  background-image: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, purple);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rainbowAnimation 7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes rainbowAnimation {
+  0% {background-position: 0%;}
+  100% {background-position: 100%;}
+}
+
+/* Hangman UI */
+#hangmanContainer {
+  background: #222;
+  color: #eee;
+  max-width: 400px;
+  padding: 12px;
+  border-radius: 12px;
+  font-family: monospace;
+  user-select: none;
+  margin: 8px auto 12px;
+  display: none;
+}
+
+#hangmanWord {
+  font-size: 24px;
+  letter-spacing: 6px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+#hangmanGuesses {
+  margin-bottom: 12px;
+}
+
+#hangmanMessage {
+  margin-top: 6px;
+  font-style: italic;
+}
+
+#hangmanInputContainer {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+#hangmanGuessInput {
+  width: 60px;
+  font-size: 20px;
+  text-transform: uppercase;
+  text-align: center;
+  border-radius: 6px;
+  border: none;
+  padding: 8px;
+  outline: none;
+  user-select: text;
+}
+
+#hangmanGuessBtn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  background: #3498db;
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+#hangmanGuessBtn:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
+  </style>
+  </head>
+<body>
+  <nav class="top-menu" role="navigation" aria-label="Main menu">
+    <!-- Add inside nav.top-menu near the right -->
+<button id="chatBtn" aria-label="Open chat" style="font-size: 18px; margin-left: 8px; background:none; border:none; color:#ecf0f1; cursor:pointer;">
+  <i class="fa-regular fa-comments"></i>
+</button>
+    <div class="menu-item" tabindex="0" aria-haspopup="true" aria-expanded="false" id="settingsMenu">
+      Settings ▼
+      <div class="dropdown-content" role="menu" aria-label="Settings submenu">
+        <div role="menuitem" aria-haspopup="true" tabindex="0" id="themeShopBtn">Theme Shop</div>
+        <div id="themeOptions" style="display:none; padding-left:16px;">
+          <ul style="list-style-type: disc; padding-left: 20px; margin: 4px 0;">
+            <li><button data-theme="red" data-cost="200" class="buy-theme-btn" type="button">Red (200)</button></li>
+            <li><button data-theme="orange" data-cost="200" class="buy-theme-btn" type="button">Orange (200)</button></li>
+            <li><button data-theme="yellow" data-cost="200" class="buy-theme-btn" type="button">Yellow (200)</button></li>
+            <li><button data-theme="green" data-cost="200" class="buy-theme-btn" type="button">Green (200)</button></li>
+            <li><button data-theme="cyan" data-cost="200" class="buy-theme-btn" type="button">Cyan (200)</button></li>
+            <li><button data-theme="blue" data-cost="200" class="buy-theme-btn" type="button">Blue (200)</button></li>
+            <li><button data-theme="purple" data-cost="200" class="buy-theme-btn" type="button">Purple (200)</button></li>
+            <li><button data-theme="pink" data-cost="200" class="buy-theme-btn" type="button">Pink (200)</button></li>
+            <li><button data-theme="black" data-cost="200" class="buy-theme-btn" type="button">Black Background (200)</button></li>
+            <!-- Added gradient themes with cost 550 -->
+            <li><button data-theme="redyellow" data-cost="550" class="buy-theme-btn" type="button">Red Yellow Gradient (550)</button></li>
+            <li><button data-theme="greenblue" data-cost="550" class="buy-theme-btn" type="button">Green Blue Gradient (550)</button></li>
+            <li><button data-theme="redblue" data-cost="550" class="buy-theme-btn" type="button">Red Blue Gradient (550)</button></li>
+            <li><button data-theme="redgreen" data-cost="550" class="buy-theme-btn" type="button">Red Green Gradient (550)</button></li>
+            <li><button data-theme="yellowblue" data-cost="550" class="buy-theme-btn" type="button">Yellow Blue Gradient (550)</button></li>
+            <li><button data-theme="greenpink" data-cost="550" class="buy-theme-btn" type="button">Green Pink Gradient (550)</button></li>
+            <li><button data-theme="greenyellow" data-cost="550" class="buy-theme-btn" type="button">Green Yellow Gradient (550)</button></li>
+            <li><button data-theme="redcyan" data-cost="550" class="buy-theme-btn" type="button">Red Cyan Gradient (550)</button></li>
+            <li><button data-theme="rainbow" data-cost="1000" class="buy-theme-btn" type="button">Rainbow (1000)</button></li>
+          </ul>
+        </div>
+        <div role="menuitem" aria-haspopup="true" tabindex="0" id="fontShopBtn" style="margin-top:8px;">Font Shop</div>
+        <div id="fontOptions" style="display:none; padding-left:16px;">
+          <ul style="list-style-type: disc; padding-left: 20px; margin: 4px 0;">
+            <li><button data-font="roboto" data-cost="200" class="buy-font-btn" type="button">Roboto (200)</button></li>
+<li><button data-font="montserrat" data-cost="250" class="buy-font-btn" type="button">Montserrat (250)</button></li>
+<li><button data-font="lobster" data-cost="300" class="buy-font-btn" type="button">Lobster (300)</button></li>
+<li><button data-font="opensans" data-cost="200" class="buy-font-btn" type="button">Open Sans (200)</button></li>
+<li><button data-font="pacifico" data-cost="220" class="buy-font-btn" type="button">Pacifico (220)</button></li>
+<li><button data-font="raleway" data-cost="240" class="buy-font-btn" type="button">Raleway (240)</button></li>
+<li><button data-font="dancingscript" data-cost="320" class="buy-font-btn" type="button">Dancing Script (320)</button></li>
+<li><button data-font="playfairdisplay" data-cost="350" class="buy-font-btn" type="button">Playfair Display (350)</button></li>
+<li><button data-font="nunito" data-cost="210" class="buy-font-btn" type="button">Nunito (210)</button></li>
+<li><button data-font="indieflower" data-cost="180" class="buy-font-btn" type="button">Indie Flower (180)</button></li>
+
+            <li><button data-font="bungee" data-cost="150" class="buy-font-btn" type="button">Bungee (150)</button></li>
+            <li><button data-font="fredoka" data-cost="250" class="buy-font-btn" type="button">Fredoka One (250)</button></li>
+            <li><button data-font="blackops" data-cost="300" class="buy-font-btn" type="button">Black Ops One (300)</button></li>
+            <li><button data-font="nosifer" data-cost="350" class="buy-font-btn" type="button">Nosifer (350)</button></li>
+            <li><button data-font="audiowide" data-cost="400" class="buy-font-btn" type="button">Audiowide (400)</button></li>
+          </ul>
+        </div>
+        
+        <div role="menuitem" tabindex="0" id="creditsBtn" style="margin-top:8px;">Credits</div>
+        <div id="creditsContent" style="display:none; padding-left:16px; white-space: pre-wrap; font-size: 13px;">
+          <!-- Credits will go here when you add them -->
+          <i>Chez - Code Development.
+            Lungus - Minor bug fixing
+          Game Devs - Thx for letting me use ur games 😘
+       CORS Developer - I couldnt do this without you, literally. 😘😘</i>
+        </div>
+        <div role="menuitem" tabindex="0" id="infoBtn" style="margin-top:8px;">Info</div>
+        <div id="infoContent" style="display:none; padding-left:16px; font-size: 13px; white-space: pre-wrap;">
+          Wsp guys! I'm chez! I started this project one april night, trying to bring the fun of games to everyone wherever they are. Have fun with my site!
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-item" tabindex="0" id="investMenuBtn" aria-haspopup="true" aria-expanded="false">
+      Invest ▼
+      <div class="dropdown-content" role="menu" aria-label="Invest submenu" id="investMenu" style="max-height: 260px;">
+        <!-- Companies injected by JS -->
+      </div>
+    </div>
+
+    <div class="balance" aria-live="polite" aria-atomic="true" id="coinBalance" title="Your current coin balance">
+      Coins: 4850
+    </div>
+
+    <section class="search-container" aria-label="Game search">
+      <input
+        type="search"
+        id="searchInput"
+        placeholder="Search Thingies..."
+        aria-label="Search games"
+        autocomplete="off"
+      />
+    </section>
+  </nav>
+
+<!-- Chat modal overlay -->
+<div id="chatModal" role="dialog" aria-modal="true" aria-label="Chat window" style="display:none;">
+  <div id="chatContainer">
+    <select id="citySelect" aria-label="Select city for weather" >
+  <!-- Options will be added dynamically -->
+</select>
+<button id="fetchWeatherBtn" >Get Weather</button>
+<div id="weatherError"></div>
+
+    <button id="chatCloseBtn" aria-label="Close chat">❌</button>
+    <div id="chatOutput" tabindex="0" aria-live="polite"></div>
+    <div id="aiChatNotice">Terminal for Commands (Experimental)</div>
+    <input id="chatInput" type="text" aria-label="Chat input" autocomplete="off" placeholder="Type a command or message..." />
+    <div id="pongGame" >
+      <canvas id="pongCanvas" width="380" height="240"></canvas>
+      <button id="shutdownPongBtn" aria-label="Shut down pong game">Shut Down</button>
+      <div id="pongControlsHint">Use W/S keys to move your paddle</div>
+    </div>
+    <div id="hangmanContainer" aria-label="Hangman game" role="region" tabindex="0">
+      <div id="hangmanWord"></div>
+      <div id="hangmanGuesses">Guessed letters: </div>
+      <div id="hangmanInputContainer">
+        <input type="text" id="hangmanGuessInput" maxlength="1" aria-label="Guess a letter for hangman" />
+        <button id="hangmanGuessBtn">Guess</button>
+      </div>
+      <div id="hangmanMessage" aria-live="polite"></div>
+    </div>
+  </div>
+</div>
+
+ <main>
+  <h1 style="text-align:center; color: #000000; user-select:none; margin-top: 64px;">
+    Stellar - Game Hub/Launcher
+  </h1>
+  
+  <h2 id="cyclingMessages" style="text-align:center; color:#000; user-select:none; margin-top:12px;"></h2>
+
+  <h3 style="text-align:center; color: #000000; user-select:none; margin-top: 16px;">
+    Your Entertainment lies here!
+    Welcome to Stellar! This game site is so good trust me gng 🥀. Anyways, on a serious note, have fun.
+  </h3>
+    <h3 style="text-align:center; color: #000000; user-select:none; margin-top: 16px;">Also, big updates and game additions coming soon!</h3>
+  <h4 style="color:black; text-align:center; max-width:900px; margin: 0 auto 24px; user-select:none;">
+  Warning! Stuff requires CORS to load. Go to https://cors-anywhere.herokuapp.com/corsdemo to obtain access, or click the button below.
+</h4>
+
+<button id="corsAccessBtn" style="background-color: black; color: white; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; display: block; margin: 0 auto 24px; user-select:none;">
+  Request CORS Access
+</button>
+
+  <section id="gamesGrid" aria-live="polite" aria-atomic="false" aria-label="List of games">
+    <!-- Game cards injected by JS -->
+  </section>
+</main>
+
+
+  <!-- Game iframe modal -->
+  <section role="dialog" aria-modal="true" aria-label="Game window" id="gameModal">
+    <button class="close-game" aria-label="Close game window">✕ Close</button>
+    <iframe src="" title="Game window" id="gameFrame" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+  </section>
+  
+  <script>
+   (() => {
+  // Proxy URL for CORS
+  const PROXY_URL = "https://cors-anywhere.herokuapp.com/";
+
+  // Initial state
+  let coinBalance = 4850;
+  const purchasedThemes = new Set();
+  const purchasedFonts = new Set();
+  const purchasedGames = new Set();
+  const favorites = new Set();
+
+  // Store last selected theme and font
+  let currentTheme = "";
+  let currentFont = "";
+
+  // Companies for invest
+  const companies = [
+    { name: "AstroTech", desc: "Leading space tech innovator." },
+    { name: "StarDynamics", desc: "Futuristic propulsion systems." },
+    { name: "GalaxySoft", desc: "Top space simulation games." },
+    { name: "CosmoEnergy", desc: "Renewable cosmic energy." },
+    { name: "NovaWorks", desc: "Advanced AI for space missions." },
+    { name: "OrbitalNetworks", desc: "Space communication tech." },
+    { name: "QuantumSat", desc: "Quantum satellite networks." },
+    { name: "SolarFlare", desc: "Solar absorption technology." },
+    { name: "MeteorMines", desc: "Asteroid mining experts." },
+    { name: "LunarLogistics", desc: "Moon transport services." },
+  ];
+
+  // Games data with requiresCors flag and real github raw urls for CORS games
+   const gamesData = [ {
+      id: "game1",
+      title: "Soccer Random",
+      category: "Sports, Multiplayer",
+      description:
+        "Play this game with friends or just yourself. Crazy soccer action with randomly generated circumstances.",
+      cost: 2075,
+      image:
+        "https://th.bing.com/th/id/OIP.09kY4K3Tx9CbrIsVLzm__AHaHa?w=180&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3&adlt=strict",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/soccerrandom.htm",
+      requiresCors: true,
+    },
+    {
+      id: "game2",
+      title: "Gn-math Game Loader",
+      category: "Game Loaders",
+      description:
+        "A site with several different games to load all for free. Very intuative and isnt made up of all games. It even has a code editor!",
+      cost: 10000,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhZuxLIqreVnTSJ6-5ZoF4rspCYq8Yz_D_Sk6rvz-V-w&s=10",
+      url: "https://raw.githubusercontent.com/gn-math/gn-math-DONTDMCA/refs/heads/main/singlefile.html",
+      requiresCors: true,
+    },
+    { id: "game3",
+      title: "Crossy Road",
+      category: "Strategy",
+      description:
+        "Play as a chicken (or anything you buy with the in game currency) and run across roads and bodies of water on water to avoid dying. Compete for a best high score.",
+      cost: 2320,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSozrbJp8K-A3Ki_STY80jF3iYbdkvkc_9IEKOEaIYNqg&s",
+      url: "https://raw.githubusercontent.com/Chezzz37/Html-offline-games-dump/refs/heads/main/offline%20games/Crossy%20road(dosent%20work%20in%20code%20editors).html",
+      requiresCors: true,
+    },
+    {
+      id: "game4",
+      title: "Slow Roads",
+      category: "Racing/Driving",
+      description:
+        "A game where you drive your choice of either a car, motorbike or RV and drive across randomly generated landscapes. You can also change the time of day.",
+      cost: 4050,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTubJHcKPH3uM4UY_XZ3ZBhzEdG6FdRFYqAL6zcai3GVA&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/slowroads.html",
+      requiresCors: true,
+    },
+    {
+      id: "game5",
+      title: "Basket Random",
+      category: "Sports, Multiplayer",
+      description:
+        "Same thing as Soccer Random, except with basketball. Huge fun expected.",
+      cost: 2255,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJ5w-qI7kmSkehCfZzaCwThakRnrRW3BQK4ltc9zsuow&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/basketrandom.html",
+      requiresCors: true,
+    },
+    {
+      id: "game6",
+      title: "Volley Random",
+      category: "Sports, Multiplayer",
+      description:
+        "Same thing as Soccer Random, except with volleyball. So unfair sonetimes! 😡",
+      cost: 2210,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyx5mYpj9QKaesv8QkqF2Y4QGMjEz0ArbtGYu-_ok83A&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/volleyrandom.html",
+      requiresCors: true,
+    },
+    {
+      id: "game7",
+      title: "2048",
+      category: "Puzzle",
+      description:
+        "A game where you multiply tiles to obtain the 2048 tile. If you get up to 1024, you are better than Chez because he has only gotten to the 512 tile.",
+      cost: 1800,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxrNJbdVEClYFV6tfA-lE5BGTCsI0ofDpyEWPm88H77A&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/2048.html",
+      requiresCors: true,
+    },
+    {
+      id: "game8",
+      title: "3D Flight Sim",
+      category: "Adventure",
+      description:
+        "A game where you can try to figure out how to get a plane of your choice to fly off a runway and fly to random places on the map. Kinda hard ngl.",
+      cost: 1965,
+      image:
+        "https://imgs.crazygames.com/3d-flight-simulator.png?metadata=none&quality=60&width=216&height=120&fit=crop&dpr=3",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/3Dflightsimulator.html",
+      requiresCors: true,
+    },
+    {
+      id: "game9",
+      title: "Escape Road ",
+      category: "Racing/Driving",
+      description:
+        "A game where you flee from cops in cars that have different builds and power depending on what you buy.",
+      cost: 2855,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQryiG-bfqYJapr5mTFfHKfW08nX6Cu9Cq1gUEvb_hlyQ&s=10",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/E/clescaperoad.html",
+      requiresCors: true,
+    },
+    {
+      id: "game10",
+      title: "Helix Jump",
+      category: "Casual",
+      description:
+        "A game where you play as a little ball and jump and break through stuff.",
+      cost: 1995,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8WyelidqjkmvKzILidtFiuSpNdOGS2781unyA-IaoQQ&s=10",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/H/clhelixjump.html",
+      requiresCors: true,
+    },
+   {
+      id: "game11",
+      title: "Eaglercraft 1.12",
+      category: "Adventure",
+      description:
+        "Basically minecraft 1.12.",
+      cost: 6575,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9q3-251bAHRwHZKutJKfnMRID6Hw19RbGR-WT7F7jzQ&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/1.12.html",
+      requiresCors: true,
+    },
+     {
+      id: "game12",
+      title: "Boxing Random",
+      category: "Sports, Multiplayer",
+      description:
+        "Same thing as Soccer Random, but for Boxing. No violence cuz its pixels.",
+      cost: 2000,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWKm0L8aw0-mPhXXsGOF-2RibHNkuGHMGqCRcOPIXiFQ&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/boxingrandom.htm",
+      requiresCors: true,
+    },
+     {
+      id: "game13",
+      title: "Super Mario 64",
+      category: "Emulated Games",
+      description:
+        "The hit N64 game where you collect stars to fight bowser and save Princess Peach.",
+      cost: 1235,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTcSgX9STtzB71QDTTX93veHCeAHIOlD1Di6osxgDCMQ&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/sm64.html",
+      requiresCors: true,
+    },
+     {
+      id: "game14",
+      title: "Coreball",
+      category: "Strategy",
+      description:
+        "A game whre you sty to fit lines around a moving ball without the lines touching each other.",
+      cost: 2990,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6TKvM4ivdn7K8DnG7-D2L7DU8iZKANSHqRe9JP5Qyfw&s=10",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/C/clcoreball.html",
+      requiresCors: true,
+    },
+     {
+      id: "game15",
+      title: "Call of Duty: Modern Warfare",
+      category: "Emulated Games",
+      description:
+        "A DS COD Game.",
+      cost: 1855,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcvZsGi_toe7pi3ZK-MkBOVBALlCbdbquzX9EkzEEGFw&s",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/C/clcodmodernwarfare.html",
+      requiresCors: true,
+    },
+     {
+      id: "game16",
+      title: "Slither.io",
+      category: "IO Games",
+      description:
+        "Game where you kill other snakes and eat the particles they drop to grow.",
+      cost: 3785,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjnoiDb5zGbDfeh6H6z0Pn-CVzinlEJS-tkA0EnOM8sA&s=10",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/S/clslitherio.html",
+      requiresCors: true,
+    },
+     {
+      id: "game17",
+      title: "Slope",
+      category: "Strategy",
+      description:
+        "Game where you fly down a hill and avoid walls and stuff.",
+      cost: 4120,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQONEdcLUgATij06t_B31GaY9SGwlDZxpCqOb0ok7yIiA&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/slope.html",
+      requiresCors: true,
+    },
+     {
+      id: "game18",
+      title: "Basket Bros",
+      category: "Sports",
+      description:
+        "Cool NBA Style game where you play as guys from the NBA.",
+      cost: 4695,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQapBq-AdxOIK6B_3gn61lYT-XRqgyweNQZy6QewcCY9Q&s=10",
+      url:"https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/basketbros.html",
+     },
+     {
+      id: "game19",
+      title: "UGS Files",
+      category: "Game Loaders",
+      description:
+        "All the games from the UGS Files Google Doc.",
+      cost: 15000,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRzBjGokjlFwMATTb0oNcPGZLOktZ1uJIkoqrVdfm7bg&s=10",
+      url: "https://raw.githubusercontent.com/bubbls/ugs-singlefile/refs/heads/main/AASINGLEFILE.html",
+      requiresCors: true,
+    },
+     {
+      id: "game20",
+      title: "Slope 2-Player",
+      category: "Strategy, Multiplayer",
+      description:
+        "Just like slope, but with a 2 player option.",
+      cost: 4445,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6pSO6NN2546g6MzvZbyvQnWGLCn5JfjskSSC-esPsWg&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/slope2player.html",
+      requiresCors: true,
+    },
+    {
+      id: "game21",
+      title: "1",
+      category: "Puzzle",
+      description:
+        "Just like 2048, but you divide the tiles.",
+      cost: 3785,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-qpbL19c_DHduzxgXar8zXz5OEb1ISrQuVNMR9lgrvA&s=10",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/1/cl1.html",
+      requiresCors: true,
+    },
+     {
+      id: "game22",
+      title: "Crazy Cars",
+      category: "Racing/Driving",
+      description:
+        "Racing game that takes place in a stunt park.",
+      cost: 5230,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1akVbD5UvyxH-oasDJzH6_peot2IfkkmYQkLBq7nbiw&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/crazycars.html",
+      requiresCors: true,
+    },
+    {
+      id: "game23",
+      title: "Escape Road 2",
+      category: "Racing/Driving",
+      description:
+        "The sequel to the hit game Escape Road.",
+      cost: 2900,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCWhfDEy0b5lodaEhQN0GtLXlOOAvlBUjHOtkGW8bQHQ&s",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/E/clescaperoad2.html",
+      requiresCors: true,
+    },
+     {
+      id: "game24",
+      title: "Super Mario Bros Plus",
+      category: "Emulated Games",
+      description:
+        "Mario Bros for the NES, but with mods, superpowers and level editors.",
+      cost: 2300,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0k2AdtFYWWp2WpDEW3L6WJ3rOGpfzs2D2uUHSlf9nmFZDt4di6Ew3CR3UV1by1L9CyM7HQDKygteh5Qt893qLTePC0ludG8pNrvbk6_-f&s=10",
+      url: "https://raw.githubusercontent.com/Hexorod/ugs/refs/heads/main/S/clsupermariobros.html",
+      requiresCors: true,
+    },
+    {
+      id: "game25",
+      title: "Madalin Stunt Cars 2",
+      category: "Racing/Driving",
+      description:
+        "A game where you race a bunch of different cars that you select in the garage.",
+      cost: 4975,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbS8VuMmmBag4FqxrU_2A_WHloMViOJwqHl3i7s_IYrg&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/madalinstuntcars2.html",
+      requiresCors: true,
+    },
+    {
+      id: "game26",
+      title: "Pac-Man",
+      category: "Strategy",
+      description:
+        "Play as a yellow ball with a mouth and a avoid ghosts that are chasing you.",
+      cost: 2635,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQohcgh7PB0taV9NlrB22UUwCW3eF45rTaQGnqmolyFpA&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/pacman.html",
+      requiresCors: true,
+    },
+    {
+      id: "game27",
+      title: "Supreme Math Lite",
+      category: "Game Loaders",
+      description:
+        "Has a ton of games to load. Thats basically it.",
+      cost: 17605,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-qpbL19c_DHduzxgXar8zXz5OEb1ISrQuVNMR9lgrvA&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/single-file.html",
+      requiresCors: true,
+    },
+    {
+      id: "game28",
+      title: "Curveball",
+      category: "Strategy",
+      description:
+        "A game where the ball gets hit by an opponent and you try to hit the ball back. Kinda like 3D Pong.",
+      cost: 2755,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWfEAWV4Ad3uw2_0PBYoWtkl1pz7GS-VIfbNJ7NdMZ4Q&s=10",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/C/clcurveball.html",
+      requiresCors: true,
+    },
+    {
+      id: "game29",
+      title: "Genizy Soundboard",
+      category: "Apps",
+      description:
+        "Has a bunch of sounds, possibly with over 300.",
+      cost: 1200,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTayEsgHJj9UXQ05H_jw7l8NYWFPxSLBpc1E7LorquQtA&s=10",
+      url: "https://raw.githubusercontent.com/genizy/soundboard/refs/heads/main/index.html",
+      requiresCors: true,
+    },
+    {
+      id: "game30",
+      title: "SoundBoardW",
+      category: "Apps",
+      description:
+        "This soundboard is the first web-based thing on our list. This actually has a URL. If you look at the code, the thing for this is an actual url website! How funny!",
+      cost: 1000,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRk6hY9ApFnGYg4vqqcm--T2l8V7sEydOKlAsyvyT4bzA&s",
+      url: "https://soundboardw.net/",
+      requiresCors: true,
+    },
+    {
+      id: "game31",
+      title: "Beta Chatbot AI",
+      category: "Apps",
+      description:
+        "This is beta. BETA. BETAAAA!",
+      cost: 1355,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtofMMlu0Jh5MmQle0NgkN-CttENnxAiLSs4lFx7XnHw&s=10",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/A/clai.html",
+      requiresCors: true,
+    },
+    {
+      id: "game32",
+      title: "BitLife",
+      category: "Strategy",
+      description:
+        "The hit game where you play as a random guy you were born as and you play a game of life, kinda.",
+      cost: 5240,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZdo5cBqkv1uAcfCofpC-WAViocRNLlysohwHMV2Lqzw&s=10",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/B/clbitlife.html",
+      requiresCors: true,
+    },
+    {
+      id: "game33",
+      title: "Doge Miner 2",
+      category: "Strategy",
+      description:
+        "The sequel to the smash hit game, Doge Miner.",
+      cost: 3560,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjtgiffmpib5KFLywHYWvn6imJfGD22JmZF4JXuDeB2Q&s=10",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/D/cldogeminer2.html",
+      requiresCors: true,
+    },
+    {
+        id: "game34",
+        title: "Baseball Bros",
+        category: "Sports",
+        description: "A game where you can run baseball games with funny sprites, all in one game.",
+        cost: 4450,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWYSmchsS6n0Idx7dQ6N-VGEA2oW5j6Z2fhr-lXP2f-qhl4afN:https://golforbitgame.com/wp-content/uploads/2026/01/Baseball-Bros-Online-for-Free.webp&s",
+        url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/baseballbros.html",
+        requiresCors: true,
+    },
+    {
+        id: "game35",
+        title: "1v1.lol",
+        category: "Strategy",
+        description: "Kinda like a web based Fortnite.",
+        cost: 4355,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR05AuxILvZqh6BxW8UQ4z86BGw6KY_f_MIUXpugvs5zcdsg_F3:https://a.simbi.com/images/192468/images/large-61901f657d10dfc871971050982e6033.jpg&s",
+        url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/1v1.lol.html",
+        requiresCors: true,
+    },
+    {
+        id: "game36",
+        title: "NautilusOS",
+        category: "Apps",
+        description: "A web-based Operating System where you can do just about anything.",
+        cost: 8975,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-qpbL19c_DHduzxgXar8zXz5OEb1ISrQuVNMR9lgrvA&s=10",
+        url: "https://raw.githubusercontent.com/nautilus-os/NautilusOS/refs/heads/main/NautilusOS-OneFile/index.html",
+        requiresCors: true,
+    },
+    {
+        id: "game37",
+        title: "LumiOS",
+        category: "Apps",
+        description: "Kinda like NautilusOS.",
+        cost: 8370,
+        image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAT4AAACfCAMAAABX0UX9AAAAflBMVEUAAAD////8/PzT09Nra2vx8fFhYWHm5ub4+PiGhobj4+Pg4ODz8/Pa2trd3d35+fmysrKcnJxYWFi9vb1PT0/Dw8ONjY3Jycmnp6d/f381NTXr6+t3d3ekpKRISEgoKCgbGxs9PT2WlpZKSkpycnIQEBA6OjoeHh4VFRUrKyt6sUKPAAADVklEQVR4nO3ca3OiMBiGYV5AsIoK2AKKtqu1rf3/f3BzELUHd3U/bDbLfX0Jg7bzzjMJQSYkCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+PuSynUFPttlsjUHj/eOK/HJ01N3lEdvpp3PnRXjnUbi7nBve91LOPvhqhrPlJnIp1OvU5F046Qa36wklPGHM49TCUMZyvTRUUkeiVV68vDxXFLLTMI6/v4vcLIMdU/LP5+uRLiDuUItuvd9nWbHIwfFeCfR6YUy+fJBtXVQjXdqNXSVmes6/PSi0xOldF2Jlw5j97uLH35va7LTGb65LsVHjXT51a5L8VEuR3eua/FQY6PTc6/wG+Nmi2N8Kj/63602XXgmxZr540atja/rhHn3jHm/d1qWL4pT37NtVjfbIo+EZ1VXGZ6nFx5uY9Q4dl2XJyo5ptdFp88sXdfli+hDeoceyCR8tckhvfDU9xrXNfmkNg+cu743C6VwXZFftqdRq7Q8vLrRvsm6aSNduC7GS/dVPp/nC2ZcAAAAAAAAAAAAAMB/Inm+8ovx5LBOY7lbnG1pUN4t+rxo8psX/75XyU43m6letZGt7Mm1WcOR9XcNh0RXfvG50O/hJyJNnGwzu1wtlyjelEXW31W7V8dnLCV8NwcTvVjyveu69D6lWJsmzlU321bBexM9qIvck2r09bHMH/Wq026h2kx0V+z9ksmz+IZ264y1JEGQThIZZiKvpWmWQXAnsepux28Xqvvdf9otoofO4hsMTWPiG6ey0hnVusn1tgY6vrvTXgYbvVNEKoOi3zuTXIhvaoMSMZc1fY3T8RV29tX25ro3N+9d7oLeuhifOc7sC/nhyMZXyXGSeDv84W6uxnb68tfq/cdcGrz2OB3YT1obX3LanKQ8HT6Pbpu+/ydf4ysuxxectod40N86/pPP+zX1xll8IxvC5BfxFd2tSilqPP/o7paHxKc7lH75eR3qe7sL8amIzZhdiLzricO+7LHo8eCdTcdaWqkeJfm6lXt9SzK2o7TNTJMd49Ova02imQxf1XHZqlnjoR70+G23dpQa7TYIVplkqnNF0yCo7c+xKDo2q4G92MV1O5h0uwnF81TCUdPbiRcAAAAAAAAAAAAAAAAAAAAAAAD4Qz8Bk7ceBHfbAXcAAAAASUVORK5CYII=",
+        url: "https://raw.githubusercontent.com/FritzCohen/LumiOS/refs/heads/main/old/LumiOS.v15.html",
+        requiresCors: true,
+    },
+    {
+        id: "game38",
+        title: "Ruffle Bubble Shooter",
+        category: "Strategy",
+        description: "A bubble shooter game ran on ruffle.",
+        cost: 2450,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-erT2OT-WwDTirGC9MET-cISEflUiQchy781DLw5vsdKk3Yc:https://play-lh.googleusercontent.com/3fSd2b95ktHuKK1Sen9-VRNjWhmcpgD8ZHjGYL2HAogK4Fp1CdaLMhig-u2iHB6EmQ%3Dw526-h296-rw&s",
+        url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/bubbleshooter.html",
+        requiresCors: true,
+    },
+    {
+        id: "game39",
+        title: "Block Blast",
+        category: "Strategy",
+        description: "The hit mobile game (Youve probably played it), now on Stellar!",
+        cost: 2350,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvpbiLvQPctyXDQ9PmR-c7ykzRxYt-95Vaapox7y1be0j0TXD-:https://www.goodplayguide.com/wp-content/uploads/2025/04/Block-Blast-4.png&s",
+        url: "https://raw.githubusercontent.com/Chezzz37/Html-offline-games-dump/refs/heads/main/offline%20games/blockblast.html",
+        requiresCors: true,
+    },
+    {
+        id: "game40",
+        title: "Among Us",
+        category: "Strategy",
+        description: "The hit game where you hide from the impostor.",
+        cost: 3355,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQagu_xq_2xZW4hEnDgc2kd56Ztc_pcIvHSJLO6NG0Cei82B0Lg:https://images.immediate.co.uk/production/volatile/sites/3/2025/02/among-us-3d-7ff0eff.jpg%3Fquality%3D90%26resize%3D980,654&s",
+        url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/amongus.html",
+        requiresCors: true,
+    },
+    {
+        id: "game41",
+        title: "War the Knights",
+        category: "Miscellanious",
+        description: "A game so insane, even I cant describe it and how good it is. Thats why it costs so much.",
+        cost: 6625,
+        image: "data:image/jpeg;base64,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",
+        url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/wartheknights.html",
+        requiresCors: true,
+    },
+    {
+        id: "game42",
+        title: "Candy Crush",
+        category: "Strategy",
+        description: "A game that everyone and their moms played back in 2011.",
+        cost: 3955,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKb07frs-OTgjPU_tfryU2kjJIp1yVOpzFBOqHbUVK3GHei_HS:https://th-thumbnailer.cdn-si-edu.com/5jrMsPdXM6TUNkRVnWFkqjWhEqI%3D/fit-in/1600x0/https://tf-cmsv2-smithsonianmag-media.s3.amazonaws.com/filer/64/09/6409af9c-6ad1-43e3-b0da-f38d914996ff/10557167836_a3e5f0d7c2_o.jpg&s",
+        url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/candycrush.html",
+        requiresCors: true,
+    },
+ ];
+
+   // Elements
+  const chatBtn = document.getElementById("chatBtn");
+  const chatModal = document.getElementById("chatModal");
+  const chatCloseBtn = document.getElementById("chatCloseBtn");
+  const chatOutput = document.getElementById("chatOutput");
+  const chatInput = document.getElementById("chatInput");
+  const aiChatNotice = document.getElementById("aiChatNotice");
+  const citySelect = document.getElementById("citySelect");
+  const fetchWeatherBtn = document.getElementById("fetchWeatherBtn");
+  const weatherError = document.getElementById("weatherError");
+  const pongGameEl = document.getElementById("pongGame");
+  const pongCanvas = document.getElementById("pongCanvas");
+  const shutdownPongBtn = document.getElementById("shutdownPongBtn");
+  const pongCtx = pongCanvas.getContext("2d");
+  const hangmanContainer = document.getElementById("hangmanContainer");
+  const hangmanWordEl = document.getElementById("hangmanWord");
+  const hangmanGuessesEl = document.getElementById("hangmanGuesses");
+  const hangmanGuessInput = document.getElementById("hangmanGuessInput");
+  const hangmanGuessBtn = document.getElementById("hangmanGuessBtn");
+  const hangmanMessage = document.getElementById("hangmanMessage");
+
+  // Variables for chat states
+  let weatherSearchActive = false;
+  let pongActive = false;
+  let hangmanActive = false;
+
+  // Pong constants and variables
+  const PADDLE_WIDTH = 10;
+  const PADDLE_HEIGHT = 50;
+  const BALL_RADIUS = 7;
+
+  let paddleY = pongCanvas.height / 2 - PADDLE_HEIGHT / 2;
+  let aiPaddleY = pongCanvas.height / 2 - PADDLE_HEIGHT / 2;
+  let ballX = pongCanvas.width / 2;
+  let ballY = pongCanvas.height / 2;
+  let ballSpeedX = 4;
+  let ballSpeedY = 3;
+
+  let playerScore = 0;
+  let aiScore = 0;
+
+  const keysPressed = {};
+
+  // Cities list for dropdown, sorted alphabetically, with added cities and replaced Astro City with Albany & added London, Stockholm, Munich as separate (Munich already present, keep multiple now)
+  const cityList = [
+    "Albany", "Baltimore", "Bangkok", "Cairo", "Charleston", "Denver", "Dubai", "Edinburgh", "Florence",
+    "Geneva", "Helsinki", "Istanbul", "Jakarta", "Kyoto", "Lisbon",
+    "London", "Munich", "Naples", "New Orleans", "Oslo", "Paris", "Phoenix", "Quebec", "Rome",
+    "Stockholm", "Seoul", "Suriname", "Tokyo", "Utrecht", "Vienna", "Warsaw", "Xian",
+    "Yokohama", "Zurich"
+  ].sort();
+
+  // Populate dropdown options on load
+  citySelect.innerHTML = ""; // Clear first
+  cityList.forEach(city => {
+    const option = document.createElement("option");
+    option.value = city;
+    option.textContent = city;
+    citySelect.appendChild(option);
+  });
+
+  // Utility functions
+  function appendMessage(msg, fromBot = false, isError = false, rainbow = false) {
+    const div = document.createElement("div");
+    div.classList.add("chat-message");
+    if (fromBot) div.classList.add("chat-bot");
+    if (isError) div.classList.add("chat-error");
+    if (rainbow) div.classList.add("rainbow-text");
+    div.textContent = msg;
+    chatOutput.appendChild(div);
+
+    // Hover animation for last two bubbles
+    chatOutput.querySelectorAll(".chat-message.hover-animate").forEach(el => el.classList.remove("hover-animate"));
+    const messages = chatOutput.querySelectorAll(".chat-message");
+    if (messages.length >= 2) {
+      messages[messages.length - 1].classList.add("hover-animate");
+      messages[messages.length - 2].classList.add("hover-animate");
+    }
+
+    chatOutput.scrollTop = chatOutput.scrollHeight;
+  }
+
+  let rainbowActive = false;
+
+  function getRandomJoke() {
+    const jokes = [
+      "Why don't scientists trust atoms? Because they make up everything!",
+      "I told my computer I needed a break, and it said 'No problem, I'll go to sleep.'",
+      "Why do programmers prefer dark mode? Because light attracts bugs!",
+      "Why was the math book sad? Because it had too many problems.",
+      "Why did the scarecrow win an award? Because he was outstanding in his field!",
+      "Why did the coffee file a police report? It got mugged!",
+      "What do you call fake spaghetti? An impasta!",
+      "Why do cows have hooves instead of feet? Because they lactose.",
+      "Why don't skeletons fight each other? They don't have the guts.",
+      "Debugging: Being the detective in a crime movie where you are also the murderer.",
+      "How many programmers does it take to change a light bulb? None, that's a hardware problem.",
+      "Programming is like writing a book... except if you miss a single comma on page 126 the whole thing makes no sense.",
+      "I would tell you a UDP joke, but you might not get it.",
+      "What's a programmer's favorite hangout place? Foo Bar.",
+      "Real programmers count from 0, not 1.",
+      "Why do Java developers wear glasses? Because they don't C#.",
+      "In order to understand recursion, one must first understand recursion.",
+      "Why did the functions stop calling each other? Because they had a breakdown.",
+      "There are 10 types of people in the world: those who understand binary and those who don't.",
+      "Algorithm: Word used by programmers when they don't want to explain what they did.",
+      "Ihop is totally a restaurant for bunnies."
+    ];
+    return jokes[Math.floor(Math.random() * jokes.length)];
+  }
+
+  function rollDice() {
+    return Math.floor(Math.random() * 6) + 1;
+  }
+
+  function flipCoin() {
+    return Math.random() < 0.5 ? "Heads" : "Tails";
+  }
+
+  async function getWeather(city) {
+    const apiKey = "f00c38e0279b7bc85480c3fe775d518c"; // OpenWeatherMap public demo key
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=imperial`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const data = await res.json();
+      const desc = data.weather[0].description;
+      const temp = data.main.temp;
+      return `Weather in ${city}: ${desc}, temperature ${temp}°F`;
+    } catch {
+      return null;
+    }
+  }
+  
+  // Pong game functions
+  function drawPong() {
+    pongCtx.fillStyle = "#111";
+    pongCtx.fillRect(0, 0, pongCanvas.width, pongCanvas.height);
+
+    // Player paddle
+    pongCtx.fillStyle = "#6bc1ff";
+    pongCtx.fillRect(0, paddleY, PADDLE_WIDTH, PADDLE_HEIGHT);
+
+    // AI paddle
+    pongCtx.fillStyle = "#FF5555";
+    pongCtx.fillRect(pongCanvas.width - PADDLE_WIDTH, aiPaddleY, PADDLE_WIDTH, PADDLE_HEIGHT);
+
+    // Ball
+    pongCtx.beginPath();
+    pongCtx.arc(ballX, ballY, BALL_RADIUS, 0, Math.PI * 2);
+    pongCtx.fillStyle = "#f1c40f";
+    pongCtx.fill();
+    pongCtx.closePath();
+
+    // Scores
+    pongCtx.fillStyle = "#6bc1ff";
+    pongCtx.font = "20px monospace";
+    pongCtx.fillText(`You: ${playerScore}`, 20, 30);
+    pongCtx.fillStyle = "#FF5555";
+    pongCtx.fillText(`AI: ${aiScore}`, pongCanvas.width - 100, 30);
+  }
+
+  function resetBall() {
+    ballX = pongCanvas.width / 2;
+    ballY = pongCanvas.height / 2;
+    ballSpeedX = (Math.random() < 0.5 ? 1 : -1) * 4;
+    ballSpeedY = (Math.random() * 4) - 2;
+  }
+
+  function updatePong() {
+    if (!pongActive) return;
+
+    // Player paddle
+    if (keysPressed["w"] && paddleY > 0) paddleY -= 5;
+    if (keysPressed["s"] && paddleY + PADDLE_HEIGHT < pongCanvas.height) paddleY += 5;
+
+    // AI paddle simple AI
+    let aiCenter = aiPaddleY + PADDLE_HEIGHT / 2;
+    if (ballY < aiCenter - 10) aiPaddleY -= 4;
+    else if (ballY > aiCenter + 10) aiPaddleY += 4;
+
+    if (aiPaddleY < 0) aiPaddleY = 0;
+    if (aiPaddleY + PADDLE_HEIGHT > pongCanvas.height) aiPaddleY = pongCanvas.height - PADDLE_HEIGHT;
+
+    // Move ball
+    ballX += ballSpeedX;
+    ballY += ballSpeedY;
+
+    // Top and bottom collision
+    if (ballY - BALL_RADIUS < 0 || ballY + BALL_RADIUS > pongCanvas.height) {
+      ballSpeedY = -ballSpeedY;
+    }
+
+    // Player paddle collision
+    if (ballX - BALL_RADIUS < PADDLE_WIDTH) {
+      if (ballY > paddleY && ballY < paddleY + PADDLE_HEIGHT) {
+        ballSpeedX = -ballSpeedX;
+        let collidePoint = ballY - (paddleY + PADDLE_HEIGHT / 2);
+        collidePoint = collidePoint / (PADDLE_HEIGHT / 2);
+        ballSpeedY = collidePoint * 5;
+      } else {
+        aiScore++;
+        resetBall();
+      }
+    }
+
+    // AI paddle collision
+    if (ballX + BALL_RADIUS > pongCanvas.width - PADDLE_WIDTH) {
+      if (ballY > aiPaddleY && ballY < aiPaddleY + PADDLE_HEIGHT) {
+        ballSpeedX = -ballSpeedX;
+        let collidePoint = ballY - (aiPaddleY + PADDLE_HEIGHT / 2);
+        collidePoint = collidePoint / (PADDLE_HEIGHT / 2);
+        ballSpeedY = collidePoint * 5;
+      } else {
+        playerScore++;
+        resetBall();
+      }
+    }
+
+    drawPong();
+    requestAnimationFrame(updatePong);
+  }
+
+  function startPong() {
+    pongActive = true;
+    playerScore = 0;
+    aiScore = 0;
+    paddleY = pongCanvas.height / 2 - PADDLE_HEIGHT / 2;
+    aiPaddleY = pongCanvas.height / 2 - PADDLE_HEIGHT / 2;
+    resetBall();
+
+    chatOutput.style.display = "none";
+    chatInput.style.display = "none";
+    aiChatNotice.style.display = "none";
+    pongGameEl.style.display = "flex";
+
+    updatePong();
+  }
+
+  function stopPong() {
+    pongActive = false;
+    chatOutput.style.display = "block";
+    chatInput.style.display = "block";
+    aiChatNotice.style.display = "block";
+    pongGameEl.style.display = "none";
+    chatInput.focus();
+  }
+
+  // Conversion rates for /convert (basic units for length, weight, temp)
+  const conversions = {
+    length: {
+      m: 1,
+      meter: 1, meters: 1,
+      km: 1000,
+      kilometer: 1000, kilometers: 1000,
+      cm: 0.01,
+      centimeter: 0.01, centimeters: 0.01,
+      mm: 0.001,
+      millimeter: 0.001, millimeters: 0.001,
+      in: 0.0254,
+      inch: 0.0254, inches: 0.0254,
+      ft: 0.3048,
+      foot: 0.3048, feet: 0.3048,
+      yd: 0.9144,
+      yard: 0.9144, yards: 0.9144,
+      mi: 1609.34,
+      mile: 1609.34, miles: 1609.34
+    },
+    weight: {
+      g: 1,
+      gram:1, grams:1,
+      kg: 1000,
+      kilogram:1000, kilograms:1000,
+      mg: 0.001,
+      milligram:0.001, milligrams:0.001,
+      lb: 453.592,
+      pound:453.592,pounds:453.592,
+      oz: 28.3495,
+      ounce:28.3495, ounces:28.3495
+    },
+    temperature: ['c', 'f', 'k', 'celsius', 'fahrenheit', 'kelvin']
+  };
+
+  // Conversion function for /convert command
+  function convertUnits(num, unit1, unit2) {
+    unit1 = unit1.toLowerCase();
+    unit2 = unit2.toLowerCase();
+
+    // Check temperature conversions explicitly
+    if (conversions.temperature.includes(unit1) && conversions.temperature.includes(unit2)) {
+      let celsius;
+
+      // to celsius first
+      switch(unit1) {
+        case 'c':
+        case 'celsius':
+          celsius = num;
+          break;
+        case 'f':
+        case 'fahrenheit':
+          celsius = (num - 32) * 5/9;
+          break;
+        case 'k':
+        case 'kelvin':
+          celsius = num - 273.15;
+          break;
+        default:
+          return null;
+      }
+
+      // to target
+      switch(unit2) {
+        case 'c':
+        case 'celsius': return celsius;
+        case 'f':
+        case 'fahrenheit': return celsius * 9/5 + 32;
+        case 'k':
+        case 'kelvin': return celsius + 273.15;
+        default: return null;
+      }
+    }
+
+    // Length
+    if (unit1 in conversions.length && unit2 in conversions.length) {
+      const meters = num * conversions.length[unit1];
+      return meters / conversions.length[unit2];
+    }
+    // Weight
+    if (unit1 in conversions.weight && unit2 in conversions.weight) {
+      const grams = num * conversions.weight[unit1];
+      return grams / conversions.weight[unit2];
+    }
+    return null;
+  }
+
+  function getRandomFact() {
+    const facts = [
+      "Honey never spoils. Archaeologists have found edible honey in ancient Egyptian tombs.",
+      "Bananas are berries, but strawberries are not.",
+      "Octopuses have three hearts.",
+      "The Eiffel Tower can be 15 cm taller during the summer due to heat expansion.",
+      "A day on Venus is longer than its year.",
+      "Humans and giraffes have the same number of neck vertebrae.",
+      "Male seahorses carry the babies, not the females.",
+      "Vincent Van Gogh sold only one painting in his lifetime.",
+      "A group of flamingos is called a “flamboyance”.",
+      "Humans shed around 200 million skin cells each hour.",
+      "Sharks have been around longer than trees.",
+      "Wombat ***** is cube-shaped.",
+      "Butterflies taste with their feet.",
+      "Bananas glow blue under black lights.",
+      "Your nose can remember 50,000 different scents.",
+      "Venus rotates clockwise, the only planet that does.",
+      "One strand of spaghetti is called a 'spaghetto'.",
+      "Cats can rotate their ears 180 degrees.",
+      "The first oranges weren’t orange but green.",
+      "Cows have best friends and get stressed when separated."
+    ];
+    return facts[Math.floor(Math.random() * facts.length)];
+  }
+
+  function getRandomFortune() {
+    const fortunes = [
+      "What ever you're goal is in life, embrace it visualize it, and for it will be yours.",
+      "Good news is coming your way.",
+      "A pleasant surprise awaits you.",
+      "Now is the time to try something new.",
+      "Trust your intuition.",
+      "Your hard work will soon pay off.",
+      "Land is always on the mind of a flying bird.",
+      "Meeting adversity well is the source of your strength.",
+      "A very attractive person has a message for you.",
+      "If you feel you are right, stand firmly by your convictions.",
+      "Your future is as bright as your faith.",
+      "Change can hurt, but it leads to something better.",
+      "Happiness is coming your way in unexpected forms.",
+      "You will make a valuable discovery soon.",
+      "Be cautious when new opportunities come knocking.",
+      "A fresh start will put you on your way.",
+      "Adventure can be real happiness.",
+      "A chance encounter will change your life for the better.",
+      "Opportunity seldom knocks twice.",
+      "A surprise gift will brighten your week."
+    ];
+    return fortunes[Math.floor(Math.random() * fortunes.length)];
+  }
+
+  async function defineWord(word) {
+    const url = `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0) return null;
+      const meanings = data[0].meanings;
+      if (!meanings || meanings.length === 0) return null;
+      // Return first definition from first meaning
+      const def = meanings[0].definitions[0];
+      if (!def) return null;
+      return `${word}: ${def.definition}`;
+    } catch {
+      return null;
+    }
+  }
+
+  async function translateText(lang, text) {
+    // Using LibreTranslate Public API
+    const url = "https://libretranslate.de/translate";
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          q: text,
+          source: "en",
+          target: lang,
+          format: "text",
+        }),
+      });
+      if (!res.ok) return null;
+      const json = await res.json();
+      return json.translatedText || null;
+    } catch {
+      return null;
+    }
+  }
+
+  function get8BallAnswer() {
+    const answers = [
+      "It is certain.",
+      "Without a doubt.",
+      "You may rely on it.",
+      "Ask again later.",
+      "Cannot predict now.",
+      "Don't count on it.",
+      "My sources say no.",
+      "Very doubtful.",
+      "Yes – definitely.",
+      "Better not tell you now.",
+      "Outlook good.",
+    ];
+    return answers[Math.floor(Math.random() * answers.length)];
+  }
+
+  // Hangman logic
+  const hangmanWords = [
+    "apple", "banana", "cherry", "dragon", "elephant", "forgive", "guitar", "horizon", "internet",
+    "jungle","keyboard","lantern","mountain","nebula","ocean","python","quantum","rocket","sunshine",
+    "ticket","umbrella","volcano","window","xylophone","yacht","zebra","amazing","butterfly","capture","dizzy",
+    "envelope", "freedom","gravity","holiday","impact","jacket","kingdom","lizard","mirror","nature","opposite",
+    "planet","quest","resolve","silence","trouble","unique","victory","wilderness","yellow","zealous",
+    "cactus","electric","fiction","glacier","harvest","island","jellyfish","kangaroo","language","mystery",
+    "noodle","orchard","pyramid","quality","recycle","sunset","treasure","utopia","village","wonder","yogurt","zodiac",
+    "adventure","brilliant","courage","dolphin","emerald","fantasy","galaxy","harmony","illusion","journey","kitchen",
+    "labyrinth","melody","necessity","oasis","paradise","quartz","radiance","sapphire","tempest","unity",
+    "verity","whisper","yearn","zenith","achievement","balance","crescent","delight","eternity","fortune",
+    "gratitude","honor","infinity","justice","kindness","liberty","miracle","nurture","optimism","passion"
+  ];
+  let hangmanWord = "";
+  let hangmanGuessed = new Set();
+  let hangmanWrong = 0;
+  const maxWrongAllowed = 7;
+
+  function startHangman() {
+    hangmanActive = true;
+    pongActive = false;
+    weatherSearchActive = false;
+    chatOutput.style.display = "none";
+    chatInput.style.display = "none";
+    aiChatNotice.style.display = "none";
+    pongGameEl.style.display = "none";
+    hangmanContainer.style.display = "block";
+    hangmanGuessed.clear();
+    hangmanWrong = 0;
+    // Pick random word with random length (5 to 12 chars for variety)
+    const filteredWords = hangmanWords.filter(w => w.length >= 5 && w.length <= 12);
+    hangmanWord = filteredWords[Math.floor(Math.random() * filteredWords.length)].toUpperCase();
+    updateHangmanDisplay();
+    hangmanMessage.textContent = `Guess the word! You can guess one letter at a time. You have ${maxWrongAllowed} wrong guesses maximum.`;
+    hangmanGuessInput.value = "";
+    hangmanGuessInput.focus();
+  }
+
+  function updateHangmanDisplay() {
+    let displayWord = "";
+    for (let char of hangmanWord) {
+      displayWord += (hangmanGuessed.has(char) ? char : "_") + " ";
+    }
+    hangmanWordEl.textContent = displayWord.trim();
+    hangmanGuessesEl.textContent = `Guessed letters: ${Array.from(hangmanGuessed).sort().join(", ")}`;
+  }
+
+  function handleHangmanGuess() {
+    const val = hangmanGuessInput.value.toUpperCase();
+    hangmanGuessInput.value = "";
+    if (!val.match(/^[A-Z]$/)) {
+      hangmanMessage.textContent = "Please enter a single letter A-Z.";
+      return;
+    }
+    if (hangmanGuessed.has(val)) {
+      hangmanMessage.textContent = "You already guessed that letter.";
+      return;
+    }
+    hangmanGuessed.add(val);
+    if (!hangmanWord.includes(val)) {
+      hangmanWrong++;
+      hangmanMessage.textContent = `Wrong guess #${hangmanWrong} out of ${maxWrongAllowed}.`;
+    } else {
+      hangmanMessage.textContent = "Good guess!";
+    }
+    updateHangmanDisplay();
+
+    if (hangmanWrong >= maxWrongAllowed) {
+      hangmanMessage.textContent = `You lost! The word was "${hangmanWord}". Type any key to exit Hangman.`;
+      hangmanGuessBtn.disabled = true;
+      hangmanGuessInput.disabled = true;
+      return;
+    }
+    // Check if won
+    const won = hangmanWord.split("").every(c => hangmanGuessed.has(c));
+    if (won) {
+      hangmanMessage.textContent = `Congratulations! You guessed the word "${hangmanWord}". Type any key to exit Hangman.`;
+      hangmanGuessBtn.disabled = true;
+      hangmanGuessInput.disabled = true;
+      return;
+    }
+  }
+
+  function endHangman() {
+    hangmanActive = false;
+    hangmanContainer.style.display = "none";
+    chatOutput.style.display = "block";
+    chatInput.style.display = "block";
+    aiChatNotice.style.display = "block";
+    chatInput.focus();
+    hangmanGuessBtn.disabled = false;
+    hangmanGuessInput.disabled = false;
+    hangmanMessage.textContent = "";
+  }
+
+  hangmanGuessBtn.addEventListener("click", () => {
+    if (hangmanActive) handleHangmanGuess();
+  });
+  hangmanGuessInput.addEventListener("keydown", (e) => {
+    if (hangmanActive && e.key === "Enter") {
+      e.preventDefault();
+      handleHangmanGuess();
+    }
+  });
+
+  // Exit hangman on any key after game over or win
+  hangmanContainer.addEventListener("keydown", (e) => {
+    if (!hangmanActive) return;
+    const won = hangmanWord.split("").every(c => hangmanGuessed.has(c));
+    if (won || hangmanWrong >= maxWrongAllowed) {
+      endHangman();
+    }
+  });
+
+  function getRandomQuote() {
+    const quotes = [
+      "Life is what happens when you're busy making other plans. — John Lennon",
+      "The only way to do great work is to love what you do. — Steve Jobs",
+      "Be yourself; everyone else is already taken. — Oscar Wilde",
+      "You miss 100% of the shots you don’t take. — Wayne Gretzky",
+      "In the middle of every difficulty lies opportunity. — Albert Einstein",
+      "Success is not final, failure is not fatal: it is the courage to continue that counts. — Winston Churchill",
+    ];
+    return quotes[Math.floor(Math.random() * quotes.length)];
+  }
+
+  function getCurrentTimeDate() {
+    const now = new Date();
+    return now.toLocaleString();
+  }
+
+  // Safe eval with exponentiation and variables support like 'x', 'y', 'z'
+  function safeEval(expr, variables = {}) {
+    try {
+      // Remove spaces and allow digits, parentheses, operators, decimal, variables (x,y,z), ^ for power
+      if (!/^[0-9+\-*/(). %^xyz]+$/i.test(expr)) {
+        return null;
+      }
+      // Replace ^ with **
+      let exprSafe = expr.replace(/\^/g, "**").toLowerCase();
+
+      // Replace variables with 1 (user input for vars really unknown; here for simple calc allow default 1)
+      exprSafe = exprSafe.replace(/[xyz]/g, (match) => {
+        if (variables.hasOwnProperty(match)) {
+          return variables[match];
+        }
+        return "1";
+      });
+
+      // eslint-disable-next-line no-new-func
+      const result = Function(`"use strict";return (${exprSafe})`)();
+      if (typeof result === "number" && isFinite(result)) {
+        return result;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  // Input event handlers
+  chatInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !weatherSearchActive && !hangmanActive) {
+      const val = chatInput.value.trim();
+      if (!val) return;
+      appendMessage(`> ${val}`, false, false, rainbowActive);
+      processCommand(val);
+      chatInput.value = "";
+    }
+  });
+
+  fetchWeatherBtn.addEventListener("click", async () => {
+    const city = citySelect.value;
+    if (!city) return;
+    weatherError.style.display = "none";
+    appendMessage(`Looking up weather for "${city}"...`, true, false, rainbowActive);
+    const weatherStr = await getWeather(city);
+    if (weatherStr) {
+      appendMessage(weatherStr, true, false, rainbowActive);
+    } else {
+      weatherError.textContent = "Weather data not found or API error.";
+      weatherError.style.display = "block";
+    }
+    // After show weather, keep dropdown visible and ChatInput visible
+    chatInput.style.display = "block";
+    citySelect.style.display = "block";
+    fetchWeatherBtn.style.display = "block";
+    weatherSearchActive = false;
+    chatInput.focus();
+  });
+
+  // Keyboard controls for Pong
+  document.addEventListener("keydown", (e) => {
+    if (!pongActive) return;
+    if (e.key.toLowerCase() === "w" || e.key.toLowerCase() === "s") {
+      keysPressed[e.key.toLowerCase()] = true;
+      e.preventDefault();
+    }
+  });
+
+  document.addEventListener("keyup", (e) => {
+    if (!pongActive) return;
+    if (e.key.toLowerCase() === "w" || e.key.toLowerCase() === "s") {
+      keysPressed[e.key.toLowerCase()] = false;
+      e.preventDefault();
+    }
+  });
+
+  shutdownPongBtn.addEventListener("click", () => {
+    stopPong();
+  });
+
+  chatBtn.addEventListener("click", () => {
+    chatModal.style.display = "flex";
+    chatInput.style.display = "block";
+    weatherError.style.display = "none";
+    chatInput.focus();
+    chatOutput.innerHTML = "";
+    appendMessage('Try typing "/help" for more commands!', true);
+  });
+
+  chatCloseBtn.addEventListener("click", () => {
+    chatModal.style.display = "none";
+    weatherSearchActive = false;
+    hangmanActive = false;
+    chatInput.value = "";
+    weatherError.style.display = "none";
+    if (pongActive) stopPong();
+    if (hangmanActive) endHangman();
+  });
+
+  // Updated command processor with new commands and hangman, convert, rainbowtxt, about
+  async function processCommand(input) {
+    const cmd = input.trim();
+    const cmdLower = cmd.toLowerCase();
+
+    if (weatherSearchActive) return;
+
+    if (pongActive) {
+      appendMessage("Please press 'Shut Down' to exit Pong mode before chatting.", true, true, rainbowActive);
+      return;
+    }
+    if (hangmanActive && !cmdLower.startsWith("/hangman")) {
+      appendMessage("You are in Hangman mode. Use the Hangman input to guess letters or exit as prompted.", true, true, rainbowActive);
+      return;
+    }
+
+    if (cmdLower === "/help") {
+      appendMessage("Commands: /joke, /dice, /weather, /coin, /pong, /quote, /time, /calc [expr], /fact, /define [word], /translate [lang] [text], /8ball [question], /fortune, /repeat [text], /convert num unit1 unit2, /hangman, /rainbowtxt, /about. More coming soon!", true, false, rainbowActive);
+    }
+    else if (cmdLower === "/joke") {
+      appendMessage(getRandomJoke(), true, false, rainbowActive);
+    }
+    else if (cmdLower === "/dice") {
+      appendMessage(`You rolled a ${rollDice()}.`, true, false, rainbowActive);
+    }
+    else if (cmdLower === "/pong") {
+      startPong();
+    }
+    else if (cmdLower === "/coin") {
+      appendMessage(`Coin flip: ${flipCoin()}`, true, false, rainbowActive);
+    }
+    else if (cmdLower === "/weather") {
+      weatherSearchActive = true;
+      appendMessage("Please select a city from the dropdown and click 'Get Weather'.", true, false, rainbowActive);
+      chatInput.style.display = "block";
+      citySelect.style.display = "block";
+      fetchWeatherBtn.style.display = "block";
+      chatInput.focus();
+    }
+    else if (cmdLower === "/quote") {
+      appendMessage(getRandomQuote(), true, false, rainbowActive);
+    }
+    else if (cmdLower === "/time") {
+      appendMessage(`Current date & time: ${getCurrentTimeDate()}`, true, false, rainbowActive);
+    }
+    else if (cmdLower.startsWith("/calc ")) {
+      const expr = cmd.substring(6).trim();
+      if (!expr) {
+        appendMessage("Usage: /calc [expression]", true, true, rainbowActive);
+        return;
+      }
+
+      // Detect possible variables like x,y,z and ask or replace with 1
+      const varMatch = expr.match(/[xyz]/gi);
+      let variables = {};
+      if (varMatch) {
+        // Just set all to 1 for now (could improve to ask user for values)
+        variables = {x: 1, y: 1, z: 1};
+      }
+      const val = safeEval(expr, variables);
+      if (val === null) {
+        appendMessage("Invalid expression for /calc command.", true, true, rainbowActive);
+      } else {
+        appendMessage(`Calc result: ${val}`, true, false, rainbowActive);
+      }
+    }
+    else if (cmdLower === "/fact") {
+      appendMessage(getRandomFact(), true, false, rainbowActive);
+    }
+    else if (cmdLower.startsWith("/define ")) {
+      const word = cmd.substring(8).trim();
+      if (!word) {
+        appendMessage("Usage: /define [word]", true, true, rainbowActive);
+        return;
+      }
+      appendMessage(`Looking up definition for "${word}"...`, true, false, rainbowActive);
+      const def = await defineWord(word);
+      if (def) {
+        appendMessage(def, true, false, rainbowActive);
+      } else {
+        appendMessage(`No definition found for "${word}".`, true, true, rainbowActive);
+      }
+    }
+    else if (cmdLower.startsWith("/translate ")) {
+      const parts = cmd.split(" ");
+      if (parts.length < 3) {
+        appendMessage("Usage: /translate [lang_code] [text]", true, true, rainbowActive);
+        return;
+      }
+      const lang = parts[1].toLowerCase();
+      const text = cmd.substring(cmd.indexOf(lang) + lang.length).trim();
+      if (!text) {
+        appendMessage("Usage: /translate [lang_code] [text]", true, true, rainbowActive);
+        return;
+      }
+      appendMessage(`Translating to "${lang}"...`, true, false, rainbowActive);
+      const translated = await translateText(lang, text);
+      if (translated) {
+        appendMessage(`Translation: ${translated}`, true, false, rainbowActive);
+      } else {
+        appendMessage("Translation failed or invalid language code.", true, true, rainbowActive);
+      }
+    }
+    else if (cmdLower.startsWith("/8ball ")) {
+      const question = cmd.substring(7).trim();
+      if (!question) {
+        appendMessage("Usage: /8ball [question]", true, true, rainbowActive);
+        return;
+      }
+      appendMessage(get8BallAnswer(), true, false, rainbowActive);
+    }
+    else if (cmdLower === "/fortune") {
+      appendMessage(getRandomFortune(), true, false, rainbowActive);
+    }
+    else if (cmdLower.startsWith("/repeat ")) {
+      const repeatText = cmd.substring(8).trim();
+      if (!repeatText) {
+        appendMessage("Usage: /repeat [text]", true, true, rainbowActive);
+        return;
+      }
+      appendMessage(repeatText, true, false, rainbowActive);
+    }
+    else if (cmdLower.startsWith("/convert ")) {
+      // /convert num unit1 unit2
+      const parts = cmd.split(/\s+/);
+      if (parts.length !== 4) {
+        appendMessage("Usage: /convert [number] [unit_from] [unit_to]", true, true, rainbowActive);
+        return;
+      }
+      const num = parseFloat(parts[1]);
+      const unit1 = parts[2];
+      const unit2 = parts[3];
+      if (isNaN(num)) {
+        appendMessage("Invalid number for /convert.", true, true, rainbowActive);
+        return;
+      }
+      const result = convertUnits(num, unit1, unit2);
+      if (result === null) {
+        appendMessage("Unsupported units or invalid conversion.", true, true, rainbowActive);
+      } else {
+        appendMessage(`${num} ${unit1} = ${result.toFixed(4)} ${unit2}`, true, false, rainbowActive);
+      }
+    }
+    else if (cmdLower === "/hangman") {
+      startHangman();
+      appendMessage("Started Hangman! Use the input box in the chat window to guess letters.", true, false, rainbowActive);
+    }
+    else if (cmdLower === "/rainbowtxt") {
+      rainbowActive = !rainbowActive;
+      appendMessage(`Rainbow text ${rainbowActive ? "enabled" : "disabled"}`, true, false, rainbowActive);
+    }
+    else if (cmdLower === "/about") {
+      appendMessage("Version: Ivory V2.0", true, false, rainbowActive);
+      appendMessage('Terminal ID: s3taJdiMoJOAIW618', true, false, rainbowActive);
+      appendMessage("©2026 Chez Mustard and Lungus_Dev. All Rights Reserved.", true, false, rainbowActive);
+    }
+    else {
+      appendMessage("Unknown command. Type /help for list of commands.", true, true, rainbowActive);
+    }
+  }
+
+  // Optional: close chat on ESC key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && chatModal.style.display === "flex") {
+      chatModal.style.display = "none";
+      weatherSearchActive = false;
+      hangmanActive = false;
+      chatInput.value = "";
+      weatherError.style.display = "none";
+      if (pongActive) stopPong();
+      if (hangmanActive) endHangman();
+    }
+  });
+
+  (function generateFallingSnowflakes(){
+    const snowflakeChars = ['❄', '✻', '❅', '❆'];
+
+    function createSnowflake() {
+      const snowflake = document.createElement('div');
+      snowflake.classList.add('snowflake');
+      snowflake.textContent = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];
+      snowflake.style.left = Math.random() * 100 + 'vw';
+      snowflake.style.fontSize = (10 + Math.random() * 20) + 'px';
+
+      const fallDuration = 8 + Math.random() * 4; 
+      const swayDuration = 3 + Math.random() * 3;
+
+      snowflake.style.animationDuration = `${fallDuration}s, ${swayDuration}s`;
+      snowflake.style.animationDelay = '0s, 0s';
+
+      snowflake.addEventListener('animationend', () => {
+        snowflake.remove();
+      });
+
+      document.body.appendChild(snowflake);
+    }
+
+    setInterval(createSnowflake, 1950);
+  })();
+
+  // Helpers
+  const updateBalance = () => {
+    const balEl = document.getElementById("coinBalance");
+    balEl.textContent = `Coins: ${coinBalance}`;
+    balEl.style.color = coinBalance <= 0 ? "#c0392b" : "#f39c12";
+  };
+
+  const loadState = () => {
+    try {
+      const savedBal = localStorage.getItem("stellar_coinBalance");
+      if (savedBal !== null) {
+        coinBalance = parseInt(savedBal);
+      }
+      const savedThemes = JSON.parse(localStorage.getItem("stellar_purchasedThemes") || "[]");
+      savedThemes.forEach((t) => purchasedThemes.add(t));
+      const savedFonts = JSON.parse(localStorage.getItem("stellar_purchasedFonts") || "[]");
+      savedFonts.forEach((f) => purchasedFonts.add(f));
+      const savedGames = JSON.parse(localStorage.getItem("stellar_purchasedGames") || "[]");
+      savedGames.forEach((g) => purchasedGames.add(g));
+      const savedFavorites = JSON.parse(localStorage.getItem("stellar_favorites") || "[]");
+      savedFavorites.forEach((fav) => favorites.add(fav));
+      currentTheme = localStorage.getItem("stellar_currentTheme") || "";
+      currentFont = localStorage.getItem("stellar_currentFont") || "";
+    } catch {}
+  };
+
+  const saveState = () => {
+    localStorage.setItem("stellar_coinBalance", coinBalance);
+    localStorage.setItem(
+      "stellar_purchasedThemes",
+      JSON.stringify([...purchasedThemes])
+    );
+    localStorage.setItem(
+      "stellar_purchasedFonts",
+      JSON.stringify([...purchasedFonts])
+    );
+    localStorage.setItem(
+      "stellar_purchasedGames",
+      JSON.stringify([...purchasedGames])
+    );
+    localStorage.setItem("stellar_favorites", JSON.stringify([...favorites]));
+    localStorage.setItem("stellar_currentTheme", currentTheme);
+    localStorage.setItem("stellar_currentFont", currentFont);
+  };
+
+  const applyTheme = () => {
+    document.body.className = "";
+    if (currentTheme) {
+      document.body.classList.add(`theme-${currentTheme}`);
+    }
+    if (currentFont) {
+      document.body.classList.add(`font-${currentFont}`);
+    }
+  };
+
+   // ----- INVEST -----
+    const investMenu = document.getElementById("investMenu");
+  const renderInvestMenu = () => {
+    investMenu.innerHTML = "";
+    companies.forEach((c, idx) => {
+      const div = document.createElement("div");
+      div.tabIndex = 0;
+      div.role = "menuitem";
+      div.className = "invest-company";
+      div.dataset.idx = idx;
+      div.style.userSelect = "none";
+      div.textContent = `${c.name} — ${c.desc}`;
+      investMenu.appendChild(div);
+    });
+  };
+  const investAmountPrompt = (companyName) => {
+    let amount = window.prompt(
+      `Enter amount of coins to invest in ${companyName} (you have ${coinBalance} coins):`,
+      "0"
+    );
+    if (amount === null) return null;
+    amount = parseInt(amount.trim());
+    if (isNaN(amount) || amount <= 0) {
+      alert("Please enter a valid positive number.");
+      return null;
+    }
+    if (amount > coinBalance) {
+      alert("You do not have enough coins.");
+      return null;
+    }
+    return amount;
+  };
+
+  // ----- THEMES & FONTS -----
+  const themeShopBtn = document.getElementById("themeShopBtn");
+  const fontShopBtn = document.getElementById("fontShopBtn");
+  const creditsBtn = document.getElementById("creditsBtn");
+  const infoBtn = document.getElementById("infoBtn");
+
+  const themeOptions = document.getElementById("themeOptions");
+  const fontOptions = document.getElementById("fontOptions");
+  const creditsContent = document.getElementById("creditsContent");
+  const infoContent = document.getElementById("infoContent");
+
+  const hideAllSettingsSubmenus = () => {
+    themeOptions.style.display = "none";
+    fontOptions.style.display = "none";
+    creditsContent.style.display = "none";
+    infoContent.style.display = "none";
+  };
+
+  themeShopBtn.addEventListener("click", () => {
+    const shown = themeOptions.style.display === "block";
+    hideAllSettingsSubmenus();
+    themeOptions.style.display = shown ? "none" : "block";
+  });
+
+  fontShopBtn.addEventListener("click", () => {
+    const shown = fontOptions.style.display === "block";
+    hideAllSettingsSubmenus();
+    fontOptions.style.display = shown ? "none" : "block";
+  });
+
+  creditsBtn.addEventListener("click", () => {
+    const shown = creditsContent.style.display === "block";
+    hideAllSettingsSubmenus();
+    creditsContent.style.display = shown ? "none" : "block";
+  });
+
+  infoBtn.addEventListener("click", () => {
+    const shown = infoContent.style.display === "block";
+    hideAllSettingsSubmenus();
+    infoContent.style.display = shown ? "none" : "block";
+  });
+
+  // Selling functions
+  function sellTheme(themeId) {
+    const sellValue = 100; // half cost 200/2
+    if (!purchasedThemes.has(themeId)) return;
+    if (!confirm(`Sell theme "${themeId}" for ${sellValue} coins?`)) return;
+    purchasedThemes.delete(themeId);
+    if (currentTheme === themeId) currentTheme = "";
+    coinBalance += sellValue;
+    applyTheme();
+    updateBalance();
+    updateBuyButtons();
+    saveState();
+    alert(`Sold theme "${themeId}" for ${sellValue} coins.`);
+  }
+
+  function sellFont(fontId) {
+    const btn = document.querySelector(`.buy-font-btn[data-font="${fontId}"]`);
+    const cost = btn ? parseInt(btn.dataset.cost) : 0;
+    const sellValue = Math.floor(cost / 2);
+    if (!purchasedFonts.has(fontId)) return;
+    if (!confirm(`Sell font "${fontId}" for ${sellValue} coins?`)) return;
+    purchasedFonts.delete(fontId);
+    if (currentFont === fontId) currentFont = "";
+    coinBalance += sellValue;
+    applyTheme();
+    updateBalance();
+    updateBuyButtons();
+    saveState();
+    alert(`Sold font "${fontId}" for ${sellValue} coins.`);
+  }
+
+  function sellGame(gameId) {
+    const game = gamesData.find((g) => g.id === gameId);
+    if (!game) return;
+    const sellValue = Math.floor(game.cost / 2);
+    if (!purchasedGames.has(gameId)) return;
+    if (!confirm(`Sell game "${game.title}" for ${sellValue} coins?`)) return;
+    purchasedGames.delete(gameId);
+    coinBalance += sellValue;
+    updateBalance();
+    updateBuyButtons();
+    saveState();
+    alert(`Sold game "${game.title}" for ${sellValue} coins.`);
+  }
+
+  // Buying Themes
+  const buyThemeButtons = document.querySelectorAll(".buy-theme-btn");
+  buyThemeButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const theme = btn.dataset.theme;
+      const cost = parseInt(btn.dataset.cost);
+      if (purchasedThemes.has(theme)) {
+        // Select this theme
+        currentTheme = theme;
+        applyTheme();
+        saveState();
+        alert(`Theme "${theme}" applied.`);
+      } else {
+        if (coinBalance < cost) {
+          alert("Not enough coins to buy this theme.");
+          return;
+        }
+        if (confirm(`Buy theme "${theme}" for ${cost} coins?`)) {
+          coinBalance -= cost;
+          purchasedThemes.add(theme);
+          currentTheme = theme;
+          applyTheme();
+          updateBalance();
+          saveState();
+          updateBuyButtons();
+          alert(`Theme "${theme}" bought and applied!`);
+        }
+      }
+    });
+  });
+
+  // Buying Fonts
+  const buyFontButtons = document.querySelectorAll(".buy-font-btn");
+  buyFontButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const font = btn.dataset.font;
+      const cost = parseInt(btn.dataset.cost);
+      if (purchasedFonts.has(font)) {
+        // Select this font
+        currentFont = font;
+        applyTheme();
+        saveState();
+        alert(`Font "${font}" applied.`);
+      } else {
+        if (coinBalance < cost) {
+          alert("Not enough coins to buy this font.");
+          return;
+        }
+        if (confirm(`Buy font "${font}" for ${cost} coins?`)) {
+          coinBalance -= cost;
+          purchasedFonts.add(font);
+          currentFont = font;
+          applyTheme();
+          updateBalance();
+          saveState();
+          updateBuyButtons();
+          alert(`Font "${font}" bought and applied!`);
+        }
+      }
+    });
+  });
+  
+  const messages = [
+  "Welcome to Stellar: Launch Your Universe!",
+  "🪐🚀",
+  "We love Cameron!",
+  "Customize your experience with themes & fonts!",
+  "Build your favorites list and keep them handy!",
+  "I ♥️ CoolDude2349 😘",
+  "Your entertainment journey starts now!",
+  "Could be adding User Chat soon in like V5.0",
+  "I'm not a nerd or anything",
+  "Did you know that the comment bubbles on the top right of your screen is actually a button for a terminal? Isn't that cool!",
+  "Ts is so tuff",
+  "Chezzz should be in the dictionary",
+  "A lot of games have sadly been patched :<",
+  "M0th3rCrystal is Elite ball knowledge",
+  "Stellar ❌    Interstellar 👍",
+  "༼ つ ◕‿◕ ༽つ"
+];
+
+const msgEl = document.getElementById("cyclingMessages");
+let lastMsgIndex = -1;
+
+function cycleMessagesRandom() {
+  let newIndex;
+  do {
+    newIndex = Math.floor(Math.random() * messages.length);
+  } while (newIndex === lastMsgIndex && messages.length > 1);
+  msgEl.textContent = messages[newIndex];
+  lastMsgIndex = newIndex;
+}
+
+cycleMessagesRandom();
+setInterval(cycleMessagesRandom, 4000);  // Change message every 4 seconds
+  // Update buy buttons style for themes/fonts/games with Play+Sell for games
+  function updateBuyButtons() {
+    buyThemeButtons.forEach((btn) => {
+      const t = btn.dataset.theme;
+      if (purchasedThemes.has(t)) {
+        btn.textContent = (currentTheme === t ? "★ " : "") + capitalize(t) + " (Owned)";
+        btn.disabled = false;
+        btn.classList.remove("buy-disabled");
+
+        // Add sell button if not exists
+        if (!btn.nextElementSibling || !btn.nextElementSibling.classList.contains("sell-btn")) {
+          const sellBtn = document.createElement("button");
+          sellBtn.textContent = "Sell";
+          sellBtn.className = "sell-btn";
+          sellBtn.type = "button";
+          sellBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            sellTheme(t);
+          });
+          btn.parentNode.insertBefore(sellBtn, btn.nextSibling);
+        }
+      } else {
+        btn.textContent = capitalize(t) + ` (${btn.dataset.cost})`;
+        btn.disabled = false;
+        btn.classList.remove("buy-disabled");
+        if (btn.nextElementSibling && btn.nextElementSibling.classList.contains("sell-btn")) {
+          btn.nextElementSibling.remove();
+        }
+      }
+    });
+    
+    buyFontButtons.forEach((btn) => {
+      const f = btn.dataset.font;
+      if (purchasedFonts.has(f)) {
+        btn.textContent = (currentFont === f ? "★ " : "") + fontLabel(f) + " (Owned)";
+        btn.disabled = false;
+        btn.classList.remove("buy-disabled");
+
+        if (!btn.nextElementSibling || !btn.nextElementSibling.classList.contains("sell-btn")) {
+          const sellBtn = document.createElement("button");
+          sellBtn.textContent = "Sell";
+          sellBtn.className = "sell-btn";
+          sellBtn.type = "button";
+          sellBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            sellFont(f);
+          });
+          btn.parentNode.insertBefore(sellBtn, btn.nextSibling);
+        }
+      } else {
+        btn.textContent = fontLabel(f) + ` (${btn.dataset.cost})`;
+        btn.disabled = false;
+        btn.classList.remove("buy-disabled");
+        if (btn.nextElementSibling && btn.nextElementSibling.classList.contains("sell-btn")) {
+          btn.nextElementSibling.remove();
+        }
+      }
+    });
+
+    // Games: replace single button with Play and Sell if owned, else Buy only
+    gamesData.forEach((game) => {
+      const card = document.querySelector(`.game-card[data-id="${game.id}"]`);
+      if (!card) return;
+      // Remove all existing buttons inside .game-bottom
+      const bottom = card.querySelector(".game-bottom");
+      bottom.innerHTML = "";
+      // Cost span
+      const costSpan = document.createElement("span");
+      costSpan.className = "cost";
+      costSpan.textContent = `${game.cost} coins`;
+      bottom.appendChild(costSpan);
+
+      if (purchasedGames.has(game.id)) {
+        // Play button
+        const playBtn = document.createElement("button");
+        playBtn.type = "button";
+        playBtn.className = "buy-btn";
+        playBtn.textContent = "Play";
+        playBtn.tabIndex = 0;
+        playBtn.style.marginRight = "8px";
+        playBtn.addEventListener("click", () => {
+          openGameWithCors(game);
+        });
+        bottom.appendChild(playBtn);
+
+        // Sell button
+        const sellBtn = document.createElement("button");
+        sellBtn.type = "button";
+        sellBtn.className = "sell-btn-game";
+        sellBtn.textContent = "Sell";
+        sellBtn.tabIndex = 0;
+        sellBtn.addEventListener("click", () => {
+          sellGame(game.id);
+        });
+        bottom.appendChild(sellBtn);
+      } else {
+        // Buy button
+        const buyBtn = document.createElement("button");
+        buyBtn.type = "button";
+        buyBtn.className = "buy-btn";
+        buyBtn.textContent = `Buy (${game.cost})`;
+        buyBtn.tabIndex = 0;
+        buyBtn.disabled = coinBalance < game.cost;
+        buyBtn.classList.toggle("buy-disabled", coinBalance < game.cost);
+        buyBtn.addEventListener("click", () => {
+          if (coinBalance < game.cost) {
+            alert("Not enough coins to buy this game.");
+            return;
+          }
+          if (confirm(`Buy "${game.title}" for ${game.cost} coins?`)) {
+            coinBalance -= game.cost;
+            purchasedGames.add(game.id);
+            updateBalance();
+            updateBuyButtons();
+            saveState();
+            alert(`You bought "${game.title}"! You can now play it or sell it.`);
+          }
+        });
+        bottom.appendChild(buyBtn);
+      }
+    });
+  }
+
+  // Capitalize helper
+  function capitalize(str) {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  // Font label helper (map internal font id to human-readable)
+  function fontLabel(id) {
+    const map = {
+      bungee: "Bungee",
+      fredoka: "Fredoka One",
+      blackops: "Black Ops One",
+      nosifer: "Nosifer",
+      audiowide: "Audiowide",
+    };
+    return map[id] || id;
+  }
+
+  // ----- GAMES -----
+  const gamesGrid = document.getElementById("gamesGrid");
+
+  // Create game cards with CORS warning and launch logic
+  function createGameCard(game) {
+    const card = document.createElement("article");
+    card.className = "game-card";
+    card.dataset.id = game.id;
+    card.setAttribute("tabindex", "0");
+    card.setAttribute(
+      "aria-label",
+      `${game.title}, category: ${game.category}. Cost ${game.cost} coins.`
+    );
+
+    // Favorites star
+    const star = document.createElement("span");
+    star.className = "star-fav";
+    star.role = "button";
+    star.setAttribute("aria-label", "Toggle favorite");
+    star.tabIndex = 0;
+    star.innerHTML = favorites.has(game.id) ? "★" : "☆";
+    if (favorites.has(game.id)) star.classList.add("favorited");
+    star.addEventListener("click", () => toggleFavorite(game.id, star));
+    star.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleFavorite(game.id, star);
+      }
+    });
+    card.appendChild(star);
+
+    // Image
+    const img = document.createElement("img");
+    img.src = game.image;
+    img.alt = `${game.title} thumbnail`;
+    img.draggable = false;
+    card.appendChild(img);
+
+    // Title
+    const title = document.createElement("h2");
+    title.className = "game-title";
+    title.textContent = game.title;
+    card.appendChild(title);
+
+    // Category
+    const cat = document.createElement("div");
+    cat.className = "game-category";
+    cat.textContent = `Category: ${game.category}`;
+    card.appendChild(cat);
+
+    // Description
+    const desc = document.createElement("p");
+    desc.className = "game-description";
+    desc.textContent = game.description;
+    card.appendChild(desc);
+
+  // Bottom container (empty for now, will be filled in updateBuyButtons)
+    const bottom = document.createElement("div");
+    bottom.className = "game-bottom";
+    card.appendChild(bottom);
+
+    // Play game on double click or Enter/Space key if owned
+    card.addEventListener("dblclick", () => {
+      if (purchasedGames.has(game.id)) {
+        openGameWithCors(game);
+      }
+    });
+    card.addEventListener("keydown", (e) => {
+      if ((e.key === "Enter" || e.key === " ") && purchasedGames.has(game.id)) {
+        e.preventDefault();
+        openGameWithCors(game);
+      }
+    });
+
+    return card;
+  }
+
+  // Toggle favorite star
+  function toggleFavorite(gameId, starEl) {
+    if (favorites.has(gameId)) {
+      favorites.delete(gameId);
+      starEl.classList.remove("favorited");
+      starEl.textContent = "☆";
+    } else {
+      favorites.add(gameId);
+      starEl.classList.add("favorited");
+      starEl.textContent = "★";
+    }
+    saveState();
+  }
+
+  // Render all games with search & favorite sort
+  function renderGames() {
+    gamesGrid.innerHTML = "";
+    const search = document.getElementById("searchInput").value.toLowerCase().trim();
+
+    const sortedGames = [...gamesData]
+      .filter((g) => {
+        const haystack = (g.title + " " + g.category + " " + g.description).toLowerCase();
+        return haystack.includes(search);
+      })
+      .sort((a, b) => {
+        const aFav = favorites.has(a.id);
+        const bFav = favorites.has(b.id);
+        if (aFav && !bFav) return -1;
+        if (!aFav && bFav) return 1;
+        return 0;
+      });
+
+    sortedGames.forEach((game) => {
+      const card = createGameCard(game);
+      gamesGrid.appendChild(card);
+    });
+
+    updateBuyButtons();
+  }
+
+  // Open game respecting CORS proxy if needed in new about:blank tab with iframe
+  function launchGame(gameUrl, title) {
+  const proxyGameUrl = PROXY_URL + gameUrl;
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("GET", proxyGameUrl, true);
+
+  xhr.onload = function () {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      const win = window.open("", "_blank");
+
+      if (win) {
+        win.document.open();
+        win.document.write(xhr.responseText);
+        win.document.close();
+
+        win.document.title = title || "Game";
+        win.document.body.style.margin = "0";
+        win.document.body.style.overflow = "auto";
+      } else {
+        alert("Please allow pop-ups for this site to launch the game.");
+      }
+    } else {
+      console.error("Failed to load game:", xhr.statusText);
+      alert("Could not load the game. Make sure cors-anywhere is unlocked.");
+    }
+  };
+
+  xhr.onerror = function () {
+    console.error("Network error occurred.");
+    alert("Network error while loading game.");
+  };
+
+  xhr.send();
+}
+
+ function openGameWithCors(game) {
+  launchGame(game.url, game.title);
+}
+
+  // Invest menu click
+  investMenu.addEventListener("click", (e) => {
+    if (e.target && e.target.matches(".invest-company")) {
+      const idx = parseInt(e.target.dataset.idx);
+      if (isNaN(idx) || idx < 0 || idx >= companies.length) return;
+      const company = companies[idx];
+      let amount = investAmountPrompt(company.name);
+      if (amount === null) return;
+
+      const gainOrLose = Math.random() < 0.5 ? "gain" : "loss";
+      let multiplier = 1;
+      if (gainOrLose === "gain") {
+        multiplier = Math.random() * 49 + 1; // 1x to 50x
+      } else {
+        multiplier = Math.random() * 0.002; // 0 to 0.002 (loss)
+      }
+
+      let outcomeCoins;
+      let resultText;
+      if (gainOrLose === "gain") {
+        outcomeCoins = Math.floor(amount * multiplier);
+        coinBalance += outcomeCoins;
+        resultText = `Congrats! Your investment in ${company.name} yielded ${outcomeCoins} coins (${multiplier.toFixed(
+          2
+        )}x).`;
+      } else {
+        outcomeCoins = Math.floor(amount * multiplier);
+        const lost = amount - outcomeCoins;
+        coinBalance -= lost;
+        if (coinBalance < 0) coinBalance = 0;
+        resultText = `Oh no! Your investment in ${company.name} lost ${lost} coins (${(
+          100 -
+          multiplier * 100
+        ).toFixed(2)}% loss).`;
+      }
+
+      updateBalance();
+      saveState();
+      alert(resultText);
+      updateBuyButtons();
+    }
+  });
+
+  // Search filter input
+  document.getElementById("searchInput").addEventListener("input", renderGames);
+
+  // Initial setup
+  loadState();
+  applyTheme();
+  updateBalance();
+  renderInvestMenu();
+  renderGames();
+  updateBuyButtons();
+  
+  // Close modal with ESC key (unused modal still present)
+  const gameModal = document.getElementById("gameModal");
+  const gameFrame = document.getElementById("gameFrame");
+  const closeGameBtn = gameModal.querySelector("button.close-game");
+  function closeGame() {
+    gameModal.style.display = "none";
+    gameFrame.src = "";
+  }
+  closeGameBtn.addEventListener("click", closeGame);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && gameModal.style.display === "flex") {
+      closeGame();
+    }
+  });
+
+  // Accessibility: close dropdowns on click outside
+  document.body.addEventListener("click", (e) => {
+    if (!e.target.closest(".menu-item")) {
+      // Hide all drop downs
+      document.getElementById("themeOptions").style.display = "none";
+      document.getElementById("fontOptions").style.display = "none";
+      document.getElementById("creditsContent").style.display = "none";
+      document.getElementById("infoContent").style.display = "none";
+    }
+  });
+
+  // Accessibility: open invest dropdown on focus
+  const investMenuBtn = document.getElementById("investMenuBtn");
+  investMenuBtn.addEventListener("focus", () => {
+    investMenu.style.display = "block";
+    investMenuBtn.setAttribute("aria-expanded", "true");
+  });
+  investMenuBtn.addEventListener("blur", () => {
+    setTimeout(() => {
+      if (!investMenu.contains(document.activeElement)) {
+        investMenu.style.display = "none";
+        investMenuBtn.setAttribute("aria-expanded", "false");
+      }
+    }, 100);
+  });
+
+  // Capitalize first letter of theme label on buy buttons on load
+  buyThemeButtons.forEach((btn) => {
+    if (!purchasedThemes.has(btn.dataset.theme)) {
+      btn.textContent = capitalize(btn.dataset.theme) + ` (${btn.dataset.cost})`;
+    }
+  });
+
+  // Font label fix for buttons on load
+  buyFontButtons.forEach((btn) => {
+    if (!purchasedFonts.has(btn.dataset.font)) {
+      btn.textContent = fontLabel(btn.dataset.font) + ` (${btn.dataset.cost})`;
+    }
+  });
+  
+  document.getElementById("corsAccessBtn").addEventListener("click", () => {
+  const corsUrl = "https://cors-anywhere.herokuapp.com/corsdemo";
+  window.open(corsUrl, "_blank", "noopener");
+});
+const UPDATE_LAST_SEEN_VERSION_KEY = 'stellar_lastSeenUpdateVersion';
+const VERSION = "2.0 'Ivory'";
+
+function showUpdatePopup() {
+  const lastSeenVersion = localStorage.getItem(UPDATE_LAST_SEEN_VERSION_KEY);
+  
+  if (lastSeenVersion === VERSION) {
+    // User has already seen this version's popup, do not show again
+    return;
+  }
+
+  const topMenu = document.querySelector(".top-menu");
+  const bgColor = getComputedStyle(topMenu).backgroundColor;
+
+  // Create overlay and popup (same as before)
+  const overlay = document.createElement("div");
+  overlay.style.position = "fixed";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.width = "100vw";
+  overlay.style.height = "100vh";
+  overlay.style.backgroundColor = "rgba(0,0,0,0.6)";
+  overlay.style.zIndex = "9998";
+  overlay.style.display = "flex";
+  overlay.style.alignItems = "center";
+  overlay.style.justifyContent = "center";
+
+  const popup = document.createElement("div");
+  popup.style.backgroundColor = bgColor;
+  popup.style.color = "#fff";
+  popup.style.borderRadius = "12px";
+  popup.style.padding = "24px 32px 32px";
+  popup.style.maxWidth = "600px";
+  popup.style.width = "90vw";
+  popup.style.maxHeight = "80vh";
+  popup.style.overflowY = "auto";
+  popup.style.position = "relative";
+  popup.style.boxShadow = "0 8px 24px rgba(0,0,0,0.4)";
+  popup.style.fontWeight = "bold";
+  popup.style.fontSize = "16px";
+  popup.style.lineHeight = "1.5";
+  popup.style.userSelect = "none";
+
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "❌";
+  closeBtn.setAttribute("aria-label", "Close update popup");
+  closeBtn.style.position = "absolute";
+  closeBtn.style.top = "12px";
+  closeBtn.style.right = "12px";
+  closeBtn.style.backgroundColor = "red";
+  closeBtn.style.border = "none";
+  closeBtn.style.color = "white";
+  closeBtn.style.fontSize = "20px";
+  closeBtn.style.cursor = "pointer";
+  closeBtn.style.borderRadius = "6px";
+  closeBtn.style.width = "32px";
+  closeBtn.style.height = "32px";
+  closeBtn.style.lineHeight = "24px";
+  closeBtn.style.textAlign = "center";
+  closeBtn.style.padding = "0";
+  closeBtn.style.userSelect = "none";
+
+  const checkboxContainer = document.createElement("label");
+  checkboxContainer.style.display = "flex";
+  checkboxContainer.style.alignItems = "center";
+  checkboxContainer.style.marginTop = "16px";
+  checkboxContainer.style.cursor = "pointer";
+  checkboxContainer.style.fontWeight = "normal";
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.style.marginRight = "8px";
+  checkbox.id = "dontShowUpdate";
+
+  checkboxContainer.appendChild(checkbox);
+  checkboxContainer.appendChild(document.createTextNode("Do not show again"));
+
+  const title = document.createElement("div");
+  title.textContent = `Welcome to Stellar, version ${VERSION}! (Release Date: 5/1/26)`;
+  title.style.marginBottom = "16px";
+  title.style.fontSize = "22px";
+  title.style.fontWeight = "700";
+  popup.appendChild(title);
+
+  const subtitle = document.createElement("div");
+  subtitle.textContent = "This MASSIVE update includes:";
+  subtitle.style.marginBottom = "12px";
+  subtitle.style.fontWeight = "600";
+  subtitle.style.fontSize = "18px";
+  popup.appendChild(subtitle);
+
+  const ul = document.createElement("ul");
+  ul.style.margin = "0";
+  ul.style.paddingLeft = "22px";
+  ul.style.fontWeight = "normal";
+
+  const updates = [
+    "I was gonna add more commands for the terminal but they got scrapped due to not working/time demands.",
+    "9 more games/apps",
+    "More cities in weather",
+    "A few more Cycle messages",
+    "Added Bug reporting and Content requesting forms",
+    "Come back every day to check for new updates (and obviously to play more games)!",
+  ];
+
+  updates.forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    li.style.marginBottom = "6px";
+    ul.appendChild(li);
+  });
+
+  popup.appendChild(ul);
+  popup.appendChild(checkboxContainer);
+  popup.appendChild(closeBtn);
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+
+  closeBtn.addEventListener("click", () => {
+    if (checkbox.checked) {
+      localStorage.setItem(UPDATE_LAST_SEEN_VERSION_KEY, VERSION);
+    }
+    document.body.removeChild(overlay);
+  });
+}
+
+// Call once on load
+showUpdatePopup();
+
+document.getElementById("citySelect").style.display = "block";
+document.getElementById("fetchWeatherBtn").style.display = "block";
+
+})();
+  </script>
+  <h1 style="text-align: center;">Other Stuff</h1>
+  <h2 style="text-align: center;">Bug Reporting Form and Requesting Form</h2>
+  <center>
+    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdoF3gU58Yx5fyRBPp2esm7GVLN4JInkDfDsG82q9IGoB8Cyw/viewform?embedded=true" width="640" height="588" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+</center>
+<center>
+    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSd9v65P7WQwDYw7gM0c3qMLAQEPSlwdL6XGJ4LT7hwhZlZTHA/viewform?embedded=true" width="640" height="747" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+</center>
+</body>
+</html>
