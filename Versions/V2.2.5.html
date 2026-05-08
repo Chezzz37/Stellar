@@ -718,6 +718,16 @@ pointer-events: auto;
   100% {background-position: 100%;}
 }
 
+#launchBlankBtn {
+  transition: transform 0.2s ease;
+  user-select: none;
+}
+
+#launchBlankBtn:hover {
+  transform: scale(1.05);
+  background-color: #34495e;
+}
+
 /* Hangman UI */
 #hangmanContainer {
   background: #222;
@@ -914,6 +924,11 @@ pointer-events: auto;
         <!-- Companies injected by JS -->
       </div>
     </div>
+    
+    <!-- Launch in about:blank Button -->
+<div class="menu-item" id="launchBlankBtn" title="Open in Disguised Tab" role="button" tabindex="0" style="color: #f1c40f; font-weight: bold; white-space: nowrap;">
+  Launch in New Tab 🚀
+</div>
 
     <div class="balance" aria-live="polite" aria-atomic="true" id="coinBalance" title="Your current coin balance">
       Coins: 4850
@@ -3367,6 +3382,7 @@ function showUpdatePopup() {
     "AN UPGRADED terminal with more commands and new animations",
     "Added a Sitewide Favicon (It dosent show up in code editors though)",
     "Added a Sitewide 'Tab Cloaking' Feature",
+    "Added a Lunch in New Tab button for debugging/code editors",
     "Fixed Escape Road 1 & 2 cuz apparently they wouldnt load on some school computers",
     "Added a few more games/apps",
     "Come back every day to check for new updates (and obviously to play more games)!",
@@ -3428,6 +3444,36 @@ if (savedT || savedI) {
   cloakIconInput.value = savedI || "";
 }
 showUpdatePopup(); 
+
+// --- Launch in about:blank Logic ---
+const launchBlankBtn = document.getElementById('launchBlankBtn');
+
+launchBlankBtn.addEventListener('click', () => {
+  // 1. Open the new blank tab
+  const win = window.open('about:blank', '_blank');
+  
+  if (!win) {
+    alert('Popup blocked! Please allow popups to launch in a new tab.');
+    return;
+  }
+
+  // 2. Capture the current page's HTML
+  const currentHTML = document.documentElement.outerHTML;
+
+  // 3. Write the content to the new tab
+  // We wrap it in a basic structure to ensure it remains scrollable
+  win.document.open();
+  win.document.write(currentHTML);
+  win.document.close();
+
+  // 4. Force scrollability on the new window
+  win.document.body.style.margin = "0";
+  win.document.body.style.height = "100vh";
+  win.document.body.style.overflow = "auto";
+  
+  // Optional: Auto-cloak the new tab's title
+  win.document.title = document.title;
+});
 })();
   </script>
   <h1 style="text-align: center;">Other Stuff</h1>
