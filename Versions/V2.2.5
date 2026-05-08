@@ -1,0 +1,3442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stellar Game Hub/Launcher</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Audiowide&family=Bungee&family=Fredoka+One&family=Nosifer&family=Black+Ops+One&display=swap"
+    rel="stylesheet"
+  />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Montserrat&family=Lobster&family=Open+Sans&family=Pacifico&family=Raleway&family=Dancing+Script&family=Playfair+Display&family=Nunito&family=Indie+Flower&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+   <link rel="icon" type="image/jpeg" href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQOUxHoniiIyjQYAWhXRv98_SLeMr4WdQxlLMRfph-SRYuq7rk:https://img.pikbest.com/wp/202344/abstract-multicolor-vibrant-neon-colors-multicolored-blurry-texture-pattern-with-a-blurred-background_9934729.jpg!w700wp&s">
+<style>
+    :root {
+      --bg: #f0f0f0;
+      --text: #222;
+      --menu-bg: #2c3e50;
+      --menu-text: #ecf0f1;
+      --highlight: #5c6ac4;
+      --buy-btn-bg: #3498db;
+      --buy-btn-cursor: pointer;
+      --buy-btn-disabled-bg: #666;
+      --buy-btn-disabled-cursor: default;
+    }
+    
+    /* Snake Game & ASCII Styling */
+#snakeContainer {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+#snakeCanvas {
+  background: #000;
+  border: 2px solid #555;
+}
+.d-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 40px);
+  grid-template-rows: repeat(2, 40px);
+  gap: 5px;
+}
+.d-btn {
+  width: 40px; height: 40px;
+  background: #444; color: white;
+  border: none; border-radius: 4px;
+  cursor: pointer;
+}
+.d-btn:active { background: var(--highlight); }
+.up { grid-column: 2; }
+.left { grid-column: 1; grid-row: 2; }
+.down { grid-column: 2; grid-row: 2; }
+.right { grid-column: 3; grid-row: 2; }
+
+.ascii-pre {
+  font-family: monospace;
+  white-space: pre;
+  line-height: 1.2;
+  font-size: 12px;
+  color: #0f0; /* Terminal Green */
+}
+    
+    .snowflake {
+  position: fixed;
+  top: -10px;
+  color: white;
+  user-select: none;
+  pointer-events: none;
+  font-size: 1em;
+  z-index: 5000;
+  animation-name: fall, sway;
+  animation-timing-function: linear, ease-in-out;
+  animation-iteration-count: infinite, infinite;
+}
+
+@keyframes fall {
+  0% {
+    top: -10px;
+    opacity: 1;
+  }
+  100% {
+    top: 100vh;
+    opacity: 0;
+  }
+}
+
+
+@keyframes sway {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(25px);
+  }
+}
+
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+    
+    #chatModal {
+  position: fixed;
+  top: 48px; right: 0; bottom: 0; left: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  z-index: 3000;
+  user-select: none;
+}
+
+#chatContainer {
+  background: #222;
+  color: #eee;
+  width: 100%;
+  max-width: 400px;
+  height: 80vh;
+  margin-top: 20px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+#chatCloseBtn {
+  align-self: flex-end;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: #eee;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+#chatOutput {
+  flex-grow: 1;
+  background: #111;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 8px;
+  overflow-y: auto;
+  font-family: monospace, monospace;
+  white-space: pre-wrap;
+  outline: none;
+}
+
+#chatInput {
+  border-radius: 6px;
+  border: none;
+  padding: 8px;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+#chatInput:focus {
+  outline: 2px solid var(--highlight);
+}
+
+.chat-message {
+  margin: 3px 0;
+}
+.chat-bot {
+  color: #6bc1ff;
+}
+.chat-error {
+  color: #ff4c4c;
+}
+
+#pongGame {
+  display: none;
+}
+/* Weather city select */
+#citySelect {
+  margin-top:8px;
+  border-radius:6px;
+  border:none;
+  padding:8px;
+  font-size:14px;
+  width:100%;
+  display: block;
+}
+/* Weather fetch button */
+#fetchWeatherBtn {
+  margin-top:6px;
+  width: 100%;
+  padding: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: block;
+}
+/* Weather error */
+#weatherError {
+  color:#ff4c4c;
+  margin-top:4px;
+  font-size:13px;
+  display:none;
+}
+
+/* Themes (background colors for body) */
+body.theme-red {
+  background-color: #b94a48;
+  color: #fff;
+}
+
+body.theme-orange {
+  background-color: #e67e22;
+  color: #fff;
+}
+
+body.theme-yellow {
+  background-color: #f1c40f;
+  color: #222;
+}
+
+body.theme-green {
+  background-color: #2ecc71;
+  color: #fff;
+}
+
+body.theme-cyan {
+  background-color: #1abc9c;
+  color: #fff;
+}
+
+body.theme-blue {
+  background-color: #3498db;
+  color: #fff;
+}
+
+body.theme-purple {
+  background-color: #9b59b6;
+  color: #fff;
+}
+
+body.theme-pink {
+  background-color: #e91e63;
+  color: #fff;
+}
+
+body.theme-black {
+  background-color: #121212;
+  color: #eee;
+}
+
+/* Added Gradient Themes */
+body.theme-redyellow {
+  background: linear-gradient(90deg, red, yellow);
+  animation: gradient 13s ease infinite;
+background-size: 400% 400%;
+}
+body.theme-greenblue {
+ background: linear-gradient(90deg, green, blue);
+  animation: gradient 13s ease infinite;
+background-size: 400% 400%;
+}
+body.theme-redblue {
+background: linear-gradient(90deg, red, blue);
+  animation: gradient 13s ease infinite;
+background-size: 400% 400%;
+}
+body.theme-redgreen {
+background: linear-gradient(90deg, red, green);
+  animation: gradient 13s ease infinite;
+background-size: 400% 400%;
+}
+body.theme-yellowblue {
+  background: linear-gradient(90deg, yellow, blue);
+   animation: gradient 13s ease infinite;
+background-size: 400% 400%;
+}
+body.theme-greenpink {
+  background: linear-gradient(90deg, green, pink);
+   animation: gradient 13s ease infinite;
+background-size: 400% 400%;
+}
+body.theme-greenyellow {
+  background: linear-gradient(90deg, green, yellow);
+   animation: gradient 13s ease infinite;
+background-size: 400% 400%;
+}
+body.theme-redcyan {
+  background: linear-gradient(90deg, red, cyan);
+   animation: gradient 13s ease infinite;
+background-size: 400% 400%;
+}
+ 
+body.theme-rainbow {
+background: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, purple);
+animation: gradient 45s ease infinite;
+background-size: 400% 400%;
+}
+
+/* Fonts */
+body.font-bungee {
+  font-family: 'Bungee', cursive, Arial, sans-serif;
+}
+
+body.font-fredoka {
+  font-family: 'Fredoka One', cursive, Arial, sans-serif;
+}
+
+body.font-blackops {
+  font-family: 'Black Ops One', cursive, Arial, sans-serif;
+}
+
+body.font-nosifer {
+  font-family: 'Nosifer', cursive, Arial, sans-serif;
+}
+
+body.font-audiowide {
+  font-family: 'Audiowide', cursive, Arial, sans-serif;
+}
+body.font-roboto {
+  font-family: 'Roboto', sans-serif;
+}
+
+body.font-montserrat {
+  font-family: 'Montserrat', sans-serif;
+}
+
+body.font-lobster {
+  font-family: 'Lobster', cursive;
+}
+
+body.font-opensans {
+  font-family: 'Open Sans', sans-serif;
+}
+
+body.font-pacifico {
+  font-family: 'Pacifico', cursive;
+}
+
+body.font-raleway {
+  font-family: 'Raleway', sans-serif;
+}
+
+body.font-dancingscript {
+  font-family: 'Dancing Script', cursive;
+}
+
+body.font-playfairdisplay {
+  font-family: 'Playfair Display', serif;
+}
+
+body.font-nunito {
+  font-family: 'Nunito', sans-serif;
+}
+
+body.font-indieflower {
+  font-family: 'Indie Flower', cursive;
+}
+
+/* Top menu */
+.top-menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: var(--menu-bg);
+  color: var(--menu-text);
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  height: 48px;
+  font-weight: 600;
+  font-size: 14px;
+  z-index: 1000;
+  user-select: none;
+}
+
+.top-menu > .balance {
+  margin-left: auto;
+  margin-right: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #f39c12;
+}
+
+.menu-item {
+  position: relative;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+.menu-item:hover,
+.menu-item:focus {
+  background-color: #34495e;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: var(--menu-bg);
+  min-width: 190px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  z-index: 1100;
+  top: 48px;
+  left: 0;
+  border-radius: 0 0 6px 6px;
+  overflow: auto;
+  max-height: 250px;
+}
+
+.dropdown-content > div,
+.dropdown-content > button {
+  color: var(--menu-text);
+  padding: 10px 16px;
+  text-align: left;
+  border: none;
+  background: none;
+  width: 100%;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+  border-bottom: 1px solid #3a4a62;
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dropdown-content > div:last-child {
+  border-bottom: none;
+}
+
+.dropdown-content {
+display: block; /* Temporarily change display to block for animation */
+opacity: 0;
+transform: translateY(-10px);
+pointer-events: none;
+transition: opacity 0.5s ease, transform 0.3s ease;
+max-height: 250px;
+overflow: auto;
+}
+
+.menu-item:hover > .dropdown-content,
+.menu-item:focus-within > .dropdown-content {
+opacity: 1;
+transform: translateY(0);
+pointer-events: auto;
+/* keep max-height and overflow as before */
+}
+
+
+.dropdown-content > div:hover,
+.dropdown-content > button:hover,
+.dropdown-content > div.buy-disabled {
+  background-color: #3a4a62;
+}
+
+.menu-item:hover > .dropdown-content,
+.menu-item:focus-within > .dropdown-content {
+  display: block;
+}
+
+/* Search bar inside top menu */
+.search-container {
+  display: flex;
+  align-items: center;
+  margin-left: 16px;
+  margin-right: 12px;
+  flex-grow: 1;
+  max-width: 400px;
+}
+ 
+@keyframes fadeCycle {
+0% { opacity: 0; }
+10% { opacity: 1; }
+90% { opacity: 1; }
+100% { opacity: 0; }
+}
+
+#cyclingMessages {
+  animation: fadeCycle 4s infinite;
+  transition: opacity 0.5s ease;
+}
+
+#searchInput {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 13px;
+  border: 2px solid var(--highlight);
+  border-radius: 4px;
+  outline: none;
+  color: var(--text);
+  background-color: #fff;
+  transition: border-color 0.3s ease;
+}
+
+#searchInput:focus {
+  border-color: var(--menu-bg);
+}
+
+/* Games grid */
+#gamesGrid {
+  margin: 0 auto 60px;
+  max-width: 900px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  padding: 0 16px 32px;
+  user-select: none;
+}
+
+.game-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  position: relative;
+}
+
+.game-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+  user-select: none;
+}
+
+.game-title {
+  text-align: center;
+  margin: 8px 0 4px;
+  font-weight: 700;
+  font-size: 18px;
+  user-select: text;
+  color: #000000;
+}
+
+.game-category {
+  font-size: 12px;
+  color: #000000;
+  text-align: center;
+  margin-bottom: 8px;
+  user-select: text;
+}
+
+.game-description {
+  font-size: 13px;
+  flex-grow: 1;
+  margin-bottom: 8px;
+  user-select: text;
+  white-space: pre-line;
+  color: #000000;
+}
+
+.game-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Gradient multicolor buy & sell buttons */
+.buy-btn, .sell-btn-game {
+  background: linear-gradient(45deg, #ff6b6b, #f8e71c, #6bffb2, #3498db);
+  background-size: 400% 400%;
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: var(--buy-btn-cursor);
+  user-select: none;
+  min-width: 80px;
+  transition: background-position 0.5s ease, background-color 0.3s ease;
+  user-select: none;
+}
+
+.buy-btn:hover:not(:disabled),
+.sell-btn-game:hover:not(:disabled) {
+  background-position: 100% 50%;
+}
+
+.buy-btn:disabled,
+.buy-btn.buy-disabled,
+.sell-btn-game:disabled {
+  background-color: var(--buy-btn-disabled-bg);
+  cursor: var(--buy-btn-disabled-cursor);
+  background-image: none;
+}
+
+.cost {
+  font-weight: 700;
+  font-size: 14px;
+  user-select: none;
+  color: #27ae60;
+  margin-right: 10px;
+  white-space: nowrap;
+}
+
+/* Sell button common style */
+.sell-btn {
+  background-color: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 4px 8px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  user-select: none;
+  margin-left: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background-color 0.3s ease;
+}
+
+.sell-btn:hover:not(:disabled) {
+  background-color: #c0392b;
+}
+
+/* Favorites star */
+.star-fav {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 22px;
+  cursor: pointer;
+  color: #bbb;
+  user-select: none;
+  transition: color 0.3s ease;
+  user-drag: none;
+  user-select: none;
+}
+
+.star-fav.favorited {
+  color: #f39c12;
+  text-shadow: 0 0 3px #f39c12;
+}
+
+/* Modal game iframe */
+#gameModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 48px;
+  z-index: 2000;
+  user-select: none;
+}
+
+#gameModal button.close-game {
+  position: fixed;
+  top: 8px;
+  right: 12px;
+  background-color: #f44336;
+  border: none;
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 3000;
+  user-select: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  transition: background-color 0.3s ease;
+}
+
+#gameModal button.close-game:hover {
+  background-color: #d32f2f;
+}
+
+/* Scroll for dropdown with large list */
+.dropdown-content {
+  scrollbar-width: thin;
+  scrollbar-color: #34495e transparent;
+}
+
+.dropdown-content::-webkit-scrollbar {
+  width: 6px;
+}
+.dropdown-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.dropdown-content::-webkit-scrollbar-thumb {
+  background-color: #34495e;
+  border-radius: 3px;
+}
+@keyframes gradient {
+  0% {
+      background-position: 0% 50%;
+  }
+  50% {
+      background-position: 100% 50%;
+  }
+  100% {
+      background-position: 0% 50%;
+  }
+}
+
+/* Rainbow text for terminal */
+.rainbow-text {
+  background-image: linear-gradient(90deg, red, orange, yellow, green, cyan, blue, purple);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rainbowAnimation 7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes rainbowAnimation {
+  0% {background-position: 0%;}
+  100% {background-position: 100%;}
+}
+
+/* Hangman UI */
+#hangmanContainer {
+  background: #222;
+  color: #eee;
+  max-width: 400px;
+  padding: 12px;
+  border-radius: 12px;
+  font-family: monospace;
+  user-select: none;
+  margin: 8px auto 12px;
+  display: none;
+}
+
+#hangmanWord {
+  font-size: 24px;
+  letter-spacing: 6px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+#hangmanGuesses {
+  margin-bottom: 12px;
+}
+
+#hangmanMessage {
+  margin-top: 6px;
+  font-style: italic;
+}
+
+#hangmanInputContainer {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+#hangmanGuessInput {
+  width: 60px;
+  font-size: 20px;
+  text-transform: uppercase;
+  text-align: center;
+  border-radius: 6px;
+  border: none;
+  padding: 8px;
+  outline: none;
+  user-select: text;
+}
+
+#hangmanGuessBtn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  background: #3498db;
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+#hangmanGuessBtn:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
+
+.loading-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #aaa;
+  font-style: italic;
+  margin: 5px 0;
+  font-family: sans-serif;
+}
+
+.bounce-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  background-color: white;
+  border-radius: 50%;
+  animation: dot-bounce 0.6s infinite alternate;
+}
+
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dot-bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-6px); }
+}
+  </style>
+  </head>
+<body>
+  <nav class="top-menu" role="navigation" aria-label="Main menu">
+    <!-- Add inside nav.top-menu near the right -->
+<button id="chatBtn" aria-label="Open chat" style="font-size: 18px; margin-left: 8px; background:none; border:none; color:#ecf0f1; cursor:pointer;">
+  <i class="fa-regular fa-comments"></i>
+</button>
+    <div class="menu-item" tabindex="0" aria-haspopup="true" aria-expanded="false" id="settingsMenu">
+      Site settings ▼
+      <div class="dropdown-content" role="menu" aria-label="Settings submenu">
+        <div role="menuitem" aria-haspopup="true" tabindex="0" id="themeShopBtn">Theme Shop</div>
+        <div id="themeOptions" style="display:none; padding-left:16px;">
+          <ul style="list-style-type: disc; padding-left: 20px; margin: 4px 0;">
+            <li><button data-theme="red" data-cost="200" class="buy-theme-btn" type="button">Red (200)</button></li>
+            <li><button data-theme="orange" data-cost="200" class="buy-theme-btn" type="button">Orange (200)</button></li>
+            <li><button data-theme="yellow" data-cost="200" class="buy-theme-btn" type="button">Yellow (200)</button></li>
+            <li><button data-theme="green" data-cost="200" class="buy-theme-btn" type="button">Green (200)</button></li>
+            <li><button data-theme="cyan" data-cost="200" class="buy-theme-btn" type="button">Cyan (200)</button></li>
+            <li><button data-theme="blue" data-cost="200" class="buy-theme-btn" type="button">Blue (200)</button></li>
+            <li><button data-theme="purple" data-cost="200" class="buy-theme-btn" type="button">Purple (200)</button></li>
+            <li><button data-theme="pink" data-cost="200" class="buy-theme-btn" type="button">Pink (200)</button></li>
+            <li><button data-theme="black" data-cost="200" class="buy-theme-btn" type="button">Black Background (200)</button></li>
+            <!-- Added gradient themes with cost 550 -->
+            <li><button data-theme="redyellow" data-cost="550" class="buy-theme-btn" type="button">Red Yellow Gradient (550)</button></li>
+            <li><button data-theme="greenblue" data-cost="550" class="buy-theme-btn" type="button">Green Blue Gradient (550)</button></li>
+            <li><button data-theme="redblue" data-cost="550" class="buy-theme-btn" type="button">Red Blue Gradient (550)</button></li>
+            <li><button data-theme="redgreen" data-cost="550" class="buy-theme-btn" type="button">Red Green Gradient (550)</button></li>
+            <li><button data-theme="yellowblue" data-cost="550" class="buy-theme-btn" type="button">Yellow Blue Gradient (550)</button></li>
+            <li><button data-theme="greenpink" data-cost="550" class="buy-theme-btn" type="button">Green Pink Gradient (550)</button></li>
+            <li><button data-theme="greenyellow" data-cost="550" class="buy-theme-btn" type="button">Green Yellow Gradient (550)</button></li>
+            <li><button data-theme="redcyan" data-cost="550" class="buy-theme-btn" type="button">Red Cyan Gradient (550)</button></li>
+            <li><button data-theme="rainbow" data-cost="1000" class="buy-theme-btn" type="button">Rainbow (1000)</button></li>
+          </ul>
+        </div>
+        <div role="menuitem" aria-haspopup="true" tabindex="0" id="fontShopBtn" style="margin-top:8px;">Font Shop</div>
+        <div id="fontOptions" style="display:none; padding-left:16px;">
+          <ul style="list-style-type: disc; padding-left: 20px; margin: 4px 0;">
+            <li><button data-font="roboto" data-cost="200" class="buy-font-btn" type="button">Roboto (200)</button></li>
+<li><button data-font="montserrat" data-cost="250" class="buy-font-btn" type="button">Montserrat (250)</button></li>
+<li><button data-font="lobster" data-cost="300" class="buy-font-btn" type="button">Lobster (300)</button></li>
+<li><button data-font="opensans" data-cost="200" class="buy-font-btn" type="button">Open Sans (200)</button></li>
+<li><button data-font="pacifico" data-cost="220" class="buy-font-btn" type="button">Pacifico (220)</button></li>
+<li><button data-font="raleway" data-cost="240" class="buy-font-btn" type="button">Raleway (240)</button></li>
+<li><button data-font="dancingscript" data-cost="320" class="buy-font-btn" type="button">Dancing Script (320)</button></li>
+<li><button data-font="playfairdisplay" data-cost="350" class="buy-font-btn" type="button">Playfair Display (350)</button></li>
+<li><button data-font="nunito" data-cost="210" class="buy-font-btn" type="button">Nunito (210)</button></li>
+<li><button data-font="indieflower" data-cost="180" class="buy-font-btn" type="button">Indie Flower (180)</button></li>
+
+            <li><button data-font="bungee" data-cost="150" class="buy-font-btn" type="button">Bungee (150)</button></li>
+            <li><button data-font="fredoka" data-cost="250" class="buy-font-btn" type="button">Fredoka One (250)</button></li>
+            <li><button data-font="blackops" data-cost="300" class="buy-font-btn" type="button">Black Ops One (300)</button></li>
+            <li><button data-font="nosifer" data-cost="350" class="buy-font-btn" type="button">Nosifer (350)</button></li>
+            <li><button data-font="audiowide" data-cost="400" class="buy-font-btn" type="button">Audiowide (400)</button></li>
+          </ul>
+        </div>
+        
+
+<!-- TAB CLOAKER SECTION -->
+<div role="menuitem" aria-haspopup="true" tabindex="0" id="cloakShopBtn" style="margin-top:8px;">Tab Cloaker (NEW, BREAKS SOME CODE EDITORS)</div>
+<div id="cloakOptions" style="display:none; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 6px; margin: 5px 10px; display: flex; flex-direction: column; gap: 8px;">
+  
+  <!-- Vertical Input Layout -->
+  <div style="display: flex; flex-direction: column; gap: 4px;">
+    <label style="font-size: 11px; opacity: 0.8;">New Tab Title</label>
+    <input type="text" id="cloakTitleInput" placeholder="e.g. Google Docs" style="width:100%; padding:8px; border-radius:4px; border:none; box-sizing:border-box; font-size:13px; background: #fff; color: #333;">
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 4px;">
+    <label style="font-size: 11px; opacity: 0.8;">Favicon URL</label>
+    <input type="text" id="cloakIconInput" placeholder="e.g. https://google.com/favicon.ico" style="width:100%; padding:8px; border-radius:4px; border:none; box-sizing:border-box; font-size:13px; background: #fff; color: #333;">
+  </div>
+
+  <!-- Action Buttons -->
+  <div style="display:flex; gap:8px; margin-top: 4px;">
+    <button id="applyCloakBtn" style="flex:1; padding:8px; background:#27ae60; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold; font-size:12px;">Apply</button>
+    <button id="resetCloakBtn" style="flex:1; padding:8px; background:#e74c3c; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold; font-size:12px;">Reset</button>
+  </div>
+</div>
+
+<!-- creditsBtn follows here... -->
+        
+        <div role="menuitem" tabindex="0" id="creditsBtn" style="margin-top:8px;">Credits</div>
+        <div id="creditsContent" style="display:none; padding-left:16px; white-space: pre-wrap; font-size: 13px;">
+          <!-- Credits will go here when you add them -->
+          <i>Chez - Code Development.
+            Lungus - Minor bug fixing
+          Game Devs - Thx for letting me use ur games 😘
+          </i>
+        </div>
+        <div role="menuitem" tabindex="0" id="infoBtn" style="margin-top:8px;">Info</div>
+        <div id="infoContent" style="display:none; padding-left:16px; font-size: 13px; white-space: pre-wrap;">
+          Wsp guys! I'm chez! I started this project one april night, trying to bring the fun of games to everyone wherever they are. Have fun with my site!
+     EDIT: I CANT BELIEVE HOW POPULAR ITS GETTING! THANKS SO MUCH 😘
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-item" tabindex="0" id="investMenuBtn" aria-haspopup="true" aria-expanded="false">
+      Invest ▼
+      <div class="dropdown-content" role="menu" aria-label="Invest submenu" id="investMenu" style="max-height: 260px;">
+        <!-- Companies injected by JS -->
+      </div>
+    </div>
+
+    <div class="balance" aria-live="polite" aria-atomic="true" id="coinBalance" title="Your current coin balance">
+      Coins: 4850
+    </div>
+
+    <section class="search-container" aria-label="Game search">
+      <input
+        type="search"
+        id="searchInput"
+        placeholder="Search Thingies..."
+        aria-label="Search games"
+        autocomplete="off"
+      />
+    </section>
+  </nav>
+
+<!-- Chat modal overlay -->
+<div id="chatModal" role="dialog" aria-modal="true" aria-label="Chat window" style="display:none;">
+  <div id="chatContainer">
+    <select id="citySelect" aria-label="Select city for weather" >
+  <!-- Options will be added dynamically -->
+</select>
+<button id="fetchWeatherBtn" >Get Weather</button>
+<div id="weatherError"></div>
+
+    <button id="chatCloseBtn" aria-label="Close chat">❌</button>
+    <div id="chatOutput" tabindex="0" aria-live="polite"></div>
+    <div id="aiChatNotice">Terminal for Commands (Games, fun things and more!)</div>
+    <input id="chatInput" type="text" aria-label="Chat input" autocomplete="off" placeholder="Type a command or message..." />
+    <div id="pongGame" >
+      <canvas id="pongCanvas" width="380" height="240"></canvas>
+      <button id="shutdownPongBtn" aria-label="Shut down pong game">Shut Down</button>
+      <div id="pongControlsHint">Use W/S keys to move your paddle</div>
+    </div>
+    <div id="hangmanContainer" aria-label="Hangman game" role="region" tabindex="0">
+      <div id="hangmanWord"></div>
+      <div id="hangmanGuesses">Guessed letters: </div>
+      <div id="hangmanInputContainer">
+        <input type="text" id="hangmanGuessInput" maxlength="1" aria-label="Guess a letter for hangman" />
+        <button id="hangmanGuessBtn">Guess</button>
+      </div>
+      <div id="hangmanMessage" aria-live="polite"></div>
+    </div>
+  </div>
+</div>
+
+ <main>
+  <h1 style="text-align:center; color: #000000; user-select:none; margin-top: 64px;">
+    Stellar - Game Hub/Launcher
+  </h1>
+  
+  <h2 id="cyclingMessages" style="text-align:center; color:#000; user-select:none; margin-top:12px;"></h2>
+
+  <h3 style="text-align:center; color: #000000; user-select:none; margin-top: 16px;">
+    Your Entertainment lies here!
+    Welcome to Stellar! This game site is so good trust me gng 🥀. Anyways, on a serious note, have fun.
+  </h3>
+    <h3 style="text-align:center; color: #000000; user-select:none; margin-top: 16px;">Also, big updates and game additions coming soon!</h3>
+  <h4 style="color:black; text-align:center; max-width:900px; margin: 0 auto 24px; user-select:none;">
+  No more CORS required! I have built my own launcher that dosent require CORS! 🥳🎉
+</h4>
+  <section id="gamesGrid" aria-live="polite" aria-atomic="false" aria-label="List of games">
+    <!-- Game cards injected by JS -->
+  </section>
+</main>
+
+
+  <!-- Game iframe modal -->
+  <section role="dialog" aria-modal="true" aria-label="Game window" id="gameModal">
+    <button class="close-game" aria-label="Close game window">✕ Close</button>
+    <iframe src="" title="Game window" id="gameFrame" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+  </section>
+  
+  <script>
+   (() => {
+  // Proxy URL for CORS
+  const PROXY_URL = "";
+
+  // Initial state
+  let coinBalance = 4850;
+  const purchasedThemes = new Set();
+  const purchasedFonts = new Set();
+  const purchasedGames = new Set();
+  const favorites = new Set();
+
+  // Store last selected theme and font
+  let currentTheme = "";
+  let currentFont = "";
+
+  // Companies for invest
+  const companies = [
+    { name: "AstroTech", desc: "Leading space tech innovator." },
+    { name: "StarDynamics", desc: "Futuristic propulsion systems." },
+    { name: "GalaxySoft", desc: "Top space simulation games." },
+    { name: "CosmoEnergy", desc: "Renewable cosmic energy." },
+    { name: "NovaWorks", desc: "Advanced AI for space missions." },
+    { name: "OrbitalNetworks", desc: "Space communication tech." },
+    { name: "QuantumSat", desc: "Quantum satellite networks." },
+    { name: "SolarFlare", desc: "Solar absorption technology." },
+    { name: "MeteorMines", desc: "Asteroid mining experts." },
+    { name: "LunarLogistics", desc: "Moon transport services." },
+  ];
+
+  // Games data with requiresCors flag and real github raw urls for CORS games
+   const gamesData = [ {
+      id: "game1",
+      title: "Soccer Random",
+      category: "Sports, Multiplayer",
+      description:
+        "Play this game with friends or just yourself. Crazy soccer action with randomly generated circumstances.",
+      cost: 2075,
+      image:
+        "https://th.bing.com/th/id/OIP.09kY4K3Tx9CbrIsVLzm__AHaHa?w=180&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3&adlt=strict",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/soccerrandom.htm",
+      requiresCors: true,
+    },
+    {
+      id: "game2",
+      title: "Gn-math Game Loader",
+      category: "Game Loaders",
+      description:
+        "A site with several different games to load all for free. Very intuative and isnt made up of all games. It even has a code editor!",
+      cost: 10000,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhZuxLIqreVnTSJ6-5ZoF4rspCYq8Yz_D_Sk6rvz-V-w&s=10",
+      url: "https://raw.githubusercontent.com/gn-math/gn-math-DONTDMCA/refs/heads/main/singlefile.html",
+      requiresCors: true,
+    },
+    { id: "game3",
+      title: "Crossy Road",
+      category: "Strategy",
+      description:
+        "Play as a chicken (or anything you buy with the in game currency) and run across roads and bodies of water on water to avoid dying. Compete for a best high score.",
+      cost: 2320,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSozrbJp8K-A3Ki_STY80jF3iYbdkvkc_9IEKOEaIYNqg&s",
+      url: "https://raw.githubusercontent.com/Chezzz37/Html-offline-games-dump/refs/heads/main/offline%20games/Crossy%20road(dosent%20work%20in%20code%20editors).html",
+      requiresCors: true,
+    },
+    {
+      id: "game4",
+      title: "Slow Roads",
+      category: "Racing/Driving",
+      description:
+        "A game where you drive your choice of either a car, motorbike or RV and drive across randomly generated landscapes. You can also change the time of day.",
+      cost: 4050,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTubJHcKPH3uM4UY_XZ3ZBhzEdG6FdRFYqAL6zcai3GVA&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/slowroads.html",
+      requiresCors: true,
+    },
+    {
+      id: "game5",
+      title: "Basket Random",
+      category: "Sports, Multiplayer",
+      description:
+        "Same thing as Soccer Random, except with basketball. Huge fun expected.",
+      cost: 2255,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTJ5w-qI7kmSkehCfZzaCwThakRnrRW3BQK4ltc9zsuow&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/basketrandom.html",
+      requiresCors: true,
+    },
+    {
+      id: "game6",
+      title: "Volley Random",
+      category: "Sports, Multiplayer",
+      description:
+        "Same thing as Soccer Random, except with volleyball. So unfair sonetimes! 😡",
+      cost: 2210,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyx5mYpj9QKaesv8QkqF2Y4QGMjEz0ArbtGYu-_ok83A&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/volleyrandom.html",
+      requiresCors: true,
+    },
+    {
+      id: "game7",
+      title: "2048",
+      category: "Puzzle",
+      description:
+        "A game where you multiply tiles to obtain the 2048 tile. If you get up to 1024, you are better than Chez because he has only gotten to the 512 tile.",
+      cost: 1800,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTxrNJbdVEClYFV6tfA-lE5BGTCsI0ofDpyEWPm88H77A&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/2048.html",
+      requiresCors: true,
+    },
+    {
+      id: "game8",
+      title: "3D Flight Sim",
+      category: "Adventure",
+      description:
+        "A game where you can try to figure out how to get a plane of your choice to fly off a runway and fly to random places on the map. Kinda hard ngl.",
+      cost: 1965,
+      image:
+        "https://imgs.crazygames.com/3d-flight-simulator.png?metadata=none&quality=60&width=216&height=120&fit=crop&dpr=3",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/3Dflightsimulator.html",
+      requiresCors: true,
+    },
+    {
+      id: "game9",
+      title: "Escape Road ",
+      category: "Racing/Driving",
+      description:
+        "A game where you flee from cops in cars that have different builds and power depending on what you buy.",
+      cost: 2855,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQryiG-bfqYJapr5mTFfHKfW08nX6Cu9Cq1gUEvb_hlyQ&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/master/offline/escaperoad.html",
+      requiresCors: true,
+    },
+    {
+      id: "game10",
+      title: "Helix Jump",
+      category: "Casual",
+      description:
+        "A game where you play as a little ball and jump and break through stuff.",
+      cost: 1995,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8WyelidqjkmvKzILidtFiuSpNdOGS2781unyA-IaoQQ&s=10",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/H/clhelixjump.html",
+      requiresCors: true,
+    },
+   {
+      id: "game11",
+      title: "Eaglercraft 1.12",
+      category: "Adventure",
+      description:
+        "Basically minecraft 1.12.",
+      cost: 6575,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9q3-251bAHRwHZKutJKfnMRID6Hw19RbGR-WT7F7jzQ&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/1.12.html",
+      requiresCors: true,
+    },
+     {
+      id: "game12",
+      title: "Boxing Random",
+      category: "Sports, Multiplayer",
+      description:
+        "Same thing as Soccer Random, but for Boxing. No violence cuz its pixels.",
+      cost: 2000,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWKm0L8aw0-mPhXXsGOF-2RibHNkuGHMGqCRcOPIXiFQ&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/boxingrandom.htm",
+      requiresCors: true,
+    },
+     {
+      id: "game13",
+      title: "Super Mario 64",
+      category: "Emulated Games",
+      description:
+        "The hit N64 game where you collect stars to fight bowser and save Princess Peach.",
+      cost: 1235,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTcSgX9STtzB71QDTTX93veHCeAHIOlD1Di6osxgDCMQ&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/sm64.html",
+      requiresCors: true,
+    },
+     {
+      id: "game14",
+      title: "Coreball",
+      category: "Strategy",
+      description:
+        "A game whre you sty to fit lines around a moving ball without the lines touching each other.",
+      cost: 2990,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6TKvM4ivdn7K8DnG7-D2L7DU8iZKANSHqRe9JP5Qyfw&s=10",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/C/clcoreball.html",
+      requiresCors: true,
+    },
+     {
+      id: "game15",
+      title: "Call of Duty: Modern Warfare",
+      category: "Emulated Games",
+      description:
+        "A DS COD Game.",
+      cost: 1855,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcvZsGi_toe7pi3ZK-MkBOVBALlCbdbquzX9EkzEEGFw&s",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/C/clcodmodernwarfare.html",
+      requiresCors: true,
+    },
+     {
+      id: "game16",
+      title: "Slither.io",
+      category: "IO Games",
+      description:
+        "Game where you kill other snakes and eat the particles they drop to grow.",
+      cost: 3785,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjnoiDb5zGbDfeh6H6z0Pn-CVzinlEJS-tkA0EnOM8sA&s=10",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/S/clslitherio.html",
+      requiresCors: true,
+    },
+     {
+      id: "game17",
+      title: "Slope",
+      category: "Strategy",
+      description:
+        "Game where you fly down a hill and avoid walls and stuff.",
+      cost: 4120,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQONEdcLUgATij06t_B31GaY9SGwlDZxpCqOb0ok7yIiA&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/slope.html",
+      requiresCors: true,
+    },
+     {
+      id: "game18",
+      title: "Basket Bros",
+      category: "Sports",
+      description:
+        "Cool NBA Style game where you play as guys from the NBA.",
+      cost: 4695,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQapBq-AdxOIK6B_3gn61lYT-XRqgyweNQZy6QewcCY9Q&s=10",
+      url:"https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/basketbros.html",
+     },
+     {
+      id: "game19",
+      title: "UGS Files",
+      category: "Game Loaders",
+      description:
+        "All the games from the UGS Files Google Doc.",
+      cost: 15000,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRzBjGokjlFwMATTb0oNcPGZLOktZ1uJIkoqrVdfm7bg&s=10",
+      url: "https://raw.githubusercontent.com/bubbls/ugs-singlefile/refs/heads/main/AASINGLEFILE.html",
+      requiresCors: true,
+    },
+     {
+      id: "game20",
+      title: "Slope 2-Player",
+      category: "Strategy, Multiplayer",
+      description:
+        "Just like slope, but with a 2 player option.",
+      cost: 4445,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6pSO6NN2546g6MzvZbyvQnWGLCn5JfjskSSC-esPsWg&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/slope2player.html",
+      requiresCors: true,
+    },
+    {
+      id: "game21",
+      title: "1",
+      category: "Puzzle",
+      description:
+        "Just like 2048, but you divide the tiles.",
+      cost: 3785,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-qpbL19c_DHduzxgXar8zXz5OEb1ISrQuVNMR9lgrvA&s=10",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/1/cl1.html",
+      requiresCors: true,
+    },
+     {
+      id: "game22",
+      title: "Crazy Cars",
+      category: "Racing/Driving",
+      description:
+        "Racing game that takes place in a stunt park.",
+      cost: 5230,
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS1akVbD5UvyxH-oasDJzH6_peot2IfkkmYQkLBq7nbiw&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/crazycars.html",
+      requiresCors: true,
+    },
+    {
+      id: "game23",
+      title: "Escape Road 2",
+      category: "Racing/Driving",
+      description:
+        "The sequel to the hit game Escape Road.",
+      cost: 2900,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCWhfDEy0b5lodaEhQN0GtLXlOOAvlBUjHOtkGW8bQHQ&s",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/master/offline/escaperoad2.html",
+      requiresCors: true,
+    },
+     {
+      id: "game24",
+      title: "Super Mario Bros Plus",
+      category: "Emulated Games",
+      description:
+        "Mario Bros for the NES, but with mods, superpowers and level editors.",
+      cost: 2300,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0k2AdtFYWWp2WpDEW3L6WJ3rOGpfzs2D2uUHSlf9nmFZDt4di6Ew3CR3UV1by1L9CyM7HQDKygteh5Qt893qLTePC0ludG8pNrvbk6_-f&s=10",
+      url: "https://raw.githubusercontent.com/Hexorod/ugs/refs/heads/main/S/clsupermariobros.html",
+      requiresCors: true,
+    },
+    {
+      id: "game25",
+      title: "Madalin Stunt Cars 2",
+      category: "Racing/Driving",
+      description:
+        "A game where you race a bunch of different cars that you select in the garage.",
+      cost: 4975,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbS8VuMmmBag4FqxrU_2A_WHloMViOJwqHl3i7s_IYrg&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/madalinstuntcars2.html",
+      requiresCors: true,
+    },
+    {
+      id: "game26",
+      title: "Pac-Man",
+      category: "Strategy",
+      description:
+        "Play as a yellow ball with a mouth and a avoid ghosts that are chasing you.",
+      cost: 2635,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQohcgh7PB0taV9NlrB22UUwCW3eF45rTaQGnqmolyFpA&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/pacman.html",
+      requiresCors: true,
+    },
+    {
+      id: "game27",
+      title: "Supreme Math Lite",
+      category: "Game Loaders",
+      description:
+        "Has a ton of games to load. Thats basically it.",
+      cost: 17605,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-qpbL19c_DHduzxgXar8zXz5OEb1ISrQuVNMR9lgrvA&s=10",
+      url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/single-file.html",
+      requiresCors: true,
+    },
+    {
+      id: "game28",
+      title: "Curveball",
+      category: "Strategy",
+      description:
+        "A game where the ball gets hit by an opponent and you try to hit the ball back. Kinda like 3D Pong.",
+      cost: 2755,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSWfEAWV4Ad3uw2_0PBYoWtkl1pz7GS-VIfbNJ7NdMZ4Q&s=10",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/C/clcurveball.html",
+      requiresCors: true,
+    },
+    {
+      id: "game29",
+      title: "Genizy Soundboard",
+      category: "Apps",
+      description:
+        "Has a bunch of sounds, possibly with over 300.",
+      cost: 1200,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTayEsgHJj9UXQ05H_jw7l8NYWFPxSLBpc1E7LorquQtA&s=10",
+      url: "https://raw.githubusercontent.com/genizy/soundboard/refs/heads/main/index.html",
+      requiresCors: true,
+    },
+    {
+      id: "game30",
+      title: "SoundBoardW",
+      category: "Apps",
+      description:
+        "This soundboard is the first web-based thing on our list. This actually has a URL. If you look at the code, the thing for this is an actual url website! How funny!",
+      cost: 1000,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRk6hY9ApFnGYg4vqqcm--T2l8V7sEydOKlAsyvyT4bzA&s",
+      url: "https://soundboardw.net/",
+      requiresCors: true,
+    },
+    {
+      id: "game31",
+      title: "Beta Chatbot AI",
+      category: "Apps",
+      description:
+        "This is beta. BETA. BETAAAA!",
+      cost: 1355,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtofMMlu0Jh5MmQle0NgkN-CttENnxAiLSs4lFx7XnHw&s=10",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/A/clai.html",
+      requiresCors: true,
+    },
+    {
+      id: "game32",
+      title: "BitLife",
+      category: "Strategy",
+      description:
+        "The hit game where you play as a random guy you were born as and you play a game of life, kinda.",
+      cost: 5240,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZdo5cBqkv1uAcfCofpC-WAViocRNLlysohwHMV2Lqzw&s=10",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/B/clbitlife.html",
+      requiresCors: true,
+    },
+    {
+      id: "game33",
+      title: "Doge Miner 2",
+      category: "Strategy",
+      description:
+        "The sequel to the smash hit game, Doge Miner.",
+      cost: 3560,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjtgiffmpib5KFLywHYWvn6imJfGD22JmZF4JXuDeB2Q&s=10",
+      url: "https://raw.githubusercontent.com/brickyosu/ugs-files-sorted/refs/heads/main/D/cldogeminer2.html",
+      requiresCors: true,
+    },
+    {
+        id: "game34",
+        title: "Baseball Bros",
+        category: "Sports",
+        description: "A game where you can run baseball games with funny sprites, all in one game.",
+        cost: 4450,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWYSmchsS6n0Idx7dQ6N-VGEA2oW5j6Z2fhr-lXP2f-qhl4afN:https://golforbitgame.com/wp-content/uploads/2026/01/Baseball-Bros-Online-for-Free.webp&s",
+        url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/baseballbros.html",
+        requiresCors: true,
+    },
+    {
+        id: "game35",
+        title: "1v1.lol",
+        category: "Strategy",
+        description: "Kinda like a web based Fortnite.",
+        cost: 4355,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR05AuxILvZqh6BxW8UQ4z86BGw6KY_f_MIUXpugvs5zcdsg_F3:https://a.simbi.com/images/192468/images/large-61901f657d10dfc871971050982e6033.jpg&s",
+        url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/1v1.lol.html",
+        requiresCors: true,
+    },
+    {
+        id: "game36",
+        title: "NautilusOS",
+        category: "Apps",
+        description: "A web-based Operating System where you can do just about anything.",
+        cost: 8975,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-qpbL19c_DHduzxgXar8zXz5OEb1ISrQuVNMR9lgrvA&s=10",
+        url: "https://raw.githubusercontent.com/nautilus-os/NautilusOS/refs/heads/main/NautilusOS-OneFile/index.html",
+        requiresCors: true,
+    },
+    {
+        id: "game37",
+        title: "LumiOS",
+        category: "Apps",
+        description: "Kinda like NautilusOS.",
+        cost: 8370,
+        image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAT4AAACfCAMAAABX0UX9AAAAflBMVEUAAAD////8/PzT09Nra2vx8fFhYWHm5ub4+PiGhobj4+Pg4ODz8/Pa2trd3d35+fmysrKcnJxYWFi9vb1PT0/Dw8ONjY3Jycmnp6d/f381NTXr6+t3d3ekpKRISEgoKCgbGxs9PT2WlpZKSkpycnIQEBA6OjoeHh4VFRUrKyt6sUKPAAADVklEQVR4nO3ca3OiMBiGYV5AsIoK2AKKtqu1rf3/f3BzELUHd3U/bDbLfX0Jg7bzzjMJQSYkCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+PuSynUFPttlsjUHj/eOK/HJ01N3lEdvpp3PnRXjnUbi7nBve91LOPvhqhrPlJnIp1OvU5F046Qa36wklPGHM49TCUMZyvTRUUkeiVV68vDxXFLLTMI6/v4vcLIMdU/LP5+uRLiDuUItuvd9nWbHIwfFeCfR6YUy+fJBtXVQjXdqNXSVmes6/PSi0xOldF2Jlw5j97uLH35va7LTGb65LsVHjXT51a5L8VEuR3eua/FQY6PTc6/wG+Nmi2N8Kj/63602XXgmxZr540atja/rhHn3jHm/d1qWL4pT37NtVjfbIo+EZ1VXGZ6nFx5uY9Q4dl2XJyo5ptdFp88sXdfli+hDeoceyCR8tckhvfDU9xrXNfmkNg+cu743C6VwXZFftqdRq7Q8vLrRvsm6aSNduC7GS/dVPp/nC2ZcAAAAAAAAAAAAAMB/Inm+8ovx5LBOY7lbnG1pUN4t+rxo8psX/75XyU43m6letZGt7Mm1WcOR9XcNh0RXfvG50O/hJyJNnGwzu1wtlyjelEXW31W7V8dnLCV8NwcTvVjyveu69D6lWJsmzlU321bBexM9qIvck2r09bHMH/Wq026h2kx0V+z9ksmz+IZ264y1JEGQThIZZiKvpWmWQXAnsepux28Xqvvdf9otoofO4hsMTWPiG6ey0hnVusn1tgY6vrvTXgYbvVNEKoOi3zuTXIhvaoMSMZc1fY3T8RV29tX25ro3N+9d7oLeuhifOc7sC/nhyMZXyXGSeDv84W6uxnb68tfq/cdcGrz2OB3YT1obX3LanKQ8HT6Pbpu+/ydf4ysuxxectod40N86/pPP+zX1xll8IxvC5BfxFd2tSilqPP/o7paHxKc7lH75eR3qe7sL8amIzZhdiLzricO+7LHo8eCdTcdaWqkeJfm6lXt9SzK2o7TNTJMd49Ova02imQxf1XHZqlnjoR70+G23dpQa7TYIVplkqnNF0yCo7c+xKDo2q4G92MV1O5h0uwnF81TCUdPbiRcAAAAAAAAAAAAAAAAAAAAAAAD4Qz8Bk7ceBHfbAXcAAAAASUVORK5CYII=",
+        url: "https://raw.githubusercontent.com/FritzCohen/LumiOS/refs/heads/main/old/LumiOS.v15.html",
+        requiresCors: true,
+    },
+    {
+        id: "game38",
+        title: "Ruffle Bubble Shooter",
+        category: "Strategy",
+        description: "A bubble shooter game ran on ruffle.",
+        cost: 2450,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-erT2OT-WwDTirGC9MET-cISEflUiQchy781DLw5vsdKk3Yc:https://play-lh.googleusercontent.com/3fSd2b95ktHuKK1Sen9-VRNjWhmcpgD8ZHjGYL2HAogK4Fp1CdaLMhig-u2iHB6EmQ%3Dw526-h296-rw&s",
+        url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/bubbleshooter.html",
+        requiresCors: true,
+    },
+    {
+        id: "game39",
+        title: "Block Blast",
+        category: "Strategy",
+        description: "The hit mobile game (Youve probably played it), now on Stellar!",
+        cost: 2350,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSvpbiLvQPctyXDQ9PmR-c7ykzRxYt-95Vaapox7y1be0j0TXD-:https://www.goodplayguide.com/wp-content/uploads/2025/04/Block-Blast-4.png&s",
+        url: "https://raw.githubusercontent.com/Chezzz37/Html-offline-games-dump/refs/heads/main/offline%20games/blockblast.html",
+        requiresCors: true,
+    },
+    {
+        id: "game40",
+        title: "Among Us",
+        category: "Strategy",
+        description: "The hit game where you hide from the impostor.",
+        cost: 3355,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQagu_xq_2xZW4hEnDgc2kd56Ztc_pcIvHSJLO6NG0Cei82B0Lg:https://images.immediate.co.uk/production/volatile/sites/3/2025/02/among-us-3d-7ff0eff.jpg%3Fquality%3D90%26resize%3D980,654&s",
+        url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/amongus.html",
+        requiresCors: true,
+    },
+    {
+        id: "game41",
+        title: "War the Knights",
+        category: "Combat",
+        description: "A game so insane, even I cant describe it and how good it is. Thats why it costs so much.",
+        cost: 6625,
+        image: "data:image/jpeg;base64,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",
+        url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/wartheknights.html",
+        requiresCors: true,
+    },
+    {
+        id: "game42",
+        title: "Candy Crush",
+        category: "Strategy",
+        description: "A game that everyone and their moms played back in 2011.",
+        cost: 3955,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRKb07frs-OTgjPU_tfryU2kjJIp1yVOpzFBOqHbUVK3GHei_HS:https://th-thumbnailer.cdn-si-edu.com/5jrMsPdXM6TUNkRVnWFkqjWhEqI%3D/fit-in/1600x0/https://tf-cmsv2-smithsonianmag-media.s3.amazonaws.com/filer/64/09/6409af9c-6ad1-43e3-b0da-f38d914996ff/10557167836_a3e5f0d7c2_o.jpg&s",
+        url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/candycrush.html",
+        requiresCors: true,
+    },
+    {
+        id: "game43",
+        title: "Elastic Man",
+        category: "Visuals",
+        description: "The game where you drak an elastic version of Morty for Rick and Morty's face around.",
+        cost: 2555,
+        image: "data:image/jpeg;base64,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",
+        url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/elasticface.htm",
+        requiresCors: true,
+    },
+    {
+        id: "game44",
+        title: "Cookie Clicker",
+        category: "Strategy",
+        description: "The hit game from SubjectNotes40.",
+        cost: 4230,
+        image: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxQTEhUTEhMVFhUXGBgYFxcVGBgZFxgYFxoXFx0YGBgaHSggGBolHRgYITEhJSkrLi4uGB8zODMtNygtLisBCgoKDg0OGxAQGi0lHSUtLS0tLS0tLSstLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAJkBSQMBIgACEQEDEQH/xAAcAAACAwEBAQEAAAAAAAAAAAAEBQMGBwIIAQD/xABJEAACAQIEAwYDBAcGAwYHAAABAgMAEQQSITEFBkEHE1FhcYEiMpEUQqGxI1JicsHR8BUzgpKy4SSiwggWF1PD8TVDVGNzdLP/xAAaAQADAQEBAQAAAAAAAAAAAAABAgMABAYF/8QAJBEAAgICAwACAgMBAAAAAAAAAAECEQMhEjFBBBMicTJRYUL/2gAMAwEAAhEDEQA/AOxDU6w0QIaJjh0rus+c4i2SKgeIxfAPWrDJh6X8Wgso9f4GsnsDj+JXilCqhpo0VDGOqtkkiONbCi+HYa73/VH4nSokTSnvCcLaO53Y39hoKEnSNGNyIxFrX54qOEWtfjBepplZREc0VRxQWGnj+dNZoKFZaaLFktC7Ex0GY6azx6UGyU1iVoHdbUHMDemrppQE0etPYiRFAN66c1+Ra/SbUV0K+wcGigKGG9FZdKyDIimauYjrX2bevkR1oem8JSdNqHYf11ogneh6LMiePao8SdRXaVxMa3gF2fIxrRJ9aFQ61NWRmQmpoTpQzGiIdqCC+j9NUAW5H1qWY2qJXrPsK6DBtQsg1qbvBUDnWiwIlh2rp20rmA11MK3gPQeihtQwolaCDIglOtdQiuZd67w4remfRITptUGepnGlD2osyNMEVGYeLSuhDrRuFh0NcVnfQG8PlS7i8Hwr6/wqxGGgeKQXC+prJ7DKOiqnDULJBarG0FCPharyIqIpgw1yABuQB71amwoUADYC1RcEwN3vbRRf36U5mh/29qSch4Q9EphqRYNKr3PHNgwhWCBRLinICpa4W50LAaknoKF5g5wxODxGHGLwojgkjXOVOdhIQM1mGnwnTL1Fzfak5op9bY+xcVqX9zTVpUlVXjYMjC6sNiD1qExVSLJSQoxEWlBNHTqeKgJY6pZKgN46X4jc3pxItLMVa9M2IkDxLvUM4NqlzA+J9PGosRLp4eopkxXHYOKKvQQkopaKFkiObev0J1r9OK+YYeNb03hM50oW9FvtQzVmZE6bCuMSKkjNQ4pwaL6MuwrgPB5sVJkgTNb5mOiID1ZunpvVvfsyxAGk0RPhZh+NqG7MuaIMKssU7lc7qyfC7XYjIR8INtl3rXq5pZJJndiwwlG2ebMZG0UjRSKVdDlYHoR/X41NA2lN+1sBOJPYWzxxN6mxS/n8lC4DlzGsmYYWYje5W34HWqQmvSGTE7pEeAwommiiJsHdVJ8ATa9bTheUcEihRhYWt1dFdj6swJrAsRMwcBQwcNYAXzhgbWAGoa/Te9a7wCTjbRDvBhF0FjOHMp82EbBQfXWp5XvTK/HSS2itdpvBYcNLE0ICCRTeNdFBW3xAdL3t7VSwdadc/YHGxTCTGsrlxZHQ/BYfcAsMpG9vO+tI+FYaTESrDCuZ3NgPzJPQDe9PGWieSNydIJiItX2abQ1qfBuzXDxqDiGaV7a2JVAfIDU+5prLyJgGFjhwPRmB+t6zzIK+LJ7MPEovRt/CnXPvJf2HLLEzNA5y/F8yMdQCQNRa9j5darcDU8JWSyY3HTO5N67w9Ruda7hpvSfhLLsaGohhUGSizRNqEVF4eLSppYLMamhj0r51n1eIOY6Cx8Xy+9OClC4yPb3/AIVk9ma0JDBQ8sNgSdBa5J0AA6nypy8YAJNgBuTsPXwrKOO8Um4xif7P4cf0A/vptcpAOpv+p4D7x8qZyoRQssnD+0PApBiZAzsYWAsF/vM2i5DtYtcXNtr1XOT8LjeK40cRmdoYIyRGE0uNiiAggjT4mO/5abwTkrDYbCnCLGGjYWkLi5lJ0Jf/AG26U1hwKxqqIoVVACqBYADYAUvfZVJLop3KnIcWEnlxLyNPM7MVkkGqK1/+c31b6W1qw8b4RFioWgnXMjfUHoynoR40wZa5pkkYw9TiOBYjuZ7y4KQkowG3mPBx1XruK0fDskiCSNgyMLqy6gg0741wiLFQtDOgZG6dQejKehHjWQRviOA4nups0uCkPwsBtfqPBx1XrvQT4/oWUeX7L3iIqAkj1p3EyTIskTB0YXVl1BFRS4XKPOq8jn4lfxkdthr5b+lXHlnkyONRJiFDynXKdVTytsW86U8v4USYyMHULdyP3Rp/zEVotCUmUxY12z4igCwFgNgNB9KjxMCyKUdQynQqwuD7GsF4/wBomPXETBMSyosrhVCRWCqxAGqX2HjfzreMFiRJGki7OqsP8QB/jSF07MH554dHhsbLFFogysoOtswBsD4XvS/DMzEKoLMdgASSfIDU0b2l4ovxPEBdbMkYA3JCICP8xIrXeSOV0wUK3AM7KDI/W9vlXwUbee9WWSkcjw85GWjlTHvYrhZLeeVT9GINB4/g+Jw9jPC8YOgYi638MwNr+9egWkA3IHqRXGJw6yIySKGVhZlIuCDQ+52M/ixqkzzrJPpTvlTlGfHXdSI4QbGRhfN4hAPmPne35Uu5o4KcPjzhFvZnQRE75ZSAuvWxNvVa33h+DSGJIoxZEUKoHgKaeXWieLBvZToezDCgWeWdj4gov4ZTSzj/AGXDuy2ElYuNckpFm8gwAsfUfSmXNXabh8FiGw7xSuyhS7IVsMwvaxNybEH3q7YeYOqupurAMpGxDC4P0NS5y/s6fqg9UeWcVM0bnMCGjJup0IZTqD4G4r1Ve+o2rAu27hoix3eKLLPEH/xqSjfhkPvW4cGmz4eF/wBaKM/VRQbs2OPG0UnGJE3MkYlUMRg1aPNsrq8lmHna9q0OsS7ReGNi+YMPh1G8cGc+EatI7ny+G49SPGta5h4xHg8M88nyoPhX9ZtlQeZNKinRmXN/EYcLx+Cc2CqEMxHQujx5iPEKwPsK1PhPFYcTH3sEiyJcjMu1xa49RevMHGeItPK80hu8jFmPmeg8hsPStp7Dnvw5x4YiQf8ALGf4mmZOD2TdtMYPDrndZoyPfMpt7E0j7CsACMTiCPiBWJfIWztb1uv+WmnbniMuAjX9edPoqSN+dqXdgOLBhxUd/iWRGt+yy2H4qaF6DX5l85w40cHhJJ0TvHXKETXVmIAvbW2tJez7mbG4wy/a8IYFAUxtkkQNcm4s+p0sbirPxniH2eCWfI0ndoXKJbMQuptfra59qzSXtzw1vhwk5P7TRqPqCaFjls7U1H9mT36GIj171P8Ace9YnhHptzZzBjuIx/aGgkjwaEZQAe7udmZyBnPS4Fh5X1SYVqviOP5G2HMa7hvUZqXD3roXZxvo7c6UPm9aIm2oLNWZolll5z4gTn7/APwhI7W9Mt/xozCdpOLTR1hf1BUj6Heq0zAsArA36CxsLfQdK+vBmB0APTwvbS49q80ss16ereKD8LLD2l4ssWyQlSdFysLb9c16e4HtGiYAYiF436938ak+I2K+hvbxO9Z1CQ2wsbbW08DbzBqVdxYeVOs80xZYINdFp554geI9xg8Di4kWdwsofMj2IJAu1sy6G6rqTl6GtG5X5Zw3C8L3aWVVGaWV7AsQNXdug8thXnzGjDR4nDNi1lMQcZzGSCFHS/rrYa2BtV04zxfE8xYn7Hgi0fD4yDLKQRnt1a51B+7GddLny64Tc42cc4KDpGicmc7YfiUk6YdZLQkWdlIV1P3gbfCb3+E6218bWd4KC5b4BBgoFw+HTKi7n7zN1Zj1Y01p7FF0sFByx2p06XoOeKnjIVoWUg54kwgwcn263ckbfeLWNu7/AG/C35U74nN3UbyZGfIpbKguzWF7KOprJeXeB4nj2I+2Y28eCQ2jjUmzFT8ig9Nwz7nYeTSYqRZeyyGH+zkaBZQCz5u91Ja9jlPylf3fDXW9P8dHoadjDKihEUKigBVUWAA0AAGwoDHRfCaCYrQm5QP/ABhH/wBtvzWr4KzrhUvdY2InYkof8QIH42rRaYaHR5e5nwRXGYhT0ml+hdiPwNXHgPaFi4cPHAqRERoEVmDFrDQX1sTQ3abge54jKW0EoWRT0NxY/ippLwtHmbu8PGZHPRRf3PgPM6UYolOTXR3wkmXiOHeU3MmJjLk9S0ik16QrzdzFwXE8OnhedRe6yIVN1JQqxW/6w6+teisDilljSVCCsiq6kbEMAR+dZjY/9POfa1jJP7UxF2YZSgSxIsO7Ugjw1Jr0Dy5j+/wsE3WSJGPqVF/xvWRdsvJ+KmxyzYaB5VkiUMUF7OpZbH1GU1qnJOBeDAYWKUZXSFFZfA21FLeyiRn/AGukRcR4bOekkeY+UcyMPwLfWtbNYX2+cQD4qGBTrFGWa3RpCCPey3/xCtQ7PuYVxuCilv8ApFASVfCRdD7H5h5GsBdmKds2HMfFJj/5ixuPTIsf/RW19m85fheCJ37lF9k+AfgooLnfs9g4lJHJJJJGyKV/RhfiUm4vmB1Gv1qxcD4WmFw8WHjJyRIFBa1yB1NtLnU1vQpGV/8AaDt/wf636X6fBf8AG1aB2dYnvOGYRr3PcqD6r8J/EGsY7WOPLjcb+jbNFCvdoRsWuS7DyJsPRBWmdieIzcMCdYpZF9mPeD/WaIqabHXDeXsvEsVjpALusUUO2kaxoXbyJe49E86h7Q+Uv7Rw4RZCkkbF473yE2tZwPLY9PrVS7YedjGrYHCvaQ6Tuu6KRfu1I+8evgNOujzkvtGw0+HQYmZIsQqgSBzlViNMyMdCDa9r3F6AW10U3nfs0iwnD/tKzMZYgnegj4JC7qhK9UsW03uB460+7A5P+ExCeGIzf5oox/0UH2sc4wzwfZMO4kzMrSOvyAIbhQfvG4B02tVX7Oubv7OeQOheKW2YKRmDLswvodCQR6U1MTlFM17nDlFOIGFZpGWKMsxRAAzsQAPiOwAv067isl4Pif7C4xJEzl4DlR2692+V1cgfeQnX/FbernxjtZjEZ+ywuZDsZbBV87Akt6aVjuNd5ZHkkYs7kszNuSetbiwPJHw9VQyq6hlIZWFwRqCD1B6ikQ5H4d3ne/YoM9818ul/HL8v4VhnLnMmLwYtBOwX/wAtviT2U7e1qaY/tD4jIpXvwgOl40VT9dx7a0eDD90TTu0TmbD4bDPhzleWRCiwjoraZmt8qje3W1hWKYZLUMl2OZiWY6ksSWJ8STqTTOFLVXHGjlzZLOzU2F3qKS166gNXXZyvonn2NB5fOinOlD6VmaI0jdD8uW/gNLj23Gp8alEVx1BG1uvr9fOq5uoN766WOo0/P+VdLMzMivIwW4F77fTr/OvNSw/6esUxtjCbqAyFwTcDUqpGpNttgNfGu8PC1i2QMF0OVrHXb4W8bHrsD6VNHw9SpBtcKcpGYADW1wD83UnWosHiVBBIN3VAAdjcg73NgKl+hgPjkV4XzRl/hPw6ZtOunUb6X2rUeyjmXh54b+hy4cYdb4hHYXBtrKT94N0b26VSMRGCL326afjVX/7sQTY2KJ8QuGWZsr36j5vh6XYgAX0zWro+NkX8Tn+RC1yND4VzRj+McSRsAzYfAYZ7u7DSXxDj7xYXsv3QbnW1bDekarhOFYP7sGHhX3J/N3Y+5JrO+WeL8Q4zxBMXCz4XAYckKN+9v8ykfK7ECxOoQba612nIbDUUy0t5m5igwMDT4hwqjYfeduioOppT2d81ycSwzzyYZoBnIQn5ZE3DLfU22J2uNDuBjBvG1YQyZHWN8jZZHF1Q20ZhfYUg7LGmbh6NNikxLFmsyG+QX+Rm3Y3udQLXtrvQPbTAHw0UbY1MMjzIrh9pFJsdvisvzeHj0q1cp8uYfA4ZYcMBk+YvcEyMR87MN7/S1raUzYtBsqUFiY9DTKaw30pTjMX0Ue5pkIyocfw9rte1tQfCrfyxx5MVHuO9WwkXY3/WA/VNVXjEJa5OtVKeN4nzxsyMNmUkEU9CKZs+N4dFNbvYo5LbZ1DWv4X2rvC4SOJbRoiL1CqFHvasYfnniKi32i9vGOIn65NaTcV5kxmIBWfEOyndfhRT6qgANFIZ5Eiz9rvNcE6DCQ2kKuHeUaqpAtlQ9TqQTt09IOzbn5cMgwuKzd0D+jkAvkv91hvlvexF7X8NaockVfhDVFDRB5WnZ6H/AO+OAtf7ZBbf5xVd5j7UsLCpXDH7RL0y37tfNnO/ov4VimIh8q/YaHWl4bGebR94nI88jyynM7ksxPUn8hRHLnF58FL3mHfKx0YEXVh4MvX86k7qoxFVOBFZC+f+L+JAF8NCTbU5nAv6a2+tV3mHn7G4xTG7LHEd0hBXMPBmJJPpoD4Up+zaVx9mofWN9zfoIkF6Lwpkjv3bul98jMt/WxF6kjj1pxwrl7E4hS0MDuo6iwX0BYgE+lNxS7J8m+isTxEkk3JJuSdTc9SfGv0EFPOL8DxGHt9oheMNoCwGUnwDKSL+9R4SNba+1ZRTZpTcVsXSQ6VwkNN5YRaoUj1FNwEWQiWHSoGg1pskdQuovTOAqmCw4evsmF02o6Jd66kIo8VQObsWRQUwVLVHmokMK0UkaTbIXGtfYetcyuDX2I3o+i+EsmxqCiGOlQa+VZmQDJwnEJ8ozX6Kf4GjcJy/MxXvGEY3IBu3Tw0p7DMJCMpAtrob9L3NvXail1J+nuOvp1ry7zS6PWcUfVwSqnUrsc3vuCbnY/Sl8kIV1yi6n4CpFgp3DqbG21redPO7unxbEbnfqffx9qDxWDNwPhZdz1v4eW/5VJBIsO4K7jfQ72sfLpvSfmfhcMsLM5CFASr728j5E9KI4hN3alzkCxnOxzNpc2NkAFyzHTXSoeTOVp+NzCSUGLAxmxtu5FvgU9T4tsB51fDik5WmTyzSVMk5K4JjuOiFcZNJ9hw2mY7yEfdB+89jlznYed62vjPFMLwnBZyBHFEuWONLAseiIOrHx9Sa64xxXCcKweZssUMYyxxoNWPREHVj/MmsC4jjcRxnEHFYm64db91EDoAOi33O2Y7nptp3ykoq2ccYuTpCvmHjeM4piVxUkedA4EUGuQKWHwKBYtc2Bbcn0sPUXBb/AGeLNCIG7tbwqQViNh8AK6EDbTwrzdxfh5ePLG+XL8mTQfDsNNgNKZDtfxseCODZD9rHwDEHVu7tuR96X9r333TFk5j5MfEtvFuXcJjePZcVjhNkjDLhCLWI/wDlZh8NvvlfmN9dNa1NnCgBQABoANAAOgFUbsz7P0wKfaJyJcZKMzSXzBA2pVGO5N9X638N7w61ZEGAYm53pfKlN5ISelQNhPE/SnTEaEGMgvVdx+Bvewq7YpFXp9aCw3DGnJJOVPHqfT+dPyE4Gc4nhfjSyfAqK2leWsPbVM3mxN/wqGflDCMCDFa/UMwI9DemTA8TMOTBtI4SNGdydFUXJ9qskfZzjiubJGP2WkGb00uPxq08Fgh4VjZY55kCTRK0UkhCkZWIKE7Am/TfKKv8cgYBlIIIBBGxB1BFN9jXQqwJ9nmrimCeGRo5VKOuhU/1qPMVcOSez04uITyymNGJCBVBZgDbMSTYC99LHau+3BAuJw7i12iYHzyNpf8AzfhU3Z52iJDEuEnjkbLfu2iXOxBN8pTe4udRRcm1aFjjSlT6J+Z+zkYeB54ZmfIMzI6gfCNyCOo8LeNZ5Ga07n3ngnDtDFh50EgytJNGyDKd1W+5O1ZXHL500JP0nljG/wARxBGLVHNbyppy1y/iMYP0KjINC7Gyj+Z8hVpHZXId8UoPkht+dUeSKIxwzltIztXCsGIzAalfEDW3v/GvReBliKAQlMgAsEtYA7aDash5k7NsRBC0sUizBQSygZWyjci5INt7Ub2Fz3bFr4CJvr3g/hUcjUlo68MZQdNF57QMMr8OxOYXyxtIPJk+IEfSsEw+JAGteg+c/wD4fjf/ANXEf/yeq52V8u4ZMFBiQivLKudncAlTqCqX+UDUab0sZ8R8uLmzKTOCOlcLJrcVuXPXB4psHNnVQyIzo9hdWUZtD4G1iOorIOQOCfbcWsbX7pBnktuQNAoPiSR7Xqqy3s5pYHF0T8K4LicRrBCzr+toq/5msPoaYt2e8Qtfu4/QSC/p4fjWyxokaAKFRFGgFgqgfkKFwHGcPMxSGeORlFyqOGIGgubdNR9aR5my0fixXZgePwc2HfJPG0bbgN1HiCLhh5g1ceV+z1sTEk80xRJAGVUALFTqCWOi+lj7VcO0vhizcPmYj4oVMqHqMgu31W9V7sp5xWRIsAyt3iK5D6ZSqm4Hjex/Cs8ja0BYIqexPz3yMuCw5xMUruilQ6uFuAxyggqB1IFrdat3LPIWHSBDiI+8lYBmzFrKSAcoAIGm16b87YcSYQxkXDy4ZbeN8RD/AAvU3MHM+FwWT7TLkL3ygK7k23NkUkDUamk5sqsUE7oyLtG4OmExWWIWjdFdRe+U3KkXOttAfekWEe9Ou0nmCDGYlHw7F0WMLmKst2zMSLOAdBbXzpDg6vjbOPMlboNk2qG3nUkt7UP8VVZGJFg8Y6/KVUXv8q6m/U2q88BYTwrItgbkMB0INv8AcVQ2Q7fkf68aM4HxI4aUPrkNg6jqPH1G/tXnZ41JHqbZpEWDNyTuNbDXobg+d7j29KWYpcp2BJ+uuum3Ty/nTLDYlJVEkZzAg2tqRcHx2ttY2+tcSYUA3A0B0HTcDXMd/L8tK53GjJ/2UrmTCTPG4ijDFlK2I3F73Gtrjp52q28jdrOEj4eVxCCGXDIF7qNbCQfKO7HRidwdt6WcZjZYWKgiy31Fum+g28L+BqqYLDQkMrsFzakldH6a6V0/HlSZPLDlsX8b4viOLTnE4k2iX+7iBORVv8qj823J/CwcBxRKsh3TLYaAW1HtoDtQEuQINbZbWta3havnLkg71wdSw0/w3+m4o5/yiHFHiGYyBS7kF7A2shIU3AuLeI0OlqX4nAANn3O3xfMB5HrTLFRZATGq5LDMCSCGGbXXe5KgnyFDzx2Nuo1J/Hf+t65+RejY+zLmAYrCrG2ksAVGA2ZALI49hY+YNXDIKxTsqxDJxFVG0kciNc+A7wH1uoHvW2mu/FLlE4MsOMiJxQ0oomRqCxMhsasiLE2OOZgg+8QKfxoFAUbDQVVYJL4uIH9Y/wClqtlOgIoPNPaN9kxDwiAPksLl7akA7WPjVw4JxEYjDxTqLCRFa3hcbe1YV2mxkcRxAPVgfYqtWjkHnyHC4NMPMkzMhexRVIysxcDVgdMxFZdmuhd264gfaoV6rCb/AOJj/KtV5Qmz4DCN+th4T7mNawTn7ihxmKefKVUhVRTa4VR1t4kk+9bb2bvfheD8ogv+Ulf4URYtNlA/7QDWfB/uz/nDV47NOGYePAwSQIA0sas77uzHe58j02FUf/tA/Pg/3Z/zhpH2M46T+0You8fu8kv6PO2S+UtfJfKDv060Tf8ARvHEcGk0TxSKGR1KsD4EfnXmbhfDmlxaYUHVphFf/FlLewBNeoGOhrzhyBilbjOHfo00hH+NJbfiRRToE420eh+H4JIY0iiXKiABQPAfmet6SPzzgRifshmImD93lySWz7Wz5cu/nVjry7zlI0PFMSwuGTFSSLfx7wyKfTUe1AZ66PSfMD5cLiCekMn+g1kHYTNbGTx/rYfN/kkQf+pQnGu1TEYqB4O5iiWRcrspZmIO9r2Av71H2OzZeKL+3FKv+lv+mjWhOSckbHzu1uHY2/8A9LiPxicVR+wVsQ2GlMjsYFYJAhtYH4nkI0vuyjf9arrz3C78PxUcYJeSMxqBuTIQgH/NRHKnBFwWEhwy65F+I/rOdWb3Yml9KFO7ZOZRDB9kjP6SYfHb7sQOx/eOnoDSbsFIL4s9csf0u/8AGhOOdnWPxXEZu8cd25ZxiCPhC65Iwg1zDQW8Nb1H2cI/DOLvg8UVBmjCgqbqW+eM3NtxmHqRRvQlPlbNh43w/wC0YeWAsUEiFCy2uoPUXqu8pdneFwEvfRPM0mUqS7C1mtcZVUeA3vtVrxMIdGRr2ZSpsbGzC2h6HWsNx/ZNxQylFxSyQ30d5pBp+0ljrbwoMei9dqXN8MGGlwoIeeaN48qkfo1kUqXfwNjoNz6Vl/ZViMvFsN4N3in3ikI/ECr3gux3Dx4aQSSs05UkSD4I0I1uEv8AEPHMfpWacmS91xHCu1rLMoJB01OU2PhrTeE3/LZ6cIHW3jr+deZ+eOPnG46WYH9GD3cX/wCNCbH3JLe9elMVAHRkJIDKVJGhsQRofHWsz535DwGF4e7QoI5EKlHdmZ3Oxjux1uL6CwBF+hoLsafRlEK00wq0DBHTPDLauqCPnZGTyDSoPappTpQ1qoySFkhrlsQQNT7HWuTLbQ69BVl5d5Mab9JiA6JcWUEBiL63BBIB26HrXwG0ls9SWbk5hHg0JABclrWa+pFtPSw08KYPibkqLnT6e+2ulDLwqNNFMgA2BcEL1Pn46E6dN6hgwLmSUmX4MxGQpe22qsG3N/D+dcz3ZibGzllKA/dNydtRsB469fGs2wGGxDXESO9tNrL/AM2h6aVc+K4lzPHDCcpILX11ABI29CfanRR1XKvw9bADcCxsL6adfTyrRk4r9hoomK5bxYF3EZ8MrdfLS1CYfhs6WawU30uQd/IEE62/DSr62oAY7aGw9f5AeH50M65Rpp09ht+BFb7mFIrmNkLKM0bBB8RzBtbDwAta3rUuJGtyb+H9eV6PxEja/Ffe+u3TQUBKhGp9vf8AI0tlCPhnEe4xMU4H926setwPmt52vXo815lxbDLcjX+vevSWHk/RpYW+FdNraDS3Suz4z00cnyV0zt6BxbgA3NSzufGluJ2rsSOJsrUuNCYmJugkFz5E2/jV9rNePw71deWuKjEQK9/jX4ZB4MBr9d/enRosyrtcweXH5yNJIkIPiVuhHsAv1FVnCKK3XmfleDHKgmzAoSVZCAwvuNQRY6fSl/Cez/BwHNlaU9O9IYf5QAD7iitCyi2YtxfDFQCysAwupIIDDxB61snZNNm4ZF+y0i/Rz/Ooe1f7P9hKy27y47gD5swte3guW9/bypf2J4sHCzQ3+KOXNb9l1Fj/AJg1F72CK4yoS9uOHkmxGEiiRpHEcrZUUs1iya2HT4aqHZLLk4rB594uvmjD616IxMscYaWQqoVfidrCyi51PhqdPOvPDcfiHGPt0SFYRNnsBqVPws+XxNy1vOh2GWnZ6C4u7iCUxKWk7t8ijcvlOUDw1tXnHinLOM4TJhcTMq6Ojrka9njIfu2OwJA8xv4V6ITj+FKd4MTCUtfNnW1vrWPdq/OiYzLhsNrCjZnkI+dhoAtxcKLnXr6b6gyaRs/COJR4mGOeI3SRQyn16HwIOh9KpnOvZdDj5/tCzNBIQA9kDq9tAbZhZrWF7+FZpyVzliMACqWkiJuYnJAB8UYfKT7jyq/p2wwWGbDTA9QChHsSR+VFxYFkix7y92d4HCIR3YlYghpJrEkEWIA2QW8PrWS8AaLD8ai7h88IxHdo36yvdBr1F2GvW1+tM+aO0WfGqYo17iE7gG7uPBm0sPIfU1UFUqwZTZlIII6Eagj0NMoOiU8ivR6hmlCKWYhVUEknQADUknwrM+B9qSTcTeFiEwrAJA7afpFJ+Nj0D3sL7WXxNUTjPOeNxMJhmmuhtmyqFLW6MRuPKqwuG8qHBjvMvD1dJKqqXZgFAuWJAAHjfa1ebefOKjFcQlniJygqsbC4NowAGHhrcj2pf3khXKXcr+qWbL9L2rlYtaZQElls1jlTtWjKLHjlZXGneqMyv5so1VvG1x6bVYMT2l8NQXGILnwSOS/4qBWG9zQ7w61nAEc7Lxzd2hy41WhhUwwHRtbvIPBiPlX9kb9T0qkPDbbQ9LfzqfDRmp3ip1DRGWRt7LVw/tSxqIEZYpCABnYEMQBb4rGxPnSHjnHcRjJA2IkzW+VQLIv7q/xOtL+4olYKKgaWVtdkUa2o6BqFYa0TAKrEhIlcVBUznSoL0WKiw8v8tJhpO8kcSNayG1so6kD9bpf8quKTZtQfO4trb122t/Wqsy7qy5b20U3tte7fyH+xULhQdSBe2p066+mteX5OT2eoaPps2haw01I8dSPPc/hX3GZQQbtlseoAO3T+NdvOuYW+bXUC59Dp6+G9QYpMxtcEm+h2I1XcDTofc0vgfQYkFs9hcCy+QJ0FfpAxUEbWudDpa+npsailusipsCCb6EqQBf1/28jXLcQVPhdh+9qDfb8xf2PhQSCCTyEXv4k3Ol7H87g/jQ0swy5lNx40t41xC5tGbAG50BBt5ai2m1LeEk5HN7/FZV1tfqRT/W1G2MnsZSuOm/ppa/n0oczG1jbzH8q+kNYa3Gg0/rpQWJzEix3O/h6igkMfsWRlNx0I/wDavSWBu0UbMCGZFJG1iVBIsddPOvPvLPCvtOLhgucrtdjf7ijM3uQpHvXoljXZ8ZUmzk+S1aRDJAPE0JLhB4miZG86ElkPia60cjoR8W4YDfU1VYxLhpDJC9jsQRdWHgw61dcaSRvVY4jCTfU09MnaCf8AxCKj48Pc/stYfQjSl3Ee0iZgRDCkZ/WclyPQCwv639KS43Bk9aVyYM+dFJmcwbi7yTsZJZC7Hq35DwHkKAw3ewuHikZGGzISD6abjypi8B8TXDYc1WMWc8pJAPF+KYmcBZ55JANgzHLfxy7E+dKUh1p1Ph9agig1p+BN5APuajMO1ORhdD/R+m5ocRi9M4CLICpBptXE+HpxDELVHPGKPDQFk2K4INaLGHqeFNaICUVAEpi3uKkjw1TsKliGlFRQHJgrYe1crFrRuI6VAg1rUZSbRL3IoV4NaOYihpN6LQItnWGhtUkq6V+gbSuptqKWgN7BiutEqBUK1NWRmQtvXcO9cS711D1oem8JXG9D3qdzcVBl9azMi2QY6yoQM2a2l9BcHrb8Pzot5RY26gfFe3Xca62Ov8Kq/AvmH7x/0VYF/uR+9/OvLTXF0eroKWUEKQRfX4ibE3F9vG4P+/SSSW53PT2Njp6kUs+8f30/KpMd85/df/SK1aA9A3MUqKM8huc2ZR8OZST08QVvfxHpVUPERZnluz2+Ej238BvqNfrej+evlj9v9JqnHf6/mK6MUdWBjVWlmOWNSfyA8yf/AHp3wLCFO8RlBIZQG6agHS+3SuOUP7h/3j/CvuI6fv8A8EpMkm20NFUT4pfEe2w8NaDla/t5e/8AOi8ZuPQ0FN19F/hUolC5dj3D82MkmJ0ijIA/akIGby+FWH+IVsLGs27GP7vE/vR/6WrRU619HCvwR87O/wA2RymgpTRctBy1ZEGBzmlOKAppPSvEVVEWLZYRrS3FRCmc1L8Vt7VWJGQmnUVFItSYjcVw25qsSExdizUEFT4zf6VDhutOib6JHFwaFFFD5TQrUWZBKbVzNX6L+H865xFYC7OUGtEBaHHT+utEvt9f4VkaQIKnhGlQNU8P8aCCz9PtQ8RqfEVAdx/XU1mZdBIHjUDrrRXQen86Gn3NFgiSQCupjpXEHy11NtW8N6DkUSKgG/8AXnUybmsgsik3rqEVzJX2Db6fwoem8Jm2qK/nU0m3tQ1FgR//2Q==",
+        url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/cookieclicker.htm",
+        requiresCors: true,
+    },
+    {
+        id: "game45",
+        title: "Chess",
+        category: "Strategy",
+        description: "The board game.",
+        cost: 3955,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGy5oMd_8Ezd5BrZ8oIFysfabhVyujhCJLhyUlCe5JAPSYWX0:https://www.popsci.com/wp-content/uploads/2026/01/198Chess-Start.jpg%3Fstrip%3Dall%26quality%3D85&s",
+        url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/chess.html",
+        requiresCors: true,
+    },
+    {
+        id: "game46",
+        title: "Death run 3D",
+        category: "Strategy",
+        description: "The game that is kinda like a 3D slope.",
+        cost: 4125,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZcxY4wqpAa97YKilvbTvp1I9h7wh_9F1_FFC1h_oq8lgojqb9-hPGZt3UBp2c92BbhZ5rV7jkvES1CMVLLJKv9dwEbexiV7G_gQmRCosR1g&s=10",
+        url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/deathrun3D.html",
+        requiresCors: true,
+    },
+    {
+        id: "game47",
+        title: "Drift Boss",
+        category: "Racing",
+        description: "A game that I played when I was in like 5th grade",
+        cost: 3625,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0s8uAy-5qX3_QsJtASpeWWOPb98uQZRrnSBxefVJ7KVyJuoqg:https://is1-ssl.mzstatic.com/image/thumb/Podcasts211/v4/69/71/76/6971764d-0133-cbc6-fdec-6a57578b957b/mza_4088849670585903639.jpeg/1200x1200bf.webp&s",
+        url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/driftboss.htm",
+        requiresCors: true,
+    },
+    {
+        id: "game48",
+        title: "Geo Dash Scratch",
+        category: "Strategy",
+        description: "The hit game from mobile, now ported to Stellar by GriffPatch!",
+        cost: 1895,
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdHBoy10f6C8-T6QSAXS56HgFFcAmOybzysPJ87Ovpd61eIVXA:https://mograph.com/wp-content/uploads/2025/11/geometry-dash-subzero-vuong.png&s",
+        url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/geometrydash.html",
+        requiresCors: true,
+    },
+ ];
+
+   // Elements
+  const chatBtn = document.getElementById("chatBtn");
+  const chatModal = document.getElementById("chatModal");
+  const chatCloseBtn = document.getElementById("chatCloseBtn");
+  const chatOutput = document.getElementById("chatOutput");
+  const chatInput = document.getElementById("chatInput");
+  const aiChatNotice = document.getElementById("aiChatNotice");
+  const citySelect = document.getElementById("citySelect");
+  const fetchWeatherBtn = document.getElementById("fetchWeatherBtn");
+  const weatherError = document.getElementById("weatherError");
+  const pongGameEl = document.getElementById("pongGame");
+  const pongCanvas = document.getElementById("pongCanvas");
+  const shutdownPongBtn = document.getElementById("shutdownPongBtn");
+  const pongCtx = pongCanvas.getContext("2d");
+  const hangmanContainer = document.getElementById("hangmanContainer");
+  const hangmanWordEl = document.getElementById("hangmanWord");
+  const hangmanGuessesEl = document.getElementById("hangmanGuesses");
+  const hangmanGuessInput = document.getElementById("hangmanGuessInput");
+  const hangmanGuessBtn = document.getElementById("hangmanGuessBtn");
+  const hangmanMessage = document.getElementById("hangmanMessage");
+  const cloakShopBtn = document.getElementById("cloakShopBtn"); 
+  const cloakOptions = document.getElementById("cloakOptions");
+  const applyCloakBtn = document.getElementById("applyCloakBtn");
+  const resetCloakBtn = document.getElementById("resetCloakBtn");
+  const cloakTitleInput = document.getElementById("cloakTitleInput");
+  const cloakIconInput = document.getElementById("cloakIconInput");
+
+  // Variables for chat states
+  let weatherSearchActive = false;
+  let pongActive = false;
+  let hangmanActive = false;
+
+  // Pong constants and variables
+  const PADDLE_WIDTH = 10;
+  const PADDLE_HEIGHT = 50;
+  const BALL_RADIUS = 7;
+
+  let paddleY = pongCanvas.height / 2 - PADDLE_HEIGHT / 2;
+  let aiPaddleY = pongCanvas.height / 2 - PADDLE_HEIGHT / 2;
+  let ballX = pongCanvas.width / 2;
+  let ballY = pongCanvas.height / 2;
+  let ballSpeedX = 4;
+  let ballSpeedY = 3;
+
+  let playerScore = 0;
+  let aiScore = 0;
+
+  const keysPressed = {};
+
+  // Cities list for dropdown, sorted alphabetically, with added cities and replaced Astro City with Albany & added London, Stockholm, Munich as separate (Munich already present, keep multiple now)
+  const cityList = [
+    "Albany", "Baltimore", "Bangkok", "Cairo", "Charleston", "Denver", "Dubai", "Edinburgh", "Florence",
+    "Geneva", "Helsinki", "Istanbul", "Jakarta", "Kyoto", "Lisbon",
+    "London", "Munich", "Naples", "New Orleans", "Oslo", "Paris", "Phoenix", "Quebec", "Rome",
+    "Stockholm", "Seoul", "Suriname", "Tokyo", "Utrecht", "Vienna", "Warsaw", "Xian",
+    "Yokohama", "Zurich"
+  ].sort();
+
+  // Populate dropdown options on load
+  citySelect.innerHTML = ""; // Clear first
+  cityList.forEach(city => {
+    const option = document.createElement("option");
+    option.value = city;
+    option.textContent = city;
+    citySelect.appendChild(option);
+  });
+
+  // Utility functions
+ // --- FIX 1: Update appendMessage to respect the global rainbowActive state ---
+function appendMessage(msg, fromBot = false, isError = false, rainbow = false) {
+  const div = document.createElement("div");
+  div.classList.add("chat-message");
+  if (fromBot) div.classList.add("chat-bot");
+  if (isError) div.classList.add("chat-error");
+  
+  // FIX: Priority is given to the global toggle (rainbowActive)
+  if (rainbowActive || rainbow === true) {
+    div.classList.add("rainbow-text");
+  }
+  
+  div.textContent = msg;
+  chatOutput.appendChild(div);
+
+  // Hover animation logic
+  chatOutput.querySelectorAll(".chat-message.hover-animate").forEach(el => el.classList.remove("hover-animate"));
+  const messages = chatOutput.querySelectorAll(".chat-message");
+  if (messages.length >= 2) {
+    messages[messages.length - 1].classList.add("hover-animate");
+    messages[messages.length - 2].classList.add("hover-animate");
+  }
+
+  chatOutput.scrollTop = chatOutput.scrollHeight;
+}
+
+  let rainbowActive = false;
+
+  function getRandomJoke() {
+    const jokes = [
+      "Why don't scientists trust atoms? Because they make up everything!",
+      "I told my computer I needed a break, and it said 'No problem, I'll go to sleep.'",
+      "Why do programmers prefer dark mode? Because light attracts bugs!",
+      "Why was the math book sad? Because it had too many problems.",
+      "Why did the scarecrow win an award? Because he was outstanding in his field!",
+      "Why did the coffee file a police report? It got mugged!",
+      "What do you call fake spaghetti? An impasta!",
+      "Why do cows have hooves instead of feet? Because they lactose.",
+      "Why don't skeletons fight each other? They don't have the guts.",
+      "Debugging: Being the detective in a crime movie where you are also the murderer.",
+      "How many programmers does it take to change a light bulb? None, that's a hardware problem.",
+      "Programming is like writing a book... except if you miss a single comma on page 126 the whole thing makes no sense.",
+      "I would tell you a UDP joke, but you might not get it.",
+      "What's a programmer's favorite hangout place? Foo Bar.",
+      "Real programmers count from 0, not 1.",
+      "Why do Java developers wear glasses? Because they don't C#.",
+      "In order to understand recursion, one must first understand recursion.",
+      "Why did the functions stop calling each other? Because they had a breakdown.",
+      "There are 10 types of people in the world: those who understand binary and those who don't.",
+      "Algorithm: Word used by programmers when they don't want to explain what they did.",
+      "Ihop is totally a restaurant for bunnies."
+    ];
+    return jokes[Math.floor(Math.random() * jokes.length)];
+  }
+
+  function rollDice() {
+    return Math.floor(Math.random() * 6) + 1;
+  }
+
+  function flipCoin() {
+    return Math.random() < 0.5 ? "Heads" : "Tails";
+  }
+
+  async function getWeather(city) {
+    const apiKey = "f00c38e0279b7bc85480c3fe775d518c"; // OpenWeatherMap public demo key
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=imperial`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const data = await res.json();
+      const desc = data.weather[0].description;
+      const temp = data.main.temp;
+      return `Weather in ${city}: ${desc}, temperature ${temp}°F`;
+    } catch {
+      return null;
+    }
+  }
+  
+  // Pong game functions
+  function drawPong() {
+    pongCtx.fillStyle = "#111";
+    pongCtx.fillRect(0, 0, pongCanvas.width, pongCanvas.height);
+
+    // Player paddle
+    pongCtx.fillStyle = "#6bc1ff";
+    pongCtx.fillRect(0, paddleY, PADDLE_WIDTH, PADDLE_HEIGHT);
+
+    // AI paddle
+    pongCtx.fillStyle = "#FF5555";
+    pongCtx.fillRect(pongCanvas.width - PADDLE_WIDTH, aiPaddleY, PADDLE_WIDTH, PADDLE_HEIGHT);
+
+    // Ball
+    pongCtx.beginPath();
+    pongCtx.arc(ballX, ballY, BALL_RADIUS, 0, Math.PI * 2);
+    pongCtx.fillStyle = "#f1c40f";
+    pongCtx.fill();
+    pongCtx.closePath();
+
+    // Scores
+    pongCtx.fillStyle = "#6bc1ff";
+    pongCtx.font = "20px monospace";
+    pongCtx.fillText(`You: ${playerScore}`, 20, 30);
+    pongCtx.fillStyle = "#FF5555";
+    pongCtx.fillText(`AI: ${aiScore}`, pongCanvas.width - 100, 30);
+  }
+
+  function resetBall() {
+    ballX = pongCanvas.width / 2;
+    ballY = pongCanvas.height / 2;
+    ballSpeedX = (Math.random() < 0.5 ? 1 : -1) * 4;
+    ballSpeedY = (Math.random() * 4) - 2;
+  }
+
+  function updatePong() {
+    if (!pongActive) return;
+
+    // Player paddle
+    if (keysPressed["w"] && paddleY > 0) paddleY -= 5;
+    if (keysPressed["s"] && paddleY + PADDLE_HEIGHT < pongCanvas.height) paddleY += 5;
+
+    // AI paddle simple AI
+    let aiCenter = aiPaddleY + PADDLE_HEIGHT / 2;
+    if (ballY < aiCenter - 10) aiPaddleY -= 4;
+    else if (ballY > aiCenter + 10) aiPaddleY += 4;
+
+    if (aiPaddleY < 0) aiPaddleY = 0;
+    if (aiPaddleY + PADDLE_HEIGHT > pongCanvas.height) aiPaddleY = pongCanvas.height - PADDLE_HEIGHT;
+
+    // Move ball
+    ballX += ballSpeedX;
+    ballY += ballSpeedY;
+
+    // Top and bottom collision
+    if (ballY - BALL_RADIUS < 0 || ballY + BALL_RADIUS > pongCanvas.height) {
+      ballSpeedY = -ballSpeedY;
+    }
+
+    // Player paddle collision
+    if (ballX - BALL_RADIUS < PADDLE_WIDTH) {
+      if (ballY > paddleY && ballY < paddleY + PADDLE_HEIGHT) {
+        ballSpeedX = -ballSpeedX;
+        let collidePoint = ballY - (paddleY + PADDLE_HEIGHT / 2);
+        collidePoint = collidePoint / (PADDLE_HEIGHT / 2);
+        ballSpeedY = collidePoint * 5;
+      } else {
+        aiScore++;
+        resetBall();
+      }
+    }
+
+    // AI paddle collision
+    if (ballX + BALL_RADIUS > pongCanvas.width - PADDLE_WIDTH) {
+      if (ballY > aiPaddleY && ballY < aiPaddleY + PADDLE_HEIGHT) {
+        ballSpeedX = -ballSpeedX;
+        let collidePoint = ballY - (aiPaddleY + PADDLE_HEIGHT / 2);
+        collidePoint = collidePoint / (PADDLE_HEIGHT / 2);
+        ballSpeedY = collidePoint * 5;
+      } else {
+        playerScore++;
+        resetBall();
+      }
+    }
+
+    drawPong();
+    requestAnimationFrame(updatePong);
+  }
+
+  function startPong() {
+    pongActive = true;
+    playerScore = 0;
+    aiScore = 0;
+    paddleY = pongCanvas.height / 2 - PADDLE_HEIGHT / 2;
+    aiPaddleY = pongCanvas.height / 2 - PADDLE_HEIGHT / 2;
+    resetBall();
+
+    chatOutput.style.display = "none";
+    chatInput.style.display = "none";
+    aiChatNotice.style.display = "none";
+    pongGameEl.style.display = "flex";
+
+    updatePong();
+  }
+
+  function stopPong() {
+    pongActive = false;
+    chatOutput.style.display = "block";
+    chatInput.style.display = "block";
+    aiChatNotice.style.display = "block";
+    pongGameEl.style.display = "none";
+    chatInput.focus();
+  }
+
+  // Conversion rates for /convert (basic units for length, weight, temp)
+  const conversions = {
+    length: {
+      m: 1,
+      meter: 1, meters: 1,
+      km: 1000,
+      kilometer: 1000, kilometers: 1000,
+      cm: 0.01,
+      centimeter: 0.01, centimeters: 0.01,
+      mm: 0.001,
+      millimeter: 0.001, millimeters: 0.001,
+      in: 0.0254,
+      inch: 0.0254, inches: 0.0254,
+      ft: 0.3048,
+      foot: 0.3048, feet: 0.3048,
+      yd: 0.9144,
+      yard: 0.9144, yards: 0.9144,
+      mi: 1609.34,
+      mile: 1609.34, miles: 1609.34
+    },
+    weight: {
+      g: 1,
+      gram:1, grams:1,
+      kg: 1000,
+      kilogram:1000, kilograms:1000,
+      mg: 0.001,
+      milligram:0.001, milligrams:0.001,
+      lb: 453.592,
+      pound:453.592,pounds:453.592,
+      oz: 28.3495,
+      ounce:28.3495, ounces:28.3495
+    },
+    temperature: ['c', 'f', 'k', 'celsius', 'fahrenheit', 'kelvin']
+  };
+  
+
+  // Conversion function for /convert command
+  function convertUnits(num, unit1, unit2) {
+    unit1 = unit1.toLowerCase();
+    unit2 = unit2.toLowerCase();
+
+    // Check temperature conversions explicitly
+    if (conversions.temperature.includes(unit1) && conversions.temperature.includes(unit2)) {
+      let celsius;
+
+      // to celsius first
+      switch(unit1) {
+        case 'c':
+        case 'celsius':
+          celsius = num;
+          break;
+        case 'f':
+        case 'fahrenheit':
+          celsius = (num - 32) * 5/9;
+          break;
+        case 'k':
+        case 'kelvin':
+          celsius = num - 273.15;
+          break;
+        default:
+          return null;
+      }
+
+      // to target
+      switch(unit2) {
+        case 'c':
+        case 'celsius': return celsius;
+        case 'f':
+        case 'fahrenheit': return celsius * 9/5 + 32;
+        case 'k':
+        case 'kelvin': return celsius + 273.15;
+        default: return null;
+      }
+    }
+
+    // Length
+    if (unit1 in conversions.length && unit2 in conversions.length) {
+      const meters = num * conversions.length[unit1];
+      return meters / conversions.length[unit2];
+    }
+    // Weight
+    if (unit1 in conversions.weight && unit2 in conversions.weight) {
+      const grams = num * conversions.weight[unit1];
+      return grams / conversions.weight[unit2];
+    }
+    return null;
+  }
+
+  function getRandomFact() {
+    const facts = [
+      "Honey never spoils. Archaeologists have found edible honey in ancient Egyptian tombs.",
+      "Bananas are berries, but strawberries are not.",
+      "Octopuses have three hearts.",
+      "The Eiffel Tower can be 15 cm taller during the summer due to heat expansion.",
+      "A day on Venus is longer than its year.",
+      "Humans and giraffes have the same number of neck vertebrae.",
+      "Male seahorses carry the babies, not the females.",
+      "Vincent Van Gogh sold only one painting in his lifetime.",
+      "A group of flamingos is called a “flamboyance”.",
+      "Humans shed around 200 million skin cells each hour.",
+      "Sharks have been around longer than trees.",
+      "Wombat ***** is cube-shaped.",
+      "Butterflies taste with their feet.",
+      "Bananas glow blue under black lights.",
+      "Your nose can remember 50,000 different scents.",
+      "Venus rotates clockwise, the only planet that does.",
+      "One strand of spaghetti is called a 'spaghetto'.",
+      "Cats can rotate their ears 180 degrees.",
+      "The first oranges weren’t orange but green.",
+      "Cows have best friends and get stressed when separated."
+    ];
+    return facts[Math.floor(Math.random() * facts.length)];
+  }
+
+  function getRandomFortune() {
+    const fortunes = [
+      "What ever you're goal is in life, embrace it visualize it, and for it will be yours.",
+      "Good news is coming your way.",
+      "A pleasant surprise awaits you.",
+      "Now is the time to try something new.",
+      "Trust your intuition.",
+      "Your hard work will soon pay off.",
+      "Land is always on the mind of a flying bird.",
+      "Meeting adversity well is the source of your strength.",
+      "A very attractive person has a message for you.",
+      "If you feel you are right, stand firmly by your convictions.",
+      "Your future is as bright as your faith.",
+      "Change can hurt, but it leads to something better.",
+      "Happiness is coming your way in unexpected forms.",
+      "You will make a valuable discovery soon.",
+      "Be cautious when new opportunities come knocking.",
+      "A fresh start will put you on your way.",
+      "Adventure can be real happiness.",
+      "A chance encounter will change your life for the better.",
+      "Opportunity seldom knocks twice.",
+      "A surprise gift will brighten your week."
+    ];
+    return fortunes[Math.floor(Math.random() * fortunes.length)];
+  }
+
+  async function defineWord(word) {
+    const url = `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0) return null;
+      const meanings = data[0].meanings;
+      if (!meanings || meanings.length === 0) return null;
+      // Return first definition from first meaning
+      const def = meanings[0].definitions[0];
+      if (!def) return null;
+      return `${word}: ${def.definition}`;
+    } catch {
+      return null;
+    }
+  }
+
+  async function translateText(lang, text) {
+    // Using LibreTranslate Public API
+    const url = "https://libretranslate.de/translate";
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          q: text,
+          source: "en",
+          target: lang,
+          format: "text",
+        }),
+      });
+      if (!res.ok) return null;
+      const json = await res.json();
+      return json.translatedText || null;
+    } catch {
+      return null;
+    }
+  }
+
+  function get8BallAnswer() {
+    const answers = [
+      "It is certain.",
+      "Without a doubt.",
+      "You may rely on it.",
+      "Ask again later.",
+      "Cannot predict now.",
+      "Don't count on it.",
+      "My sources say no.",
+      "Very doubtful.",
+      "Yes – definitely.",
+      "Better not tell you now.",
+      "Outlook good.",
+    ];
+    return answers[Math.floor(Math.random() * answers.length)];
+  }
+
+  // Hangman logic
+  const hangmanWords = [
+    "apple", "banana", "cherry", "dragon", "elephant", "forgive", "guitar", "horizon", "internet",
+    "jungle","keyboard","lantern","mountain","nebula","ocean","python","quantum","rocket","sunshine",
+    "ticket","umbrella","volcano","window","xylophone","yacht","zebra","amazing","butterfly","capture","dizzy",
+    "envelope", "freedom","gravity","holiday","impact","jacket","kingdom","lizard","mirror","nature","opposite",
+    "planet","quest","resolve","silence","trouble","unique", "Chezzz", "victory","wilderness","yellow","zealous",
+    "cactus","electric","fiction","glacier","harvest","island","jellyfish","kangaroo","language","mystery",
+    "noodle","orchard","pyramid","quality","recycle","sunset","treasure","utopia","village","wonder","yogurt","zodiac",
+    "adventure","brilliant","courage","dolphin","emerald","fantasy","galaxy","harmony","illusion","journey","kitchen",
+    "labyrinth","melody","necessity","oasis","paradise","quartz","radiance","sapphire","tempest","unity",
+    "verity","whisper","yearn","zenith","achievement","balance","crescent","delight","eternity","fortune",
+    "gratitude","honor","infinity","justice","kindness","liberty","miracle","nurture","optimism","passion"
+  ];
+  let hangmanWord = "";
+  let hangmanGuessed = new Set();
+  let hangmanWrong = 0;
+  const maxWrongAllowed = 7;
+
+  function startHangman() {
+    hangmanActive = true;
+    pongActive = false;
+    weatherSearchActive = false;
+    chatOutput.style.display = "none";
+    chatInput.style.display = "none";
+    aiChatNotice.style.display = "none";
+    pongGameEl.style.display = "none";
+    hangmanContainer.style.display = "block";
+    hangmanGuessed.clear();
+    hangmanWrong = 0;
+    // Pick random word with random length (5 to 12 chars for variety)
+    const filteredWords = hangmanWords.filter(w => w.length >= 5 && w.length <= 12);
+    hangmanWord = filteredWords[Math.floor(Math.random() * filteredWords.length)].toUpperCase();
+    updateHangmanDisplay();
+    hangmanMessage.textContent = `Guess the word! You can guess one letter at a time. You have ${maxWrongAllowed} wrong guesses maximum.`;
+    hangmanGuessInput.value = "";
+    hangmanGuessInput.focus();
+  }
+
+  function updateHangmanDisplay() {
+    let displayWord = "";
+    for (let char of hangmanWord) {
+      displayWord += (hangmanGuessed.has(char) ? char : "_") + " ";
+    }
+    hangmanWordEl.textContent = displayWord.trim();
+    hangmanGuessesEl.textContent = `Guessed letters: ${Array.from(hangmanGuessed).sort().join(", ")}`;
+  }
+
+  function handleHangmanGuess() {
+    const val = hangmanGuessInput.value.toUpperCase();
+    hangmanGuessInput.value = "";
+    if (!val.match(/^[A-Z]$/)) {
+      hangmanMessage.textContent = "Please enter a single letter A-Z.";
+      return;
+    }
+    if (hangmanGuessed.has(val)) {
+      hangmanMessage.textContent = "You already guessed that letter.";
+      return;
+    }
+    hangmanGuessed.add(val);
+    if (!hangmanWord.includes(val)) {
+      hangmanWrong++;
+      hangmanMessage.textContent = `Wrong guess #${hangmanWrong} out of ${maxWrongAllowed}.`;
+    } else {
+      hangmanMessage.textContent = "Good guess!";
+    }
+    updateHangmanDisplay();
+
+    if (hangmanWrong >= maxWrongAllowed) {
+      hangmanMessage.textContent = `You lost! The word was "${hangmanWord}". Type any key to exit Hangman.`;
+      hangmanGuessBtn.disabled = true;
+      hangmanGuessInput.disabled = true;
+      return;
+    }
+    // Check if won
+    const won = hangmanWord.split("").every(c => hangmanGuessed.has(c));
+    if (won) {
+      hangmanMessage.textContent = `Congratulations! You guessed the word "${hangmanWord}". Type any key to exit Hangman.`;
+      hangmanGuessBtn.disabled = true;
+      hangmanGuessInput.disabled = true;
+      return;
+    }
+  }
+
+  function endHangman() {
+    hangmanActive = false;
+    hangmanContainer.style.display = "none";
+    chatOutput.style.display = "block";
+    chatInput.style.display = "block";
+    aiChatNotice.style.display = "block";
+    chatInput.focus();
+    hangmanGuessBtn.disabled = false;
+    hangmanGuessInput.disabled = false;
+    hangmanMessage.textContent = "";
+  }
+
+  hangmanGuessBtn.addEventListener("click", () => {
+    if (hangmanActive) handleHangmanGuess();
+  });
+  hangmanGuessInput.addEventListener("keydown", (e) => {
+    if (hangmanActive && e.key === "Enter") {
+      e.preventDefault();
+      handleHangmanGuess();
+    }
+  });
+
+  // Exit hangman on any key after game over or win
+  hangmanContainer.addEventListener("keydown", (e) => {
+    if (!hangmanActive) return;
+    const won = hangmanWord.split("").every(c => hangmanGuessed.has(c));
+    if (won || hangmanWrong >= maxWrongAllowed) {
+      endHangman();
+    }
+  });
+
+  function getRandomQuote() {
+    const quotes = [
+      "Life is what happens when you're busy making other plans. — John Lennon",
+      "The only way to do great work is to love what you do. — Steve Jobs",
+      "Be yourself; everyone else is already taken. — Oscar Wilde",
+      "You miss 100% of the shots you don’t take. — Wayne Gretzky",
+      "In the middle of every difficulty lies opportunity. — Albert Einstein",
+      "Success is not final, failure is not fatal: it is the courage to continue that counts. — Winston Churchill",
+    ];
+    return quotes[Math.floor(Math.random() * quotes.length)];
+  }
+
+  function getCurrentTimeDate() {
+    const now = new Date();
+    return now.toLocaleString();
+  }
+
+  // Safe eval with exponentiation and variables support like 'x', 'y', 'z'
+  function safeEval(expr, variables = {}) {
+    try {
+      // Remove spaces and allow digits, parentheses, operators, decimal, variables (x,y,z), ^ for power
+      if (!/^[0-9+\-*/(). %^xyz]+$/i.test(expr)) {
+        return null;
+      }
+      // Replace ^ with **
+      let exprSafe = expr.replace(/\^/g, "**").toLowerCase();
+
+      // Replace variables with 1 (user input for vars really unknown; here for simple calc allow default 1)
+      exprSafe = exprSafe.replace(/[xyz]/g, (match) => {
+        if (variables.hasOwnProperty(match)) {
+          return variables[match];
+        }
+        return "1";
+      });
+
+      // eslint-disable-next-line no-new-func
+      const result = Function(`"use strict";return (${exprSafe})`)();
+      if (typeof result === "number" && isFinite(result)) {
+        return result;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  // Input event handlers
+  chatInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !weatherSearchActive && !hangmanActive) {
+      const val = chatInput.value.trim();
+      if (!val) return;
+      appendMessage(`> ${val}`, false, false, rainbowActive);
+      processCommand(val);
+      chatInput.value = "";
+    }
+  });
+
+  fetchWeatherBtn.addEventListener("click", async () => {
+    const city = citySelect.value;
+    if (!city) return;
+    weatherError.style.display = "none";
+    appendMessage(`Looking up weather for "${city}"...`, true, false, rainbowActive);
+    const weatherStr = await getWeather(city);
+    if (weatherStr) {
+      appendMessage(weatherStr, true, false, rainbowActive);
+    } else {
+      weatherError.textContent = "Weather data not found or API error.";
+      weatherError.style.display = "block";
+    }
+    // After show weather, keep dropdown visible and ChatInput visible
+    chatInput.style.display = "block";
+    citySelect.style.display = "block";
+    fetchWeatherBtn.style.display = "block";
+    weatherSearchActive = false;
+    chatInput.focus();
+  });
+
+  // Keyboard controls for Pong
+  document.addEventListener("keydown", (e) => {
+    if (!pongActive) return;
+    if (e.key.toLowerCase() === "w" || e.key.toLowerCase() === "s") {
+      keysPressed[e.key.toLowerCase()] = true;
+      e.preventDefault();
+    }
+  });
+
+  document.addEventListener("keyup", (e) => {
+    if (!pongActive) return;
+    if (e.key.toLowerCase() === "w" || e.key.toLowerCase() === "s") {
+      keysPressed[e.key.toLowerCase()] = false;
+      e.preventDefault();
+    }
+  });
+
+  shutdownPongBtn.addEventListener("click", () => {
+    stopPong();
+  });
+
+  chatBtn.addEventListener("click", () => {
+    chatModal.style.display = "flex";
+    chatInput.style.display = "block";
+    weatherError.style.display = "none";
+    chatInput.focus();
+    chatOutput.innerHTML = "";
+    appendMessage('Try typing "/help" for more commands!', true);
+  });
+
+  chatCloseBtn.addEventListener("click", () => {
+    chatModal.style.display = "none";
+    weatherSearchActive = false;
+    hangmanActive = false;
+    chatInput.value = "";
+    weatherError.style.display = "none";
+    if (pongActive) stopPong();
+    if (hangmanActive) endHangman();
+  });
+
+  // Updated command processor with new commands and hangman, convert, rainbowtxt, about
+ async function processCommand(input) {
+  const cmd = input.trim();
+  const cmdLower = cmd.toLowerCase();
+
+  // 1. Immediate Execution (No Delay for Games or active states)
+  if (cmdLower === "/pong") return startPong();
+  if (cmdLower === "/hangman") return startHangman();
+  
+  if (weatherSearchActive) return;
+  if (pongActive) {
+    appendMessage("Please press 'Shut Down' to exit Pong mode before chatting.", true, true, rainbowActive);
+    return;
+  }
+  if (hangmanActive && !cmdLower.startsWith("/hangman")) {
+    appendMessage("You are in Hangman mode. Use the Hangman input to guess letters.", true, true, rainbowActive);
+    return;
+  }
+
+  // 2. Determine Delay based on command type
+  let delay = 870.6378; // Default .2706378s
+  if (cmdLower.startsWith("/cowsay ") || cmdLower.startsWith("/banner ")) {
+    delay = 3600; // 3.6s for ASCII art
+  }
+
+  // 3. Show "Generating response..." Loader
+  const loader = showLoader();
+
+  // 4. Simulate the delay
+  await new Promise(resolve => setTimeout(resolve, delay));
+
+  // 5. Remove Loader
+  if (loader) loader.remove();
+
+  // 6. Command Logic Switch
+  if (cmdLower === "/help") {
+    appendMessage("Commands: /joke, /dice, /weather, /coin, /pong, /quote, /time, /calc [expr], /fact, /define [word], /translate [lang] [text], /8ball [question], /fortune, /repeat [text], /convert num unit1 unit2, /hangman, /cowsay [msg], /banner [msg], /say [txt], /rainbowtxt, /clear, /daily, /timer [seconds], /password [length], /about, and /status. Gonna take a break from making new ones.", true, false, rainbowActive);
+  }
+  else if (cmdLower.startsWith("/timer ")) {
+  const sec = parseInt(cmd.split(" ")[1]);
+  if (isNaN(sec) || sec <= 0) {
+    appendMessage("Usage: /timer [seconds]", true, true);
+  } else {
+    appendMessage(`Timer set for ${sec} seconds.`, true);
+    setTimeout(() => {
+      appendMessage(`\u23f0 Timer Finished: ${sec} seconds are up!`, true, false, true);
+      alert(`Stellar Terminal: ${sec} seconds are up!`);
+    }, sec * 1000);
+  }
+  }
+  else if (cmdLower === "/joke") {
+    appendMessage(getRandomJoke(), true, false, rainbowActive);
+  }
+ else if (cmdLower.startsWith("/password ")) {
+  const len = parseInt(cmd.split(" ")[1]) || 12;
+  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%|~`";
+  let pass = "";
+  for (let i = 0; i < len; ++i) pass += charset.charAt(Math.floor(Math.random() * charset.length));
+  
+  // Ensure rainbowActive is passed here
+  appendMessage(`Generated Password: ${pass}`, true, false, rainbowActive);
+  }
+  else if (cmdLower === "/status") {
+  appendMessage(`--- ACCOUNT STATUS ---`, true, false, rainbowActive);
+  appendMessage(`Coins: ${coinBalance}`, true, false, rainbowActive);
+  appendMessage(`Games Owned: ${purchasedGames.size}`, true, false, rainbowActive);
+  appendMessage(`Themes Owned: ${purchasedThemes.size}`, true, false, rainbowActive);
+  }
+  else if (cmdLower === "/dice") {
+    appendMessage(`You rolled a ${rollDice()}.`, true, false, rainbowActive);
+  }
+  else if (cmdLower === "/coin") {
+    appendMessage(`Coin flip: ${flipCoin()}`, true, false, rainbowActive);
+  }
+  else if (cmdLower === "/weather") {
+    weatherSearchActive = true;
+    appendMessage("Please select a city from the dropdown and click 'Get Weather'.", true, false, rainbowActive);
+    chatInput.style.display = "block";
+    citySelect.style.display = "block";
+    fetchWeatherBtn.style.display = "block";
+    chatInput.focus();
+  }
+  else if (cmdLower === "/daily") {
+  const lastClaim = localStorage.getItem("stellar_lastDaily");
+  const now = Date.now();
+  if (lastClaim && now - lastClaim < 86400000) {
+    const hoursLeft = Math.ceil((86400000 - (now - lastClaim)) / 3600000);
+    appendMessage(`You already claimed your daily reward. Come back in ${hoursLeft} hours.`, true, true);
+  } else {
+    const reward = Math.floor(Math.random() * 500) + 100;
+    coinBalance += reward;
+    localStorage.setItem("stellar_lastDaily", now);
+    updateBalance();
+    saveState();
+    appendMessage(`Daily reward claimed! You received ${reward} coins.`, true, false, true);
+ }
+  }
+  else if (cmdLower === "/quote") {
+    appendMessage(getRandomQuote(), true, false, rainbowActive);
+  }
+  else if (cmdLower === "/time") {
+    appendMessage(`Current date & time: ${getCurrentTimeDate()}`, true, false, rainbowActive);
+  }
+  else if (cmdLower.startsWith("/calc ")) {
+    const expr = cmd.substring(6).trim();
+    const val = safeEval(expr, {x: 1, y: 1, z: 1});
+    if (val === null) appendMessage("Invalid expression.", true, true, rainbowActive);
+    else appendMessage(`Calc result: ${val}`, true, false, rainbowActive);
+  }
+  else if (cmdLower === "/fact") {
+    appendMessage(getRandomFact(), true, false, rainbowActive);
+  }
+  else if (cmdLower.startsWith("/define ")) {
+    const word = cmd.substring(8).trim();
+    appendMessage(`Looking up definition for "${word}"...`, true, false, rainbowActive);
+    const def = await defineWord(word);
+    if (def) appendMessage(def, true, false, rainbowActive);
+    else appendMessage(`No definition found for "${word}".`, true, true, rainbowActive);
+  }
+  else if (cmdLower.startsWith("/translate ")) {
+    const parts = cmd.split(" ");
+    if (parts.length < 3) {
+      appendMessage("Usage: /translate [lang_code] [text]", true, true, rainbowActive);
+      return;
+    }
+    const lang = parts[1].toLowerCase();
+    const text = cmd.substring(cmd.indexOf(lang) + lang.length).trim();
+    const translated = await translateText(lang, text);
+    if (translated) appendMessage(`Translation: ${translated}`, true, false, rainbowActive);
+    else appendMessage("Translation failed.", true, true, rainbowActive);
+  }
+  else if (cmdLower.startsWith("/8ball ")) {
+    appendMessage(get8BallAnswer(), true, false, rainbowActive);
+  }
+  else if (cmdLower === "/clear") {
+  chatOutput.innerHTML = "";
+  appendMessage("Terminal cleared. Type /help for commands.", true);
+}
+  else if (cmdLower === "/fortune") {
+    appendMessage(getRandomFortune(), true, false, rainbowActive);
+  }
+  else if (cmdLower.startsWith("/repeat ")) {
+    appendMessage(cmd.substring(8).trim(), true, false, rainbowActive);
+  }
+  else if (cmdLower.startsWith("/convert ")) {
+    const parts = cmd.split(/\s+/);
+    if (parts.length !== 4) {
+      appendMessage("Usage: /convert [num] [unit1] [unit2]", true, true, rainbowActive);
+      return;
+    }
+    const result = convertUnits(parseFloat(parts[1]), parts[2], parts[3]);
+    if (result === null) appendMessage("Unsupported units.", true, true, rainbowActive);
+    else appendMessage(`${parts[1]} ${parts[2]} = ${result.toFixed(4)} ${parts[3]}`, true, false, rainbowActive);
+  }
+  else if (cmdLower.startsWith("/say ")) {
+    const text = cmd.substring(5).trim();
+    if ('speechSynthesis' in window) {
+      const utter = new SpeechSynthesisUtterance(text);
+      window.speechSynthesis.speak(utter);
+      appendMessage(`[Speech] ${text}`, true, false, rainbowActive);
+    } else {
+      appendMessage("WebSpeech API not supported in this browser.", true, true, rainbowActive);
+    }
+  }
+  else if (cmdLower.startsWith("/cowsay ")) {
+    const msg = cmd.substring(8).trim();
+    const cow = `< ${msg} >\n -------\n        \\   ^__^\n         \\  (oo)\\_______\n            (__)\\       )\\/\\\n                ||----w |\n                ||     ||`;
+    appendAscii(cow);
+  }
+  else if (cmdLower.startsWith("/banner ")) {
+    const msg = cmd.substring(8).trim().toUpperCase();
+    appendAscii(generateBanner(msg));
+  }
+  else if (cmdLower === "/rainbowtxt") {
+    rainbowActive = !rainbowActive;
+    
+    // LIVE UPDATE: Find all existing messages and toggle the class
+    const allExistingMessages = chatOutput.querySelectorAll(".chat-message");
+    allExistingMessages.forEach(msg => {
+      if (rainbowActive) msg.classList.add("rainbow-text");
+      else msg.classList.remove("rainbow-text");
+    });
+
+    appendMessage(`Rainbow text ${rainbowActive ? "enabled" : "disabled"}`, true, false, rainbowActive);
+  }
+  else if (cmdLower === "/about") {
+    appendMessage("Version: Ivory V2.2.5", true, false, rainbowActive);
+    appendMessage('Terminal ID: s3taJdiMoJOAIW618dev', true, false, rainbowActive);
+    appendMessage("©2026 Chez Mustard and Lungus_Dev. All Rights Reserved.", true, false, rainbowActive);
+  }
+  else {
+    appendMessage("Unknown command. Type /help for list of commands.", true, true, rainbowActive);
+  }
+}
+
+  // Optional: close chat on ESC key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && chatModal.style.display === "flex") {
+      chatModal.style.display = "none";
+      weatherSearchActive = false;
+      hangmanActive = false;
+      chatInput.value = "";
+      weatherError.style.display = "none";
+      if (pongActive) stopPong();
+      if (hangmanActive) endHangman();
+    }
+  });
+
+  (function generateFallingSnowflakes(){
+    const snowflakeChars = ['❄', '✻', '❅', '❆'];
+
+    function createSnowflake() {
+      const snowflake = document.createElement('div');
+      snowflake.classList.add('snowflake');
+      snowflake.textContent = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];
+      snowflake.style.left = Math.random() * 100 + 'vw';
+      snowflake.style.fontSize = (10 + Math.random() * 20) + 'px';
+
+      const fallDuration = 8 + Math.random() * 4; 
+      const swayDuration = 3 + Math.random() * 3;
+
+      snowflake.style.animationDuration = `${fallDuration}s, ${swayDuration}s`;
+      snowflake.style.animationDelay = '0s, 0s';
+
+      snowflake.addEventListener('animationend', () => {
+        snowflake.remove();
+      });
+
+      document.body.appendChild(snowflake);
+    }
+
+    setInterval(createSnowflake, 1950);
+  })();
+  
+  function appendAscii(text) {
+  const pre = document.createElement("pre");
+  pre.className = "ascii-pre";
+  pre.textContent = text;
+  chatOutput.appendChild(pre);
+  chatOutput.scrollTop = chatOutput.scrollHeight;
+}
+
+// Simple Block Font Generator
+function generateBanner(text) {
+  const font = {
+    'A': [" AAA ","A   A","AAAAA","A   A","A   A"],
+    'B': ["BBBB ","B   B","BBBB ","B   B","BBBB "],
+    'C': [" CCCC","C    ","C    ","C    "," CCCC"],
+    'D': ["DDDD ","D   D","D   D","D   D","DDDD "],
+    'E': ["EEEEE","E    ","EEEE ","E    ","EEEEE"],
+    'F': ["EEEEE","F    ","FFF  ","F    ","F    "],
+    'G': [" GGGG","G    ","G  GG","G   G"," GGGG"],
+    'H': ["H   H","H   H","HHHHH","H   H","H   H"],
+    'I': [" III ","  I  ","  I  ","  I  "," III "],
+    'J': ["  JJJ","   J ","   J ","J  J "," JJ  "],
+    'K': ["K  K ","K K  ","KK   ","K K  ","K  K "],
+    'L': ["L    ","L    ","L    ","L    ","LLLLL"],
+    'M': ["M   M","MM MM","M M M","M   M","M   M"],
+    'N': ["N   N","NN  N","N N N","N  NN","N   N"],
+    'O': [" OOO ","O   O","O   O","O   O"," OOO "],
+    'P': ["PPPP ","P   P","PPPP ","P    ","P    "],
+    'Q': [" QOO ","O   O","O   O","O  OO"," QOOQ"],
+    'R': ["RRRR ","R   R","RRRR ","R  R ","R   R"],
+    'S': [" SSSS","S    "," SSS ","    S","SSSS "],
+    'T': ["TTTTT","  T  ","  T  ","  T  ","  T  "],
+    'U': ["U   U","U   U","U   U","U   U"," UUU "],
+    'V': ["V   V","V   V","V   V"," V V ","  V  "],
+    'W': ["W   W","W   W","W W W","WW WW","W   W"],
+    'X': ["X   X"," X X ","  X  "," X X ","X   X"],
+    'Y': ["Y   Y"," Y Y ","  Y  ","  Y  ","  Y  "],
+    'Z': ["ZZZZZ","   Z ","  Z  "," Z   ","ZZZZZ"],
+    '0': [" 000 ","0  00","0 0 0","00  0"," 000 "],
+    '1': ["  1  "," 11  ","  1  ","  1  "," 111 "],
+    '2': [" 222 ","2   2","   2 ","  2  ","22222"],
+    '3': ["3333 ","    3"," 333 ","    3","3333 "],
+    '4': ["4  4 ","4  4 ","44444","   4 ","   4 "],
+    '5': ["55555","5    ","5555 ","    5","5555 "],
+    '6': [" 666 ","6    ","6666 ","6   6"," 666 "],
+    '7': ["77777","    7","   7 ","  7  "," 7   "],
+    '8': [" 888 ","8   8"," 888 ","8   8"," 888 "],
+    '9': [" 999 ","9   9"," 9999","    9"," 999 "],
+    ' ': ["     ","     ","     ","     ","     "],
+    '!': ["  I  ","  I  ","  I  ","     ","  I  "],
+    '?': [" ??? ","?   ?","  ?? ","     ","  ?  "],
+    '.': ["     ","     ","     ","     ","  .  "],
+    ',': ["     ","     ","     ","  ,  "," ,   "],
+    '-': ["     ","     "," --- ","     ","     "],
+    '+': ["     ","  +  "," +++ ","  +  ","     "],
+    '=': ["     "," === ","     "," === ","     "],
+    '*': ["     "," * * ","  *  "," * * ","     "],
+    '#': [" # # ","#####"," # # ","#####"," # # "],
+    '/': ["    /","   / ","  /  "," /   ","/    "]
+  };
+
+  let lines = ["", "", "", "", ""];
+  for (let char of text) {
+    const glyph = font[char] || ["     ", "     ", " [?] ", "     ", "     "];
+    for (let i = 0; i < 5; i++) {
+      lines[i] += glyph[i] + "  ";
+    }
+  }
+  return lines.join("\n");
+}
+
+  // Helpers
+  const updateBalance = () => {
+    const balEl = document.getElementById("coinBalance");
+    balEl.textContent = `Coins: ${coinBalance}`;
+    balEl.style.color = coinBalance <= 0 ? "#c0392b" : "#f39c12";
+  };
+
+  const loadState = () => {
+    try {
+      const savedBal = localStorage.getItem("stellar_coinBalance");
+      if (savedBal !== null) {
+        coinBalance = parseInt(savedBal);
+      }
+      const savedThemes = JSON.parse(localStorage.getItem("stellar_purchasedThemes") || "[]");
+      savedThemes.forEach((t) => purchasedThemes.add(t));
+      const savedFonts = JSON.parse(localStorage.getItem("stellar_purchasedFonts") || "[]");
+      savedFonts.forEach((f) => purchasedFonts.add(f));
+      const savedGames = JSON.parse(localStorage.getItem("stellar_purchasedGames") || "[]");
+      savedGames.forEach((g) => purchasedGames.add(g));
+      const savedFavorites = JSON.parse(localStorage.getItem("stellar_favorites") || "[]");
+      savedFavorites.forEach((fav) => favorites.add(fav));
+      currentTheme = localStorage.getItem("stellar_currentTheme") || "";
+      currentFont = localStorage.getItem("stellar_currentFont") || "";
+    } catch {}
+  };
+
+  const saveState = () => {
+    localStorage.setItem("stellar_coinBalance", coinBalance);
+    localStorage.setItem(
+      "stellar_purchasedThemes",
+      JSON.stringify([...purchasedThemes])
+    );
+    localStorage.setItem(
+      "stellar_purchasedFonts",
+      JSON.stringify([...purchasedFonts])
+    );
+    localStorage.setItem(
+      "stellar_purchasedGames",
+      JSON.stringify([...purchasedGames])
+    );
+    localStorage.setItem("stellar_favorites", JSON.stringify([...favorites]));
+    localStorage.setItem("stellar_currentTheme", currentTheme);
+    localStorage.setItem("stellar_currentFont", currentFont);
+  };
+
+  const applyTheme = () => {
+    document.body.className = "";
+    if (currentTheme) {
+      document.body.classList.add(`theme-${currentTheme}`);
+    }
+    if (currentFont) {
+      document.body.classList.add(`font-${currentFont}`);
+    }
+  };
+
+   // ----- INVEST -----
+    const investMenu = document.getElementById("investMenu");
+  const renderInvestMenu = () => {
+    investMenu.innerHTML = "";
+    companies.forEach((c, idx) => {
+      const div = document.createElement("div");
+      div.tabIndex = 0;
+      div.role = "menuitem";
+      div.className = "invest-company";
+      div.dataset.idx = idx;
+      div.style.userSelect = "none";
+      div.textContent = `${c.name} — ${c.desc}`;
+      investMenu.appendChild(div);
+    });
+  };
+  const investAmountPrompt = (companyName) => {
+    let amount = window.prompt(
+      `Enter amount of coins to invest in ${companyName} (you have ${coinBalance} coins):`,
+      "0"
+    );
+    if (amount === null) return null;
+    amount = parseInt(amount.trim());
+    if (isNaN(amount) || amount <= 0) {
+      alert("Please enter a valid positive number.");
+      return null;
+    }
+    if (amount > coinBalance) {
+      alert("You do not have enough coins.");
+      return null;
+    }
+    return amount;
+  };
+
+  // ----- THEMES & FONTS -----
+  const themeShopBtn = document.getElementById("themeShopBtn");
+  const fontShopBtn = document.getElementById("fontShopBtn");
+  const creditsBtn = document.getElementById("creditsBtn");
+  const infoBtn = document.getElementById("infoBtn");
+
+  const themeOptions = document.getElementById("themeOptions");
+  const fontOptions = document.getElementById("fontOptions");
+  const creditsContent = document.getElementById("creditsContent");
+  const infoContent = document.getElementById("infoContent");
+
+ const hideAllSettingsSubmenus = () => {
+  themeOptions.style.display = "none";
+  fontOptions.style.display = "none";
+  cloakOptions.style.display = "none"; // Hide cloaker
+  creditsContent.style.display = "none";
+  infoContent.style.display = "none";
+};
+
+  themeShopBtn.addEventListener("click", () => {
+    const shown = themeOptions.style.display === "block";
+    hideAllSettingsSubmenus();
+    themeOptions.style.display = shown ? "none" : "block";
+  });
+
+  fontShopBtn.addEventListener("click", () => {
+    const shown = fontOptions.style.display === "block";
+    hideAllSettingsSubmenus();
+    fontOptions.style.display = shown ? "none" : "block";
+  });
+  
+ cloakShopBtn.addEventListener("click", () => {
+  const isShown = cloakOptions.style.display === "flex"; // Note: using flex for the layout
+  hideAllSettingsSubmenus();
+  cloakOptions.style.display = isShown ? "none" : "flex";
+});
+
+  creditsBtn.addEventListener("click", () => {
+    const shown = creditsContent.style.display === "block";
+    hideAllSettingsSubmenus();
+    creditsContent.style.display = shown ? "none" : "block";
+  });
+
+  infoBtn.addEventListener("click", () => {
+    const shown = infoContent.style.display === "block";
+    hideAllSettingsSubmenus();
+    infoContent.style.display = shown ? "none" : "block";
+  });
+
+  // Selling functions
+  function sellTheme(themeId) {
+    const sellValue = 100; // half cost 200/2
+    if (!purchasedThemes.has(themeId)) return;
+    if (!confirm(`Sell theme "${themeId}" for ${sellValue} coins?`)) return;
+    purchasedThemes.delete(themeId);
+    if (currentTheme === themeId) currentTheme = "";
+    coinBalance += sellValue;
+    applyTheme();
+    updateBalance();
+    updateBuyButtons();
+    saveState();
+    alert(`Sold theme "${themeId}" for ${sellValue} coins.`);
+  }
+
+  function sellFont(fontId) {
+    const btn = document.querySelector(`.buy-font-btn[data-font="${fontId}"]`);
+    const cost = btn ? parseInt(btn.dataset.cost) : 0;
+    const sellValue = Math.floor(cost / 2);
+    if (!purchasedFonts.has(fontId)) return;
+    if (!confirm(`Sell font "${fontId}" for ${sellValue} coins?`)) return;
+    purchasedFonts.delete(fontId);
+    if (currentFont === fontId) currentFont = "";
+    coinBalance += sellValue;
+    applyTheme();
+    updateBalance();
+    updateBuyButtons();
+    saveState();
+    alert(`Sold font "${fontId}" for ${sellValue} coins.`);
+  }
+
+  function sellGame(gameId) {
+    const game = gamesData.find((g) => g.id === gameId);
+    if (!game) return;
+    const sellValue = Math.floor(game.cost / 2);
+    if (!purchasedGames.has(gameId)) return;
+    if (!confirm(`Sell game "${game.title}" for ${sellValue} coins?`)) return;
+    purchasedGames.delete(gameId);
+    coinBalance += sellValue;
+    updateBalance();
+    updateBuyButtons();
+    saveState();
+    alert(`Sold game "${game.title}" for ${sellValue} coins.`);
+  }
+
+  // Buying Themes
+  const buyThemeButtons = document.querySelectorAll(".buy-theme-btn");
+  buyThemeButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const theme = btn.dataset.theme;
+      const cost = parseInt(btn.dataset.cost);
+      if (purchasedThemes.has(theme)) {
+        // Select this theme
+        currentTheme = theme;
+        applyTheme();
+        saveState();
+        alert(`Theme "${theme}" applied.`);
+      } else {
+        if (coinBalance < cost) {
+          alert("Not enough coins to buy this theme.");
+          return;
+        }
+        if (confirm(`Buy theme "${theme}" for ${cost} coins?`)) {
+          coinBalance -= cost;
+          purchasedThemes.add(theme);
+          currentTheme = theme;
+          applyTheme();
+          updateBalance();
+          saveState();
+          updateBuyButtons();
+          alert(`Theme "${theme}" bought and applied!`);
+        }
+      }
+    });
+  });
+
+  // Buying Fonts
+  const buyFontButtons = document.querySelectorAll(".buy-font-btn");
+  buyFontButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const font = btn.dataset.font;
+      const cost = parseInt(btn.dataset.cost);
+      if (purchasedFonts.has(font)) {
+        // Select this font
+        currentFont = font;
+        applyTheme();
+        saveState();
+        alert(`Font "${font}" applied.`);
+      } else {
+        if (coinBalance < cost) {
+          alert("Not enough coins to buy this font.");
+          return;
+        }
+        if (confirm(`Buy font "${font}" for ${cost} coins?`)) {
+          coinBalance -= cost;
+          purchasedFonts.add(font);
+          currentFont = font;
+          applyTheme();
+          updateBalance();
+          saveState();
+          updateBuyButtons();
+          alert(`Font "${font}" bought and applied!`);
+        }
+      }
+    });
+  });
+  
+  function applyTabDisguise(title, icon) {
+  if (title) document.title = title;
+  
+  let link = document.querySelector("link[rel*='icon']");
+  if (!link) {
+    link = document.createElement('link');
+    link.rel = 'shortcut icon';
+    document.head.appendChild(link);
+  }
+  if (icon) link.href = icon;
+}
+
+// Apply Logic
+applyCloakBtn.addEventListener("click", () => {
+  const title = cloakTitleInput.value.trim();
+  const icon = cloakIconInput.value.trim();
+  
+  applyTabDisguise(title, icon);
+  
+  // Save to localStorage so it stays cloaked on refresh
+  localStorage.setItem("stellar_cloakTitle", title);
+  localStorage.setItem("stellar_cloakIcon", icon);
+  alert("Tab Cloak Applied!");
+});
+
+// Reset Logic
+resetCloakBtn.addEventListener("click", () => {
+  localStorage.removeItem("stellar_cloakTitle");
+  localStorage.removeItem("stellar_cloakIcon");
+  location.reload(); // Refresh to restore original title and icon
+});
+  
+  const messages = [
+  "Welcome to Stellar: Launch Your Universe!",
+  "🪐🚀",
+  "We love Cameron!",
+  "Customize your experience with themes & fonts!",
+  "Build your favorites list and keep them handy!",
+  "I ♥️ CoolDude2349 😘",
+  "Your entertainment journey starts now!",
+  "Could be adding User Chat soon in like V5.0",
+  "I'm not a nerd or anything",
+  "Did you know that the comment bubbles on the top right of your screen is actually a button for a terminal? Isn't that cool!",
+  "Ts is so tuff",
+  "Chezzz should be in the dictionary",
+  "A lot of games have sadly been patched :<",
+  "M0th3rCrystal is Elite ball knowledge",
+  "Stellar ❌    Interstellar 👍",
+  "༼ つ ◕‿◕ ༽つ"
+];
+
+const msgEl = document.getElementById("cyclingMessages");
+let lastMsgIndex = -1;
+
+function cycleMessagesRandom() {
+  let newIndex;
+  do {
+    newIndex = Math.floor(Math.random() * messages.length);
+  } while (newIndex === lastMsgIndex && messages.length > 1);
+  msgEl.textContent = messages[newIndex];
+  lastMsgIndex = newIndex;
+}
+
+cycleMessagesRandom();
+setInterval(cycleMessagesRandom, 4000);  // Change message every 4 seconds
+  // Update buy buttons style for themes/fonts/games with Play+Sell for games
+  function updateBuyButtons() {
+    buyThemeButtons.forEach((btn) => {
+      const t = btn.dataset.theme;
+      if (purchasedThemes.has(t)) {
+        btn.textContent = (currentTheme === t ? "★ " : "") + capitalize(t) + " (Owned)";
+        btn.disabled = false;
+        btn.classList.remove("buy-disabled");
+
+        // Add sell button if not exists
+        if (!btn.nextElementSibling || !btn.nextElementSibling.classList.contains("sell-btn")) {
+          const sellBtn = document.createElement("button");
+          sellBtn.textContent = "Sell";
+          sellBtn.className = "sell-btn";
+          sellBtn.type = "button";
+          sellBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            sellTheme(t);
+          });
+          btn.parentNode.insertBefore(sellBtn, btn.nextSibling);
+        }
+      } else {
+        btn.textContent = capitalize(t) + ` (${btn.dataset.cost})`;
+        btn.disabled = false;
+        btn.classList.remove("buy-disabled");
+        if (btn.nextElementSibling && btn.nextElementSibling.classList.contains("sell-btn")) {
+          btn.nextElementSibling.remove();
+        }
+      }
+    });
+    
+    buyFontButtons.forEach((btn) => {
+      const f = btn.dataset.font;
+      if (purchasedFonts.has(f)) {
+        btn.textContent = (currentFont === f ? "★ " : "") + fontLabel(f) + " (Owned)";
+        btn.disabled = false;
+        btn.classList.remove("buy-disabled");
+
+        if (!btn.nextElementSibling || !btn.nextElementSibling.classList.contains("sell-btn")) {
+          const sellBtn = document.createElement("button");
+          sellBtn.textContent = "Sell";
+          sellBtn.className = "sell-btn";
+          sellBtn.type = "button";
+          sellBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            sellFont(f);
+          });
+          btn.parentNode.insertBefore(sellBtn, btn.nextSibling);
+        }
+      } else {
+        btn.textContent = fontLabel(f) + ` (${btn.dataset.cost})`;
+        btn.disabled = false;
+        btn.classList.remove("buy-disabled");
+        if (btn.nextElementSibling && btn.nextElementSibling.classList.contains("sell-btn")) {
+          btn.nextElementSibling.remove();
+        }
+      }
+    });
+
+    // Games: replace single button with Play and Sell if owned, else Buy only
+    gamesData.forEach((game) => {
+      const card = document.querySelector(`.game-card[data-id="${game.id}"]`);
+      if (!card) return;
+      // Remove all existing buttons inside .game-bottom
+      const bottom = card.querySelector(".game-bottom");
+      bottom.innerHTML = "";
+      // Cost span
+      const costSpan = document.createElement("span");
+      costSpan.className = "cost";
+      costSpan.textContent = `${game.cost} coins`;
+      bottom.appendChild(costSpan);
+
+      if (purchasedGames.has(game.id)) {
+        // Play button
+        const playBtn = document.createElement("button");
+        playBtn.type = "button";
+        playBtn.className = "buy-btn";
+        playBtn.textContent = "Play";
+        playBtn.tabIndex = 0;
+        playBtn.style.marginRight = "8px";
+        playBtn.addEventListener("click", () => {
+          openGameWithCors(game);
+        });
+        bottom.appendChild(playBtn);
+
+        // Sell button
+        const sellBtn = document.createElement("button");
+        sellBtn.type = "button";
+        sellBtn.className = "sell-btn-game";
+        sellBtn.textContent = "Sell";
+        sellBtn.tabIndex = 0;
+        sellBtn.addEventListener("click", () => {
+          sellGame(game.id);
+        });
+        bottom.appendChild(sellBtn);
+      } else {
+        // Buy button
+        const buyBtn = document.createElement("button");
+        buyBtn.type = "button";
+        buyBtn.className = "buy-btn";
+        buyBtn.textContent = `Buy (${game.cost})`;
+        buyBtn.tabIndex = 0;
+        buyBtn.disabled = coinBalance < game.cost;
+        buyBtn.classList.toggle("buy-disabled", coinBalance < game.cost);
+        buyBtn.addEventListener("click", () => {
+          if (coinBalance < game.cost) {
+            alert("Not enough coins to buy this game.");
+            return;
+          }
+          if (confirm(`Buy "${game.title}" for ${game.cost} coins?`)) {
+            coinBalance -= game.cost;
+            purchasedGames.add(game.id);
+            updateBalance();
+            updateBuyButtons();
+            saveState();
+            alert(`You bought "${game.title}"! You can now play it or sell it.`);
+          }
+        });
+        bottom.appendChild(buyBtn);
+      }
+    });
+  }
+
+  // Capitalize helper
+  function capitalize(str) {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  // Font label helper (map internal font id to human-readable)
+  function fontLabel(id) {
+    const map = {
+      bungee: "Bungee",
+      fredoka: "Fredoka One",
+      blackops: "Black Ops One",
+      nosifer: "Nosifer",
+      audiowide: "Audiowide",
+    };
+    return map[id] || id;
+  }
+
+  // ----- GAMES -----
+  const gamesGrid = document.getElementById("gamesGrid");
+
+  // Create game cards with CORS warning and launch logic
+  function createGameCard(game) {
+    const card = document.createElement("article");
+    card.className = "game-card";
+    card.dataset.id = game.id;
+    card.setAttribute("tabindex", "0");
+    card.setAttribute(
+      "aria-label",
+      `${game.title}, category: ${game.category}. Cost ${game.cost} coins.`
+    );
+
+    // Favorites star
+    const star = document.createElement("span");
+    star.className = "star-fav";
+    star.role = "button";
+    star.setAttribute("aria-label", "Toggle favorite");
+    star.tabIndex = 0;
+    star.innerHTML = favorites.has(game.id) ? "★" : "☆";
+    if (favorites.has(game.id)) star.classList.add("favorited");
+    star.addEventListener("click", () => toggleFavorite(game.id, star));
+    star.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggleFavorite(game.id, star);
+      }
+    });
+    card.appendChild(star);
+
+    // Image
+    const img = document.createElement("img");
+    img.src = game.image;
+    img.alt = `${game.title} thumbnail`;
+    img.draggable = false;
+    card.appendChild(img);
+
+    // Title
+    const title = document.createElement("h2");
+    title.className = "game-title";
+    title.textContent = game.title;
+    card.appendChild(title);
+
+    // Category
+    const cat = document.createElement("div");
+    cat.className = "game-category";
+    cat.textContent = `Category: ${game.category}`;
+    card.appendChild(cat);
+
+    // Description
+    const desc = document.createElement("p");
+    desc.className = "game-description";
+    desc.textContent = game.description;
+    card.appendChild(desc);
+
+  // Bottom container (empty for now, will be filled in updateBuyButtons)
+    const bottom = document.createElement("div");
+    bottom.className = "game-bottom";
+    card.appendChild(bottom);
+
+    // Play game on double click or Enter/Space key if owned
+    card.addEventListener("dblclick", () => {
+      if (purchasedGames.has(game.id)) {
+        openGameWithCors(game);
+      }
+    });
+    card.addEventListener("keydown", (e) => {
+      if ((e.key === "Enter" || e.key === " ") && purchasedGames.has(game.id)) {
+        e.preventDefault();
+        openGameWithCors(game);
+      }
+    });
+
+    return card;
+  }
+
+  // Toggle favorite star
+  function toggleFavorite(gameId, starEl) {
+    if (favorites.has(gameId)) {
+      favorites.delete(gameId);
+      starEl.classList.remove("favorited");
+      starEl.textContent = "☆";
+    } else {
+      favorites.add(gameId);
+      starEl.classList.add("favorited");
+      starEl.textContent = "★";
+    }
+    saveState();
+  }
+
+  // Render all games with search & favorite sort
+  function renderGames() {
+    gamesGrid.innerHTML = "";
+    const search = document.getElementById("searchInput").value.toLowerCase().trim();
+
+    const sortedGames = [...gamesData]
+      .filter((g) => {
+        const haystack = (g.title + " " + g.category + " " + g.description).toLowerCase();
+        return haystack.includes(search);
+      })
+      .sort((a, b) => {
+        const aFav = favorites.has(a.id);
+        const bFav = favorites.has(b.id);
+        if (aFav && !bFav) return -1;
+        if (!aFav && bFav) return 1;
+        return 0;
+      });
+
+    sortedGames.forEach((game) => {
+      const card = createGameCard(game);
+      gamesGrid.appendChild(card);
+    });
+
+    updateBuyButtons();
+  }
+
+  // Open game respecting CORS proxy if needed in new about:blank tab with iframe
+  function launchGame(gameUrl, title) {
+  const proxyGameUrl = PROXY_URL + gameUrl;
+
+  const xhr = new XMLHttpRequest();
+  xhr.open("GET", proxyGameUrl, true);
+
+  xhr.onload = function () {
+    if (xhr.status >= 200 && xhr.status < 300) {
+      const win = window.open("", "_blank");
+
+      if (win) {
+        win.document.open();
+        win.document.write(xhr.responseText);
+        win.document.close();
+
+        win.document.title = title || "Game";
+        win.document.body.style.margin = "0";
+        win.document.body.style.overflow = "auto";
+      } else {
+        alert("Please allow pop-ups for this site to launch the game.");
+      }
+    } else {
+      console.error("Failed to load game:", xhr.statusText);
+      alert("Could not load the game. Make sure cors-anywhere is unlocked.");
+    }
+  };
+
+  xhr.onerror = function () {
+    console.error("Network error occurred.");
+    alert("Network error while loading game.");
+  };
+
+  xhr.send();
+}
+
+ function openGameWithCors(game) {
+  launchGame(game.url, game.title);
+}
+
+  // Invest menu click
+  investMenu.addEventListener("click", (e) => {
+    if (e.target && e.target.matches(".invest-company")) {
+      const idx = parseInt(e.target.dataset.idx);
+      if (isNaN(idx) || idx < 0 || idx >= companies.length) return;
+      const company = companies[idx];
+      let amount = investAmountPrompt(company.name);
+      if (amount === null) return;
+
+      const gainOrLose = Math.random() < 0.5 ? "gain" : "loss";
+      let multiplier = 1;
+      if (gainOrLose === "gain") {
+        multiplier = Math.random() * 49 + 1; // 1x to 50x
+      } else {
+        multiplier = Math.random() * 0.002; // 0 to 0.002 (loss)
+      }
+
+      let outcomeCoins;
+      let resultText;
+      if (gainOrLose === "gain") {
+        outcomeCoins = Math.floor(amount * multiplier);
+        coinBalance += outcomeCoins;
+        resultText = `Congrats! Your investment in ${company.name} yielded ${outcomeCoins} coins (${multiplier.toFixed(
+          2
+        )}x).`;
+      } else {
+        outcomeCoins = Math.floor(amount * multiplier);
+        const lost = amount - outcomeCoins;
+        coinBalance -= lost;
+        if (coinBalance < 0) coinBalance = 0;
+        resultText = `Oh no! Your investment in ${company.name} lost ${lost} coins (${(
+          100 -
+          multiplier * 100
+        ).toFixed(2)}% loss).`;
+      }
+
+      updateBalance();
+      saveState();
+      alert(resultText);
+      updateBuyButtons();
+    }
+  });
+
+  // Search filter input
+  document.getElementById("searchInput").addEventListener("input", renderGames);
+
+  // Initial setup
+  loadState();
+  applyTheme();
+  updateBalance();
+  renderInvestMenu();
+  renderGames();
+  updateBuyButtons();
+  
+  // Close modal with ESC key (unused modal still present)
+  const gameModal = document.getElementById("gameModal");
+  const gameFrame = document.getElementById("gameFrame");
+  const closeGameBtn = gameModal.querySelector("button.close-game");
+  function closeGame() {
+    gameModal.style.display = "none";
+    gameFrame.src = "";
+  }
+  closeGameBtn.addEventListener("click", closeGame);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && gameModal.style.display === "flex") {
+      closeGame();
+    }
+  });
+
+  // Accessibility: close dropdowns on click outside
+  document.body.addEventListener("click", (e) => {
+    if (!e.target.closest(".menu-item")) {
+      // Hide all drop downs
+      document.getElementById("themeOptions").style.display = "none";
+      document.getElementById("fontOptions").style.display = "none";
+      document.getElementById("creditsContent").style.display = "none";
+      document.getElementById("infoContent").style.display = "none";
+    }
+  });
+
+  // Accessibility: open invest dropdown on focus
+  const investMenuBtn = document.getElementById("investMenuBtn");
+  investMenuBtn.addEventListener("focus", () => {
+    investMenu.style.display = "block";
+    investMenuBtn.setAttribute("aria-expanded", "true");
+  });
+  investMenuBtn.addEventListener("blur", () => {
+    setTimeout(() => {
+      if (!investMenu.contains(document.activeElement)) {
+        investMenu.style.display = "none";
+        investMenuBtn.setAttribute("aria-expanded", "false");
+      }
+    }, 100);
+  });
+
+  // Capitalize first letter of theme label on buy buttons on load
+  buyThemeButtons.forEach((btn) => {
+    if (!purchasedThemes.has(btn.dataset.theme)) {
+      btn.textContent = capitalize(btn.dataset.theme) + ` (${btn.dataset.cost})`;
+    }
+  });
+
+  // Font label fix for buttons on load
+  buyFontButtons.forEach((btn) => {
+    if (!purchasedFonts.has(btn.dataset.font)) {
+      btn.textContent = fontLabel(btn.dataset.font) + ` (${btn.dataset.cost})`;
+    }
+  });
+
+
+const UPDATE_LAST_SEEN_VERSION_KEY = 'stellar_lastSeenUpdateVersion';
+const VERSION = "2.2.5";
+
+function showUpdatePopup() {
+  const lastSeenVersion = localStorage.getItem(UPDATE_LAST_SEEN_VERSION_KEY);
+  const topMenu = document.querySelector(".top-menu");
+  const bgColor = getComputedStyle(topMenu).backgroundColor;
+
+  // Create overlay and popup (same as before)
+  const overlay = document.createElement("div");
+  overlay.style.position = "fixed";
+  overlay.style.top = "0";
+  overlay.style.left = "0";
+  overlay.style.width = "100vw";
+  overlay.style.height = "100vh";
+  overlay.style.backgroundColor = "rgba(0,0,0,0.6)";
+  overlay.style.zIndex = "9998";
+  overlay.style.display = "flex";
+  overlay.style.alignItems = "center";
+  overlay.style.justifyContent = "center";
+
+  const popup = document.createElement("div");
+  popup.style.backgroundColor = bgColor;
+  popup.style.color = "#fff";
+  popup.style.borderRadius = "12px";
+  popup.style.padding = "24px 32px 32px";
+  popup.style.maxWidth = "600px";
+  popup.style.width = "90vw";
+  popup.style.maxHeight = "80vh";
+  popup.style.overflowY = "auto";
+  popup.style.position = "relative";
+  popup.style.boxShadow = "0 8px 24px rgba(0,0,0,0.4)";
+  popup.style.fontWeight = "bold";
+  popup.style.fontSize = "16px";
+  popup.style.lineHeight = "1.5";
+  popup.style.userSelect = "none";
+
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "❌";
+  closeBtn.setAttribute("aria-label", "Close update popup");
+  closeBtn.style.position = "absolute";
+  closeBtn.style.top = "12px";
+  closeBtn.style.right = "12px";
+  closeBtn.style.backgroundColor = "red";
+  closeBtn.style.border = "none";
+  closeBtn.style.color = "white";
+  closeBtn.style.fontSize = "20px";
+  closeBtn.style.cursor = "pointer";
+  closeBtn.style.borderRadius = "6px";
+  closeBtn.style.width = "32px";
+  closeBtn.style.height = "32px";
+  closeBtn.style.lineHeight = "24px";
+  closeBtn.style.textAlign = "center";
+  closeBtn.style.padding = "0";
+  closeBtn.style.userSelect = "none";
+
+  const checkboxContainer = document.createElement("label");
+  checkboxContainer.style.display = "flex";
+  checkboxContainer.style.alignItems = "center";
+  checkboxContainer.style.marginTop = "16px";
+  checkboxContainer.style.cursor = "pointer";
+  checkboxContainer.style.fontWeight = "normal";
+
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.style.marginRight = "8px";
+  checkbox.id = "dontShowUpdate";
+
+  checkboxContainer.appendChild(checkbox);
+  checkboxContainer.appendChild(document.createTextNode("Do not show again"));
+
+  const title = document.createElement("div");
+  title.textContent = `Welcome to Stellar, version ${VERSION}! (Release Date: 5/8/26)`;
+  title.style.marginBottom = "16px";
+  title.style.fontSize = "22px";
+  title.style.fontWeight = "700";
+  popup.appendChild(title);
+
+  const subtitle = document.createElement("div");
+  subtitle.textContent = "This Pretty big update includes:";
+  subtitle.style.marginBottom = "12px";
+  subtitle.style.fontWeight = "600";
+  subtitle.style.fontSize = "18px";
+  popup.appendChild(subtitle);
+
+  const ul = document.createElement("ul");
+  ul.style.margin = "0";
+  ul.style.paddingLeft = "22px";
+  ul.style.fontWeight = "normal";
+
+  const updates = [
+    "AN UPGRADED terminal with more commands and new animations",
+    "Added a Sitewide Favicon (It dosent show up in code editors though)",
+    "Added a Sitewide 'Tab Cloaking' Feature",
+    "Fixed Escape Road 1 & 2 cuz apparently they wouldnt load on some school computers",
+    "Added a few more games/apps",
+    "Come back every day to check for new updates (and obviously to play more games)!",
+  ];
+
+  updates.forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    li.style.marginBottom = "6px";
+    ul.appendChild(li);
+  });
+
+  popup.appendChild(ul);
+  popup.appendChild(checkboxContainer);
+  popup.appendChild(closeBtn);
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+
+  closeBtn.addEventListener("click", () => {
+    if (checkbox.checked) {
+      localStorage.setItem(UPDATE_LAST_SEEN_VERSION_KEY, VERSION);
+    }
+    document.body.removeChild(overlay);
+  });
+}
+
+function showLoader() {
+  const loader = document.createElement("div");
+  loader.id = "chatLoader";
+  loader.className = "loading-container";
+  loader.innerHTML = `
+    Got it. Processing...
+    <div class="bounce-dots">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>`;
+  chatOutput.appendChild(loader);
+  chatOutput.scrollTop = chatOutput.scrollHeight;
+  return loader;
+}
+
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+document.getElementById("citySelect").style.display = "block";
+document.getElementById("fetchWeatherBtn").style.display = "block";
+
+const savedCloakTitle = localStorage.getItem("stellar_cloakTitle");
+const savedCloakIcon = localStorage.getItem("stellar_cloakIcon");
+
+// Load saved cloak settings on startup
+const savedT = localStorage.getItem("stellar_cloakTitle");
+const savedI = localStorage.getItem("stellar_cloakIcon");
+
+if (savedT || savedI) {
+  applyTabDisguise(savedT, savedI);
+  // Fill the inputs so the user sees current settings
+  cloakTitleInput.value = savedT || "";
+  cloakIconInput.value = savedI || "";
+}
+showUpdatePopup(); 
+})();
+  </script>
+  <h1 style="text-align: center;">Other Stuff</h1>
+  <h2 style="text-align: center;">Bug Reporting Form and Requesting Form</h2>
+  <center>
+    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdoF3gU58Yx5fyRBPp2esm7GVLN4JInkDfDsG82q9IGoB8Cyw/viewform?embedded=true" width="640" height="588" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+</center>
+<center>
+    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSd9v65P7WQwDYw7gM0c3qMLAQEPSlwdL6XGJ4LT7hwhZlZTHA/viewform?embedded=true" width="640" height="747" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+</center>
+</body>
+</html>
